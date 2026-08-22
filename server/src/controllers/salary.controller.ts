@@ -4,7 +4,7 @@ import prisma from '../lib/prisma';
 // Get My Salary Payslips
 export const getMySalary = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId || req.user?.id;
     if (!userId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;

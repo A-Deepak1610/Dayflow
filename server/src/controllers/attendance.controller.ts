@@ -4,7 +4,7 @@ import prisma from '../lib/prisma';
 // Clock In (creates a new attendance record for today)
 export const clockIn = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId || req.user?.id;
     if (!userId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
@@ -49,7 +49,7 @@ export const clockIn = async (req: Request, res: Response): Promise<void> => {
 // Clock Out (updates today's record)
 export const clockOut = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId || req.user?.id;
     if (!userId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
@@ -90,7 +90,7 @@ export const clockOut = async (req: Request, res: Response): Promise<void> => {
 // Get My Attendance Logs
 export const getMyAttendance = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId || req.user?.id;
     if (!userId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
