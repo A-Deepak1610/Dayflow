@@ -113,251 +113,72 @@ export const PayrollAnalyticsPage = () => {
   const [loanTenure, setLoanTenure] = useState(6);
   const [loanReason, setLoanReason] = useState('Emergency medical expense');
 
-  // ----------------------------------------------------
   // Primary Employee Compensation State (Full Enterprise Fields)
-  // ----------------------------------------------------
-  const [employees, setEmployees] = useState([
-    {
-      id: 'DAY-HR-2026-0001',
-      name: 'Adam Admin',
-      dept: 'Executive',
-      role: 'Chief HR Officer',
-      avatar: 'AA',
-      empType: 'Full-time Permanent',
-      taxRegime: 'New Regime (Default)',
-      ctcAnnual: 168000,
-      basePay: 10000,
-      hra: 2000,
-      special: 800,
-      conveyance: 300,
-      medical: 200,
-      bonus: 1000,
-      lopDays: 0,
-      lopDeduction: 0,
-      pf: 800,
-      tax: 1200,
-      insurance: 150,
-      loanEmi: 0,
-      netPay: 12150,
-      status: 'Disbursed',
-      bankAccount: '•••• •••• 4092',
-      bankName: 'JPMorgan Chase USA',
-      ifsc: 'CHASUS33',
-      panNo: 'ADMPA1009K',
-      disbursedDate: 'Aug 20, 2026',
-      holdReason: ''
-    },
-    {
-      id: 'DAY-SJ-2026-0012',
-      name: 'Sarah Jenkins',
-      dept: 'Engineering',
-      role: 'Lead Cloud Architect',
-      avatar: 'SJ',
-      empType: 'Full-time Permanent',
-      taxRegime: 'New Regime (Default)',
-      ctcAnnual: 135000,
-      basePay: 8200,
-      hra: 1640,
-      special: 600,
-      conveyance: 250,
-      medical: 150,
-      bonus: 600,
-      lopDays: 0,
-      lopDeduction: 0,
-      pf: 656,
-      tax: 980,
-      insurance: 120,
-      loanEmi: 0,
-      netPay: 9684,
-      status: 'Disbursed',
-      bankAccount: '•••• •••• 8821',
-      bankName: 'Bank of America',
-      ifsc: 'BOFAUS3N',
-      panNo: 'SJENK4412L',
-      disbursedDate: 'Aug 20, 2026',
-      holdReason: ''
-    },
-    {
-      id: 'DAY-AR-2026-0045',
-      name: 'Alex Rivera',
-      dept: 'Product Design',
-      role: 'Staff UI/UX Designer',
-      avatar: 'AR',
-      empType: 'Full-time Permanent',
-      taxRegime: 'Old Regime (Exemptions)',
-      ctcAnnual: 120000,
-      basePay: 7400,
-      hra: 1480,
-      special: 400,
-      conveyance: 200,
-      medical: 150,
-      bonus: 400,
-      lopDays: 0,
-      lopDeduction: 0,
-      pf: 592,
-      tax: 820,
-      insurance: 120,
-      loanEmi: 250, // Active Loan EMI
-      netPay: 8248,
-      status: 'Disbursed',
-      bankAccount: '•••• •••• 3145',
-      bankName: 'Wells Fargo Bank',
-      ifsc: 'WFBIUS6S',
-      panNo: 'ARIVE9011P',
-      disbursedDate: 'Aug 20, 2026',
-      holdReason: ''
-    },
-    {
-      id: 'DAY-DC-2026-0008',
-      name: 'David Chen',
-      dept: 'Human Resources',
-      role: 'Senior Talent Partner',
-      avatar: 'DC',
-      empType: 'Full-time Permanent',
-      taxRegime: 'New Regime (Default)',
-      ctcAnnual: 105000,
-      basePay: 6500,
-      hra: 1300,
-      special: 350,
-      conveyance: 200,
-      medical: 100,
-      bonus: 300,
-      lopDays: 0,
-      lopDeduction: 0,
-      pf: 520,
-      tax: 720,
-      insurance: 100,
-      loanEmi: 0,
-      netPay: 7410,
-      status: 'Disbursed',
-      bankAccount: '•••• •••• 9920',
-      bankName: 'Citibank NA',
-      ifsc: 'CITIUS33',
-      panNo: 'DCHEN3381M',
-      disbursedDate: 'Aug 20, 2026',
-      holdReason: ''
-    },
-    {
-      id: 'DAY-EW-2026-0033',
-      name: 'Emma Watson',
-      dept: 'Operations',
-      role: 'Operations & Logistics Lead',
-      avatar: 'EW',
-      empType: 'Full-time Permanent',
-      taxRegime: 'New Regime (Default)',
-      ctcAnnual: 98000,
-      basePay: 6000,
-      hra: 1200,
-      special: 300,
-      conveyance: 150,
-      medical: 100,
-      bonus: 200,
-      lopDays: 1, // 1 Day LOP unapproved absence
-      lopDeduction: 200,
-      pf: 480,
-      tax: 640,
-      insurance: 100,
-      loanEmi: 0,
-      netPay: 6430,
-      status: 'Pending',
-      bankAccount: '•••• •••• 1104',
-      bankName: 'Silicon Valley Bank',
-      ifsc: 'SVBKUS2S',
-      panNo: 'EWATS7720Q',
-      disbursedDate: '--',
-      holdReason: ''
-    },
-    {
-      id: 'DAY-ER-2026-0012',
-      name: 'Elena Rostova',
-      dept: 'Engineering',
-      role: 'Senior Backend Engineer',
-      avatar: 'ER',
-      empType: 'Full-time Permanent',
-      taxRegime: 'New Regime (Default)',
-      ctcAnnual: 118000,
-      basePay: 7200,
-      hra: 1440,
-      special: 400,
-      conveyance: 200,
-      medical: 120,
-      bonus: 350,
-      lopDays: 0,
-      lopDeduction: 0,
-      pf: 576,
-      tax: 810,
-      insurance: 120,
-      loanEmi: 0,
-      netPay: 8204,
-      status: 'Disbursed',
-      bankAccount: '•••• •••• 6610',
-      bankName: 'Morgan Stanley Wealth',
-      ifsc: 'MSWDUS44',
-      panNo: 'EROST5502R',
-      disbursedDate: 'Aug 20, 2026',
-      holdReason: ''
-    },
-    {
-      id: 'DAY-AM-2026-0051',
-      name: 'Alice Murphy',
-      dept: 'Marketing',
-      role: 'Growth Marketing Manager',
-      avatar: 'AM',
-      empType: 'Full-time Permanent',
-      taxRegime: 'New Regime (Default)',
-      ctcAnnual: 110000,
-      basePay: 6800,
-      hra: 1360,
-      special: 400,
-      conveyance: 200,
-      medical: 100,
-      bonus: 500,
-      lopDays: 0,
-      lopDeduction: 0,
-      pf: 544,
-      tax: 770,
-      insurance: 100,
-      loanEmi: 0,
-      netPay: 7946,
-      status: 'Disbursed',
-      bankAccount: '•••• •••• 5531',
-      bankName: 'Barclays US',
-      ifsc: 'BARCUS22',
-      panNo: 'AMURP2219S',
-      disbursedDate: 'Aug 20, 2026',
-      holdReason: ''
-    },
-    {
-      id: 'DAY-JS-2026-0077',
-      name: 'John Smith',
-      dept: 'Sales',
-      role: 'Enterprise Account Exec',
-      avatar: 'JS',
-      empType: 'Full-time Permanent',
-      taxRegime: 'Old Regime (Exemptions)',
-      ctcAnnual: 125000,
-      basePay: 6200,
-      hra: 1240,
-      special: 300,
-      conveyance: 200,
-      medical: 100,
-      bonus: 1400, // Sales commission
-      lopDays: 2, // 2 Unapproved absences
-      lopDeduction: 413,
-      pf: 496,
-      tax: 820,
-      insurance: 100,
-      loanEmi: 300,
-      netPay: 7311,
-      status: 'On Hold',
-      bankAccount: '•••• •••• 7712',
-      bankName: 'Capital One Bank',
-      ifsc: 'CAPOUS99',
-      panNo: 'JSMIT8841T',
-      disbursedDate: '--',
-      holdReason: 'Awaiting updated tax declaration for overseas commissions'
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadAllPayrollData = async () => {
+    try {
+      const [recRes, strRes] = await Promise.all([
+        fetchAllPayrollRecordsApi({ departmentId: deptFilter, status: statusFilter }),
+        fetchAllSalaryStructuresApi()
+      ]);
+
+      if (recRes.ok && recRes.data?.records) {
+        const mapped = recRes.data.records.map(r => {
+          const u = r.user || {};
+          const gross = Number(r.grossPay);
+          const net = Number(r.netPay);
+          const base = Math.round(gross * 0.5);
+          const hra = Math.round(gross * 0.25);
+          const special = Math.round(gross * 0.15);
+          const pf = Math.round(gross * 0.08);
+          const tax = Math.round(gross * 0.12);
+
+          return {
+            id: u.loginId || r.userId,
+            rawUserId: r.userId,
+            name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Employee',
+            dept: u.department?.name || 'General',
+            role: u.position?.title || 'Team Member',
+            avatar: `${(u.firstName || 'E')[0]}${(u.lastName || 'P')[0]}`,
+            empType: 'Full-time Permanent',
+            taxRegime: 'New Regime (Default)',
+            ctcAnnual: gross * 12,
+            basePay: base,
+            hra: hra,
+            special: special,
+            conveyance: 250,
+            medical: 150,
+            bonus: 500,
+            lopDays: 0,
+            lopDeduction: 0,
+            pf: pf,
+            tax: tax,
+            insurance: 120,
+            loanEmi: 0,
+            netPay: net,
+            status: r.status === 'PAID' ? 'Disbursed' : 'Processed',
+            bankAccount: '•••• •••• 8842',
+            bankName: 'HDFC Bank Ltd',
+            ifsc: 'HDFC0001234',
+            panNo: 'ABCDE1234F',
+            disbursedDate: r.disbursementDate ? new Date(r.disbursementDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Aug 20, 2026',
+            holdReason: ''
+          };
+        });
+        setEmployees(mapped);
+      }
+    } catch (e) {
+      console.error('Failed to load HR payroll analytics:', e);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    loadAllPayrollData();
+  }, [deptFilter, statusFilter]);
 
   // ----------------------------------------------------
   // Reimbursements Claims State
@@ -567,38 +388,27 @@ export const PayrollAnalyticsPage = () => {
   };
 
   // Save Modified Salary Structure
-  const handleSaveSalaryStructure = (e) => {
+  const handleSaveSalaryStructure = async (e) => {
     e.preventDefault();
     if (!selectedEmployee) return;
 
-    setEmployees(prev =>
-      prev.map(emp => {
-        if (emp.id === selectedEmployee.id) {
-          return {
-            ...emp,
-            basePay: Number(formBase),
-            hra: Number(formHra),
-            special: Number(formSpecial),
-            conveyance: Number(formConveyance),
-            medical: Number(formMedical),
-            bonus: Number(formBonus),
-            pf: Number(formPf),
-            tax: Number(formTax),
-            insurance: Number(formInsurance),
-            loanEmi: Number(formLoanEmi),
-            lopDays: Number(formLopDays),
-            lopDeduction: computedLopDeduction,
-            taxRegime: formTaxRegime,
-            ctcAnnual: computedAnnualCtc,
-            netPay: computedNet
-          };
-        }
-        return emp;
-      })
-    );
+    try {
+      if (selectedEmployee.rawUserId) {
+        await createSalaryRevisionApi({
+          targetUserId: selectedEmployee.rawUserId,
+          revisedGross: computedGross,
+          revisedCtc: computedAnnualCtc,
+          changeType: 'HR Compensation Adjustment',
+          remarks: `Tax Regime: ${formTaxRegime}, Base: ${formBase}`
+        });
+      }
 
-    setIsEditModalOpen(false);
-    showToast(`Salary structure & tax regime updated for ${selectedEmployee.name}`);
+      setIsEditModalOpen(false);
+      showToast(`Salary structure & tax regime updated for ${selectedEmployee.name}`);
+      loadAllPayrollData();
+    } catch (err) {
+      showToast('Error updating salary structure', 'error');
+    }
   };
 
   // Open Quick Bonus Modal

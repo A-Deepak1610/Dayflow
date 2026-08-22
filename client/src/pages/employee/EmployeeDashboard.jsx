@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
+  fetchEmployeeDashboardApi,
+  clockInApi,
+  clockOutApi,
+  applyLeaveApi
+} from '../../services/api';
+import {
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -131,10 +137,17 @@ export const EmployeeDashboard = () => {
       setClockedIn(false);
       showToast('Checked out successfully.');
     } else {
-      setClockedIn(true);
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setClockInTime(timeStr);
-      showToast(`Checked in successfully at ${timeStr}.`);
+      const res = await clockInApi({ workMode: 'Office' });
+      if (res.ok) {
+        setClockedIn(true);
+        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setClockInTime(timeStr);
+        setElapsedSeconds(0);
+        showToast(`Checked in successfully at ${timeStr}.`);
+        loadDashboard();
+      } else {
+        showToast(res.data?.message || 'Failed to check in');
+      }
     }
   };
 

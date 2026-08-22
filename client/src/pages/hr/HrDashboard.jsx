@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Users, UserCheck, Calendar, Briefcase, RefreshCcw, Plus
@@ -7,9 +7,29 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
   AreaChart, Area, PieChart, Pie, Cell, Legend, LineChart, Line
 } from 'recharts';
+import { fetchHrDashboardApi } from '../../services/api';
 
 export const HrDashboard = () => {
   const [activeDateFilter, setActiveDateFilter] = useState('This Month');
+  const [hrStats, setHrStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadHrDashboard = async () => {
+    try {
+      const res = await fetchHrDashboardApi();
+      if (res.ok && res.data) {
+        setHrStats(res.data);
+      }
+    } catch (e) {
+      console.error('Failed to load HR dashboard:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadHrDashboard();
+  }, []);
 
   // Chart Data
   const headcountData = [

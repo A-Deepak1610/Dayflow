@@ -1,5 +1,10 @@
-import React, {useState, useMemo} from "react";
-import {Link} from "react-router-dom";
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  fetchColleagueDirectoryApi,
+  fetchMyProfileApi,
+  updateMyProfileApi,
+} from '../../services/api';
 import {
   Search,
   Filter,
@@ -248,8 +253,12 @@ export const EmployeeDirectory = ({initialTab = "directory"}) => {
   // Toast Notification
   const [toastMessage, setToastMessage] = useState(null);
 
+  // Live Database States
+  const [colleaguesList, setColleaguesList] = useState(EMPLOYEES_MASTER);
+  const [loading, setLoading] = useState(true);
+
   // --------------------------------------------------------------------------
-  // LOGGED-IN EMPLOYEE EDITABLE PROFILE STATE (Alex Johnson / Current User)
+  // LOGGED-IN EMPLOYEE EDITABLE PROFILE STATE (Fetched from DB)
   // --------------------------------------------------------------------------
   const [myProfileData, setMyProfileData] = useState({
     name: user?.firstName
@@ -277,29 +286,99 @@ export const EmployeeDirectory = ({initialTab = "directory"}) => {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Save My Profile Changes (Only allowed editable fields: Address, Phone, Emergency Contact)
-  const handleSaveMyProfile = (e) => {
+  const loadDirectoryAndProfile = async () => {
+    try {
+      const [dirRes, profRes] = await Promise.all([
+        fetchColleagueDirectoryApi(),
+        fetchMyProfileApi()
+      ]);
+
+      if (dirRes.ok && dirRes.data?.colleagues && dirRes.data.colleagues.length > 0) {
+        const bgColors = ["bg-indigo-600", "bg-purple-600", "bg-emerald-600", "bg-rose-600", "bg-amber-600", "bg-blue-600", "bg-cyan-600", "bg-teal-600"];
+        const mapped = dirRes.data.colleagues.map((c, i) => ({
+          id: c.loginId || c.id,
+          name: `${c.firstName} ${c.lastName || ""}`.trim(),
+          designation: c.position?.title || "Team Member",
+          department: c.department?.name || "General",
+          email: c.email,
+          location: c.profile?.location || "Corporate Office, Floor 3",
+          manager: c.manager ? `${c.manager.firstName} ${c.manager.lastName}` : "Operations Lead",
+          joiningDate: c.profile?.joiningDate ? new Date(c.profile.joiningDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : "15 Jan 2024",
+          status: i % 4 === 0 ? "In Meeting" : i % 7 === 0 ? "Offline" : "Online",
+          avatarBg: bgColors[i % bgColors.length],
+          skills: c.profile?.skills ? (Array.isArray(c.profile.skills) ? c.profile.skills : JSON.parse(c.profile.skills)) : ["Productivity", "Communication", "Problem Solving"],
+          bio: c.profile?.about || `Professional contributor at Dayflow in the ${c.department?.name || "Corporate"} division.`,
+        }));
+        setColleaguesList(mapped);
+      }
+
+      if (profRes.ok && profRes.data?.user) {
+        const u = profRes.data.user;
+        const pData = {
+          name: `${u.firstName} ${u.lastName || ""}`.trim(),
+          employeeId: u.loginId || "EMP-1024",
+          designation: u.position?.title || "Senior Software Engineer",
+          department: u.department?.name || "Product Engineering",
+          email: u.email,
+          phone: u.phone || "+91 98765 43210",
+          address: u.profile?.address || "Flat 402, Greenfield Residency, Pune",
+          emergencyContact: "Emergency Contact Registered",
+          joiningDate: u.profile?.joiningDate ? new Date(u.profile.joiningDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : "15 Jan 2024",
+          manager: u.manager ? `${u.manager.firstName} ${u.manager.lastName}` : "Sarah Williams",
+          workLocation: u.profile?.location || "Building A, Floor 3",
+          bloodGroup: "O+ Positive",
+          avatarUrl: u.profile?.avatarUrl || null,
+        };
+        setMyProfileData(pData);
+        setEditFormData(pData);
+      }
+    } catch (e) {
+      console.error('Failed to load directory/profile:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDirectoryAndProfile();
+  }, []);
+
+  // Save My Profile Changes to Backend
+  const handleSaveMyProfile = async (e) => {
     e.preventDefault();
-    setMyProfileData({...editFormData});
-    setIsEditingMyProfile(false);
-    showToast("Your profile information has been updated.");
+    try {
+      const res = await updateMyProfileApi({
+        phone: editFormData.phone,
+        address: editFormData.address,
+      });
+
+      if (res.ok) {
+        setMyProfileData({...editFormData});
+        setIsEditingMyProfile(false);
+        showToast("Your profile information has been saved to the database.");
+      } else {
+        showToast(res.data?.message || "Failed to update profile", "error");
+      }
+    } catch (err) {
+      showToast("Error updating profile", "error");
+    }
   };
 
   // Distinct Departments for filter
   const departmentsList = useMemo(() => {
-    const deps = new Set(EMPLOYEES_MASTER.map((e) => e.department));
+    const deps = new Set(colleaguesList.map((e) => e.department));
     return ["ALL", ...Array.from(deps)];
-  }, []);
+  }, [colleaguesList]);
 
   // Distinct Designations for filter
   const designationsList = useMemo(() => {
-    const des = new Set(EMPLOYEES_MASTER.map((e) => e.designation));
+    const des = new Set(colleaguesList.map((e) => e.designation));
     return ["ALL", ...Array.from(des)];
-  }, []);
+  }, [colleaguesList]);
 
   // Filtered Colleagues List
   const filteredEmployees = useMemo(() => {
-    return EMPLOYEES_MASTER.filter((emp) => {
+    return colleaguesList.filter((emp) => {
       const matchesDept =
         departmentFilter === "ALL" || emp.department === departmentFilter;
       const matchesDes =
@@ -315,7 +394,7 @@ export const EmployeeDirectory = ({initialTab = "directory"}) => {
 
       return matchesDept && matchesDes && matchesStatus && matchesSearch;
     });
-  }, [departmentFilter, designationFilter, statusFilter, searchQuery]);
+  }, [colleaguesList, departmentFilter, designationFilter, statusFilter, searchQuery]);
 
   return (
     <div className="space-y-6 font-inter text-slate-900">

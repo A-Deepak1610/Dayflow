@@ -6,9 +6,15 @@ import { useAuth } from '../../context/AuthContext';
 export const HrHeader = ({ onOpenAddModal }) => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const currentPath = location.pathname.split('/').pop();
   const pageName = currentPath ? currentPath.charAt(0).toUpperCase() + currentPath.slice(1) : 'Dashboard';
+
+  const handleLogout = async () => {
+    await logoutUser();
+    navigate('/');
+  };
 
   return (
     <header className="bg-[#0a0a0a]/90 backdrop-blur-md border-b border-white/10 sticky top-0 z-20 px-6 py-3.5 flex items-center justify-between font-inter">
@@ -52,6 +58,13 @@ export const HrHeader = ({ onOpenAddModal }) => {
             </p>
             <p className="text-[10px] text-slate-500 font-mono">HR Administrator</p>
           </div>
+          <button
+            onClick={handleLogout}
+            title="Sign out"
+            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer ml-1"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </header>
