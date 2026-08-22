@@ -6,7 +6,6 @@ import {
   Building,
   Phone,
   Upload,
-  Sparkles,
   ArrowRight,
   Eye,
   EyeOff,
@@ -14,11 +13,14 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  X
+  X,
+  KeyRound,
+  ShieldCheck,
+  RotateCcw
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom'; 
 import { useAuth } from '../../context/AuthContext';
-import { registerCompanyApi, loginApi } from '../../services/api';
+import { registerCompanyApi, loginApi, sendOtpApi, verifyOtpApi } from '../../services/api';
 
 export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const navigate = useNavigate();
@@ -46,6 +48,16 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [signUpPassword, setSignUpPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Email Verification OTP State
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [otpSuccess, setOtpSuccess] = useState('');
+  const [countdown, setCountdown] = useState(0);
+  const [verificationToken, setVerificationToken] = useState('');
+
   const logoInputId = useId();
 
   useEffect(() => {
@@ -53,6 +65,24 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     setErrorMessage('');
     setSubmittedSuccess(null);
   }, [initialMode, isOpen]);
+
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
+  // Reset OTP state if email changes
+  const handleEmailChange = (e) => {
+    setSignUpEmail(e.target.value);
+    if (isOtpVerified) {
+      setIsOtpVerified(false);
+      setVerificationToken('');
+      setOtpSuccess('');
+    }
+  };
 
   // Close on Escape key press
   useEffect(() => {
@@ -92,6 +122,58 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       const reader = new FileReader();
       reader.onloadend = () => setLogoPreview(reader.result);
       reader.readAsDataURL(file);
+    }
+  };
+
+  // Send OTP
+  const handleSendOtp = async () => {
+    if (!signUpEmail || !signUpEmail.includes('@')) {
+      setOtpError('Please enter a valid email address first.');
+      return;
+    }
+    setOtpError('');
+    setOtpSuccess('');
+    setOtpLoading(true);
+
+    try {
+      const res = await sendOtpApi({ email: signUpEmail.trim(), name: adminName.trim() });
+      if (res.ok) {
+        setOtpSent(true);
+        setCountdown(60);
+        setOtpSuccess(`Verification code sent to ${signUpEmail}`);
+      } else {
+        setOtpError(res.data?.message || res.error || 'Failed to send OTP email.');
+      }
+    } catch (err) {
+      setOtpError('Error connecting to mail service. Please ensure backend is running.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Verify OTP
+  const handleVerifyOtp = async () => {
+    if (!otp || otp.trim().length !== 6) {
+      setOtpError('Please enter the 6-digit numeric OTP code.');
+      return;
+    }
+    setOtpError('');
+    setOtpSuccess('');
+    setOtpLoading(true);
+
+    try {
+      const res = await verifyOtpApi({ email: signUpEmail.trim(), otp: otp.trim() });
+      if (res.ok && res.data?.verified) {
+        setIsOtpVerified(true);
+        setVerificationToken(res.data.verificationToken || 'verified-token');
+        setOtpSuccess('Email verified successfully ✓');
+      } else {
+        setOtpError(res.data?.message || 'Invalid or expired OTP code.');
+      }
+    } catch (err) {
+      setOtpError('Error verifying OTP code.');
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -145,6 +227,11 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     setErrorMessage('');
     setSubmittedSuccess(null);
 
+    if (!isOtpVerified) {
+      setErrorMessage('Please verify your email address with the 6-digit OTP code before proceeding.');
+      return;
+    }
+
     if (signUpPassword !== confirmPassword) {
       setErrorMessage('Passwords do not match');
       return;
@@ -165,6 +252,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         email: signUpEmail,
         phone: signUpPhone,
         password: signUpPassword,
+        verificationToken,
       }, logoFile);
 
       if (res.ok) {
@@ -172,11 +260,11 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         setSubmittedSuccess({
           type: 'signup',
           title: 'Company Registration Complete!',
-          message: `Your organization "${companyName}" has been successfully created in backend.`,
+          message: `Your organization "${companyName}" has been successfully created.`,
           generatedId,
         });
       } else {
-        setErrorMessage(res.data?.message || res.error || 'Failed to register company. Email or Company Name might already exist.');
+        setErrorMessage(res.data?.message || res.error || 'Failed to register company.');
       }
     } catch (err) {
       setErrorMessage('Server error during registration. Please check backend connection.');
@@ -190,11 +278,11 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     setErrorMessage('');
     setSubmittedSuccess(null);
     if (role === 'admin') {
-      setLoginIdOrEmail('DAY-HR-2026-0001');
-      setLoginPassword('AdminPass2026!');
+      setLoginIdOrEmail('alex.johnson@dayflow.io');
+      setLoginPassword('Dayflow@123');
     } else {
-      setLoginIdOrEmail('DAY-SJ-2026-0042');
-      setLoginPassword('EmployeePass2026!');
+      setLoginIdOrEmail('sophia.chen@dayflow.io');
+      setLoginPassword('Dayflow@123');
     }
   };
 
@@ -207,17 +295,17 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       />
 
       {/* Modal Card Container */}
-      <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 animate-modal-pop my-auto">
+      <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 animate-modal-pop my-auto max-h-[92vh] overflow-y-auto">
         
         {/* Top Header Bar & Close Button */}
-        <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#1F2A52] flex items-center justify-center font-sora font-bold text-[#FF5D7A] text-sm shadow-md">
+            <div className="w-9 h-9 rounded-xl bg-[#1F2A52] flex items-center justify-center font-sora font-bold text-[#E9573F] text-sm shadow-md">
               DF
             </div>
             <div>
               <h3 className="font-sora text-base font-bold text-[#1F2A52]">Dayflow Portal</h3>
-              <p className="text-[11px] text-slate-500">Authentication Pop-up</p>
+              <p className="text-[11px] text-slate-500">Authentication & HR Registration</p>
             </div>
           </div>
 
@@ -231,7 +319,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         </div>
 
         {/* Mode Switch Pills */}
-        <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 mb-6">
+        <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 mb-5">
           <button
             type="button"
             onClick={() => {
@@ -241,7 +329,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             }}
             className={`flex-1 py-2 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
               mode === 'login'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-[#1F2A52] text-white shadow-sm'
                 : 'text-slate-600 hover:text-[#1F2A52]'
             }`}
           >
@@ -256,126 +344,124 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             }}
             className={`flex-1 py-2 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
               mode === 'signup'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-[#E9573F] text-white shadow-sm'
                 : 'text-slate-600 hover:text-[#1F2A52]'
             }`}
           >
-            Sign Up (HR Admin Only)
+            HR Sign Up
           </button>
         </div>
 
-        {/* Backend Error Alert */}
+        {/* Error Alert Banner */}
         {errorMessage && (
-          <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-2.5 text-rose-700 text-xs">
-            <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-center gap-2 animate-fade-in">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        {/* Success Notification Alert */}
+        {/* Success Alert Banner */}
         {submittedSuccess && (
-          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3 text-emerald-800">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-            <div className="text-xs">
-              <h4 className="font-sora font-bold text-emerald-900 mb-0.5">{submittedSuccess.title}</h4>
-              <p className="text-slate-600">{submittedSuccess.message}</p>
-              {submittedSuccess.generatedId && (
-                <div className="mt-2.5 p-2.5 bg-white border border-emerald-300 rounded-xl">
-                  <p className="text-[10px] text-slate-500 font-mono">Your Auto-Generated Login ID:</p>
-                  <p className="text-base font-mono font-bold text-[#FF5D7A]">{submittedSuccess.generatedId}</p>
-                </div>
-              )}
+          <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-900 text-xs space-y-2 animate-fade-in">
+            <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+              <span>{submittedSuccess.title}</span>
             </div>
+            <p className="text-slate-600">{submittedSuccess.message}</p>
+            {submittedSuccess.generatedId && (
+              <div className="mt-2 p-2.5 bg-white border border-emerald-200 rounded-xl font-mono text-center font-bold text-xs text-[#1F2A52]">
+                Login ID: <span className="text-[#E9573F]">{submittedSuccess.generatedId}</span>
+              </div>
+            )}
           </div>
         )}
 
         {/* MODE 1: SIGN IN VIEW */}
         {mode === 'login' && (
           <div>
-            <div className="text-center mb-6">
+            <div className="text-center mb-5">
               <h3 className="font-sora text-2xl font-extrabold text-[#1F2A52] mb-1">
-                Sign In to Dayflow
+                Welcome Back
               </h3>
               <p className="text-xs text-slate-500">
-                Enter your Login ID or Email to access your HR workspace.
+                Enter your credentials to access your Dayflow portal.
               </p>
             </div>
 
-            {/* Quick Demo Fill Buttons */}
-            <div className="mb-5 p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
-              <span className="text-slate-500 font-medium text-[11px]">Quick Demo Fill:</span>
-              <div className="flex gap-2">
+            {/* Quick 1-Click Demo Accounts */}
+            <div className="mb-5 p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                🚀 One-Click Demo Logins (Password: Dayflow@123)
+              </span>
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => fillDemoAccount('admin')}
-                  className="px-2.5 py-1 bg-white hover:bg-slate-100 text-[#FF5D7A] rounded-lg font-mono text-[11px] border border-slate-200 cursor-pointer shadow-2xs font-semibold"
+                  className="px-3 py-1.5 bg-white border border-slate-200 hover:border-[#1F2A52] rounded-lg text-xs font-semibold text-[#1F2A52] transition cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  HR Admin
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#E9573F]" />
+                  <span>HR Admin</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => fillDemoAccount('employee')}
-                  className="px-2.5 py-1 bg-white hover:bg-slate-100 text-blue-600 rounded-lg font-mono text-[11px] border border-slate-200 cursor-pointer shadow-2xs font-semibold"
+                  className="px-3 py-1.5 bg-white border border-slate-200 hover:border-[#1F2A52] rounded-lg text-xs font-semibold text-[#1F2A52] transition cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  Employee
+                  <User className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Employee</span>
                 </button>
               </div>
             </div>
 
             <form onSubmit={handleSignInSubmit} className="space-y-4">
-              {/* Field 1: Login ID / Email */}
+              {/* Field 1: Login ID or Email */}
               <div>
-                <label className="block text-xs font-semibold text-[#1F2A52] mb-1">
-                  Login ID / Email
+                <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
+                  Login ID or Email Address <span className="text-[#E9573F]">*</span>
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     required
-                    placeholder="e.g. DAY-HR-2026-0001 or admin@company.com"
+                    placeholder="e.g. EMP1000 or alex.johnson@dayflow.io"
                     value={loginIdOrEmail}
                     onChange={(e) => setLoginIdOrEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#1F2A52] focus:bg-white transition"
                   />
                 </div>
               </div>
 
               {/* Field 2: Password */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-semibold text-[#1F2A52]">
-                    Password
-                  </label>
-                  <a href="#" onClick={(e) => e.preventDefault()} className="text-[11px] text-[#FF5D7A] hover:underline">
-                    Forgot password?
-                  </a>
-                </div>
+                <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
+                  Password <span className="text-[#E9573F]">*</span>
+                </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     placeholder="••••••••••••"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
+                    className="w-full pl-9 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#1F2A52] focus:bg-white transition"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              {/* Field 3: Sign In Primary Button */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-[#FF5D7A] hover:bg-[#FF4263] disabled:opacity-50 text-white font-sora font-bold text-xs sm:text-sm rounded-xl transition duration-200 shadow-md shadow-[#FF5D7A]/20 cursor-pointer flex items-center justify-center gap-2 mt-2"
+                className="w-full py-2.5 bg-[#1F2A52] hover:bg-[#151c38] text-white font-sora font-semibold text-xs rounded-xl shadow-md transition cursor-pointer flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -384,16 +470,15 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                   </>
                 ) : (
                   <>
-                    <span>Sign In</span>
+                    <span>Sign In to Dayflow</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
 
-              {/* Field 4: Small Link at Bottom: Don't have an account? Sign Up */}
               <div className="text-center pt-3 border-t border-slate-100">
                 <p className="text-xs text-slate-500">
-                  Don't have an account?{' '}
+                  Registering a new company?{' '}
                   <button
                     type="button"
                     onClick={() => {
@@ -401,9 +486,9 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                       setSubmittedSuccess(null);
                       setErrorMessage('');
                     }}
-                    className="text-[#FF5D7A] hover:underline font-semibold cursor-pointer ml-1"
+                    className="text-[#E9573F] hover:underline font-semibold cursor-pointer ml-1"
                   >
-                    Sign Up
+                    HR Sign Up
                   </button>
                 </p>
               </div>
@@ -419,25 +504,16 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                 Register Your Organization
               </h3>
               <p className="text-xs text-slate-500">
-                Setup your Dayflow HR workspace for your company.
+                Setup your Dayflow HR workspace with mandatory email verification.
               </p>
             </div>
 
-            {/* Auto-Generated Login ID Note Explanation */}
-            <div className="mb-4 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-2.5">
-              <Info className="w-4 h-4 text-[#FF5D7A] shrink-0 mt-0.5" />
-              <div className="text-[11px] text-slate-600">
-                <span className="font-semibold text-[#1F2A52] block mb-0.5">📌 System Auto-Generated Login ID</span>
-                Login ID format: <code className="bg-white px-1.5 py-0.5 rounded text-[#FF5D7A] border border-slate-200 font-mono">{calculateSampleId()}</code>
-              </div>
-            </div>
-
-            <form onSubmit={handleSignUpSubmit} className="space-y-3">
+            <form onSubmit={handleSignUpSubmit} className="space-y-3.5">
               
               {/* Field 1: Company Name */}
               <div>
                 <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
-                  Company Name <span className="text-[#FF5D7A]">*</span>
+                  Company Name <span className="text-[#E9573F]">*</span>
                 </label>
                 <div className="relative">
                   <Building className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -447,144 +523,189 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     placeholder="e.g. Acme Corporation"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#E9573F] focus:bg-white transition"
                   />
                 </div>
               </div>
 
-              {/* Field 2: Upload Logo */}
+              {/* Field 2: Name (Admin/HR Officer's name) */}
               <div>
                 <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
-                  Upload Logo
-                </label>
-                <div className="flex items-center gap-3">
-                  <label
-                    htmlFor={logoInputId}
-                    className="flex-1 border border-dashed border-slate-300 hover:border-[#FF5D7A] bg-slate-50 rounded-xl p-2.5 text-center cursor-pointer transition flex items-center justify-center gap-2"
-                  >
-                    <Upload className="w-3.5 h-3.5 text-[#FF5D7A]" />
-                    <span className="text-[11px] text-slate-600 truncate">
-                      {logoFile ? logoFile.name : 'Click to Upload Logo (PNG, JPG)'}
-                    </span>
-                    <input
-                      id={logoInputId}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoUpload}
-                      className="hidden"
-                    />
-                  </label>
-                  {logoPreview && (
-                    <div className="w-9 h-9 rounded-lg bg-white border border-slate-200 p-0.5 flex items-center justify-center shrink-0">
-                      <img src={logoPreview} alt="Preview" className="max-h-full max-w-full object-contain" />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Field 3: Name (Admin/HR Officer's name) */}
-              <div>
-                <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
-                  Name (Admin / HR Officer's Name) <span className="text-[#FF5D7A]">*</span>
+                  HR Officer Full Name <span className="text-[#E9573F]">*</span>
                 </label>
                 <div className="relative">
                   <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Jane Doe"
+                    placeholder="e.g. Sarah Williams"
                     value={adminName}
                     onChange={(e) => setAdminName(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#E9573F] focus:bg-white transition"
                   />
                 </div>
               </div>
 
-              {/* Grid for Email & Phone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Field 4: Email */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
-                    Email <span className="text-[#FF5D7A]">*</span>
+              {/* Field 3: Email with OTP Verification Trigger */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] font-semibold text-[#1F2A52]">
+                    Business Email <span className="text-[#E9573F]">*</span>
                   </label>
-                  <div className="relative">
+                  {isOtpVerified && (
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Email Verified
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
                     <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       required
-                      placeholder="jane@company.com"
+                      disabled={isOtpVerified}
+                      placeholder="hr@yourcompany.com"
                       value={signUpEmail}
-                      onChange={(e) => setSignUpEmail(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
+                      onChange={handleEmailChange}
+                      className={`w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none transition ${
+                        isOtpVerified 
+                          ? 'border-emerald-300 bg-emerald-50/30' 
+                          : 'border-slate-200 focus:border-[#E9573F] focus:bg-white'
+                      }`}
                     />
                   </div>
-                </div>
 
-                {/* Field 5: Phone */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
-                    Phone <span className="text-[#FF5D7A]">*</span>
-                  </label>
-                  <div className="relative">
-                    <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="tel"
-                      required
-                      placeholder="+1 555-234-5678"
-                      value={signUpPhone}
-                      onChange={(e) => setSignUpPhone(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
-                    />
-                  </div>
+                  {!isOtpVerified && (
+                    <button
+                      type="button"
+                      disabled={otpLoading || countdown > 0 || !signUpEmail}
+                      onClick={handleSendOtp}
+                      className="px-3.5 py-2 bg-[#1F2A52] hover:bg-[#151c38] disabled:bg-slate-200 text-white disabled:text-slate-400 text-xs font-semibold rounded-xl shadow-2xs transition cursor-pointer whitespace-nowrap flex items-center gap-1.5"
+                    >
+                      {otpLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <KeyRound className="w-3.5 h-3.5" />
+                      )}
+                      <span>{countdown > 0 ? `Resend (${countdown}s)` : otpSent ? 'Resend OTP' : 'Send OTP'}</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* Grid for Password & Confirm Password */}
+              {/* OTP Verification Box (Appears after OTP is sent) */}
+              {otpSent && !isOtpVerified && (
+                <div className="p-3.5 bg-amber-50/50 border border-amber-200 rounded-2xl space-y-2.5 animate-fade-in">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-amber-900 flex items-center gap-1">
+                      <KeyRound className="w-3.5 h-3.5 text-amber-600" />
+                      Enter 6-Digit Email Verification Code
+                    </span>
+                    {countdown > 0 && (
+                      <span className="text-[10px] font-mono text-slate-500 font-medium">
+                        Expires in {countdown}s
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="e.g. 123456"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                      className="flex-1 px-3 py-2 bg-white border border-amber-300 rounded-xl text-center text-sm font-mono font-bold tracking-widest text-[#1F2A52] focus:outline-none focus:border-[#E9573F]"
+                    />
+                    <button
+                      type="button"
+                      disabled={otpLoading || otp.length !== 6}
+                      onClick={handleVerifyOtp}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 text-white disabled:text-slate-400 text-xs font-bold rounded-xl shadow-2xs transition cursor-pointer"
+                    >
+                      {otpLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Verify Code'}
+                    </button>
+                  </div>
+
+                  {otpError && (
+                    <p className="text-[11px] text-rose-600 font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {otpError}
+                    </p>
+                  )}
+                  {otpSuccess && (
+                    <p className="text-[11px] text-emerald-700 font-medium flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      {otpSuccess}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Field 4: Phone */}
+              <div>
+                <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    placeholder="+1 555-0199"
+                    value={signUpPhone}
+                    onChange={(e) => setSignUpPhone(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#E9573F] focus:bg-white transition"
+                  />
+                </div>
+              </div>
+
+              {/* Field 5: Passwords */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Field 6: Password */}
                 <div>
                   <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
-                    Password <span className="text-[#FF5D7A]">*</span>
+                    Password <span className="text-[#E9573F]">*</span>
                   </label>
                   <div className="relative">
                     <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      placeholder="Min 8 chars"
+                      placeholder="••••••••••••"
                       value={signUpPassword}
                       onChange={(e) => setSignUpPassword(e.target.value)}
-                      className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
+                      className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#E9573F] focus:bg-white transition"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     >
                       {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
 
-                {/* Field 7: Confirm Password */}
                 <div>
                   <label className="block text-[11px] font-semibold text-[#1F2A52] mb-1">
-                    Confirm Password <span className="text-[#FF5D7A]">*</span>
+                    Confirm Password <span className="text-[#E9573F]">*</span>
                   </label>
                   <div className="relative">
                     <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       required
-                      placeholder="Re-enter"
+                      placeholder="••••••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
+                      className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#E9573F] focus:bg-white transition"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     >
                       {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
@@ -592,29 +713,32 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                 </div>
               </div>
 
-              {/* Field 8: Sign Up Primary Button */}
+              {/* Submit Registration Button */}
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full py-3 bg-[#FF5D7A] hover:bg-[#FF4263] disabled:opacity-50 text-white font-sora font-bold text-xs sm:text-sm rounded-xl transition duration-200 shadow-md shadow-[#FF5D7A]/20 cursor-pointer flex items-center justify-center gap-2 mt-3"
+                disabled={loading || !isOtpVerified}
+                className={`w-full py-2.5 font-sora font-semibold text-xs rounded-xl shadow-md transition cursor-pointer flex items-center justify-center gap-2 ${
+                  isOtpVerified
+                    ? 'bg-[#E9573F] hover:bg-[#d64a32] text-white'
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                }`}
               >
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Registering...</span>
+                    <span>Registering organization...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4" />
-                    <span>Sign Up & Create Workspace</span>
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>{isOtpVerified ? 'Complete HR Sign Up' : 'Verify Email to Sign Up'}</span>
                   </>
                 )}
               </button>
 
-              {/* Field 9: Small Link at Bottom: Already have an account? Sign In */}
-              <div className="text-center pt-2.5 border-t border-slate-100">
+              <div className="text-center pt-2 border-t border-slate-100">
                 <p className="text-xs text-slate-500">
-                  Already have an account?{' '}
+                  Already registered?{' '}
                   <button
                     type="button"
                     onClick={() => {
@@ -622,17 +746,15 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                       setSubmittedSuccess(null);
                       setErrorMessage('');
                     }}
-                    className="text-[#FF5D7A] hover:underline font-semibold cursor-pointer ml-1"
+                    className="text-[#1F2A52] hover:underline font-semibold cursor-pointer ml-1"
                   >
                     Sign In
                   </button>
                 </p>
               </div>
-
             </form>
           </div>
         )}
-
       </div>
     </div>
   );
