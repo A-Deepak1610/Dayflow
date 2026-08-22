@@ -1,105 +1,86 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Navbar from '../components/common/Navbar';
+import HeroSection from '../components/landing/HeroSection';
+import FeaturesSection from '../components/landing/FeaturesSection';
+import HowItWorksSection from '../components/landing/HowItWorksSection';
+import PricingSection from '../components/landing/PricingSection';
+import SocialProofSection from '../components/landing/SocialProofSection';
+import AuthPanel from '../components/auth/AuthPanel';
+import Footer from '../components/common/Footer';
 import { checkServerHealth } from '../services/api';
+import { Activity, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export const Home = () => {
+  const [authMode, setAuthMode] = useState('login');
   const [health, setHealth] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetchHealth = async () => {
-    setLoading(true);
-    const res = await checkServerHealth();
-    if (res.ok) {
-      setHealth(res.data);
-    } else {
-      setHealth({
-        status: 'error',
-        error: res.error || 'Server offline or un-reachable',
-      });
-    }
-    setLoading(false);
-  };
+  const [showHealthToast, setShowHealthToast] = useState(false);
 
   useEffect(() => {
+    const fetchHealth = async () => {
+      const res = await checkServerHealth();
+      if (res.ok) {
+        setHealth(res.data);
+      } else {
+        setHealth({ status: 'offline' });
+      }
+    };
     fetchHealth();
   }, []);
 
+  const handleOpenAuth = (mode = 'login') => {
+    setAuthMode(mode);
+    const authElement = document.getElementById('auth-panel');
+    if (authElement) {
+      authElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-indigo-900/40 via-purple-900/20 to-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl">
-        <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">
-          Project Setup Ready
-        </h2>
-        <p className="text-slate-400 max-w-2xl">
-          Frontend and backend directory structures are configured. Prisma ORM with TypeScript & TiDB Cloud MySQL database setup initialized.
-        </p>
-      </div>
+    <div className="relative w-full overflow-hidden">
+      {/* Sticky Navigation Bar */}
+      <Navbar onOpenAuth={handleOpenAuth} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Backend Status Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Backend Status</h3>
-            <span
-              className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                loading
-                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                  : health?.status === 'ok'
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-              }`}
-            >
-              {loading ? 'Checking...' : health?.status === 'ok' ? 'Online (200 OK)' : 'Offline / Error'}
-            </span>
-          </div>
+      {/* Main Landing Sections */}
+      <main>
+        <HeroSection onOpenAuth={handleOpenAuth} />
+        
+        {/* Auth Section Panel */}
+        <section className="bg-gradient-to-b from-[#0B1120] via-[#121A36]/80 to-[#0B1120] py-8 border-y border-slate-800/60">
+          <AuthPanel initialMode={authMode} key={authMode} />
+        </section>
 
-          <p className="text-xs text-slate-400 font-mono mb-4">
-            Endpoint: <code className="bg-slate-800 text-indigo-300 px-2 py-0.5 rounded">http://localhost:5000/api/health</code>
-          </p>
+        <FeaturesSection onOpenAuth={handleOpenAuth} />
+        <HowItWorksSection onOpenAuth={handleOpenAuth} />
+        <PricingSection onOpenAuth={handleOpenAuth} />
+        <SocialProofSection />
+      </main>
 
-          <button
-            onClick={fetchHealth}
-            disabled={loading}
-            className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition cursor-pointer disabled:opacity-50"
-          >
-            {loading ? 'Re-checking Connection...' : 'Check Health Status'}
-          </button>
-        </div>
+      {/* Footer */}
+      <Footer onOpenAuth={handleOpenAuth} />
 
-        {/* Database Status Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Database Status</h3>
-            <span
-              className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                loading
-                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                  : health?.database?.status === 'connected'
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                  : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-              }`}
-            >
-              {loading
-                ? 'Checking...'
-                : health?.database?.status === 'connected'
-                ? 'Connected (TiDB MySQL)'
-                : 'Pending / Credentials Check'}
-            </span>
-          </div>
+      {/* Subtle Bottom System Status Floating Badge */}
+      <div className="fixed bottom-4 left-4 z-40">
+        <button
+          onClick={() => setShowHealthToast(!showHealthToast)}
+          className="flex items-center gap-2 px-3 py-1.5 bg-[#121A36]/90 backdrop-blur-md border border-slate-700/80 rounded-full text-[11px] text-slate-300 shadow-xl hover:border-[#FF5D7A]/50 transition cursor-pointer"
+        >
+          <Activity className="w-3.5 h-3.5 text-[#FF5D7A] animate-pulse" />
+          <span>Server API:</span>
+          <span className={`font-semibold ${health?.status === 'ok' ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {health?.status === 'ok' ? 'Online' : 'Checking / Standby'}
+          </span>
+        </button>
 
-          <div className="space-y-2 text-xs text-slate-300 font-mono">
-            <div>
-              <span className="text-slate-500">Provider:</span> MySQL (TiDB Cloud)
+        {showHealthToast && (
+          <div className="mt-2 p-3 bg-[#0F172A] border border-slate-700 rounded-xl shadow-2xl text-xs space-y-1 w-64 animate-fadeIn">
+            <div className="flex items-center justify-between font-bold text-white mb-1">
+              <span>System Telemetry</span>
+              <span className="text-[10px] text-slate-400">TiDB MySQL</span>
             </div>
-            <div>
-              <span className="text-slate-500">ORM:</span> Prisma Client v6
-            </div>
-            {health?.database?.error && (
-              <div className="p-3 bg-slate-950 border border-amber-900/40 text-amber-400 rounded-lg text-[11px] overflow-x-auto">
-                {health.database.error}
-              </div>
-            )}
+            <p className="text-[11px] text-slate-400 font-mono">Backend: http://localhost:5000</p>
+            <p className="text-[11px] text-slate-400 font-mono">DB Status: {health?.database?.status || 'Connected'}</p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
