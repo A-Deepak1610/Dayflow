@@ -322,6 +322,37 @@ export const EmployeeDashboard = () => {
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
+            <h1 className="font-sora text-2xl sm:text-4xl font-extrabold tracking-tight">
+              Hello, {user?.firstName || 'Team Member'}!
+            </h1>
+            <p className="text-slate-300 text-xs sm:text-sm mt-1">
+              Your Login ID: <span className="font-mono text-[#FF5D7A] font-bold">{user?.loginId || 'DAY-SJ-2026-0042'}</span>
+            </p>
+
+            {/* Quick Navigation Links */}
+            <div className="flex flex-wrap items-center gap-2 pt-3">
+              <Link
+                to="/employee/attendance"
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition flex items-center gap-1.5"
+              >
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>My Attendance Timesheet &rarr;</span>
+              </Link>
+              <Link
+                to="/employee/leaves"
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition flex items-center gap-1.5"
+              >
+                <Calendar className="w-3.5 h-3.5 text-blue-400" />
+                <span>My Leaves &rarr;</span>
+              </Link>
+              <Link
+                to="/employee/payslips"
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition flex items-center gap-1.5"
+              >
+                <DollarSign className="w-3.5 h-3.5 text-amber-400" />
+                <span>My Payslips &rarr;</span>
+              </Link>
+            </div>
           </div>
 
           {/* 3. Salary & Payslip Snapshot Card */}
