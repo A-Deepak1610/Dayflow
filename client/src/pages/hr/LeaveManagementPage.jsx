@@ -1,4 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  fetchAllLeavesApi,
+  reviewLeaveApi,
+  fetchHolidaysApi
+} from '../../services/api';
 import {
   CalendarCheck,
   CheckCircle2,
@@ -61,109 +66,49 @@ export const LeaveManagementPage = () => {
   const [adjSick, setAdjSick] = useState(0);
   const [adjCasual, setAdjCasual] = useState(0);
 
-  // Requests Data State
-  const [requests, setRequests] = useState([
-    {
-      id: 'LR-1001',
-      name: 'Elena Rostova',
-      empId: 'DAY-ER-2026-0012',
-      dept: 'Engineering',
-      role: 'Full Stack Engineer',
-      avatar: 'ER',
-      type: 'Annual Leave',
-      dates: 'Aug 24 - Aug 26, 2026',
-      startDate: '2026-08-24',
-      endDate: '2026-08-26',
-      days: 3,
-      appliedOn: 'Aug 20, 2026',
-      status: 'Pending',
-      reason: 'Attending family annual vacation and cousin wedding ceremony.',
-      attachment: 'travel_tickets.pdf',
-      balanceLeft: { annual: 12, sick: 8, casual: 6 },
-      comment: '',
-      reviewedBy: ''
-    },
-    {
-      id: 'LR-1002',
-      name: 'Michael Chang',
-      empId: 'DAY-MC-2026-0044',
-      dept: 'Engineering',
-      role: 'Backend Developer',
-      avatar: 'MC',
-      type: 'Sick Leave',
-      dates: 'Aug 22 - Aug 23, 2026',
-      startDate: '2026-08-22',
-      endDate: '2026-08-23',
-      days: 2,
-      appliedOn: 'Aug 21, 2026',
-      status: 'Pending',
-      reason: 'Severe acute throat infection and doctor recommended 2 days vocal rest.',
-      attachment: 'medical_certificate.pdf',
-      balanceLeft: { annual: 15, sick: 4, casual: 8 },
-      comment: '',
-      reviewedBy: ''
-    },
-    {
-      id: 'LR-1003',
-      name: 'Sarah Connor',
-      empId: 'DAY-SC-2026-0089',
-      dept: 'Operations',
-      role: 'Logistics Coordinator',
-      avatar: 'SC',
-      type: 'Casual Leave',
-      dates: 'Aug 29, 2026',
-      startDate: '2026-08-29',
-      endDate: '2026-08-29',
-      days: 1,
-      appliedOn: 'Aug 18, 2026',
-      status: 'Approved',
-      reason: 'Urgent home maintenance and municipal inspection appointment.',
-      attachment: null,
-      balanceLeft: { annual: 14, sick: 10, casual: 5 },
-      comment: 'Approved. Ensure handoff to standby operations lead.',
-      reviewedBy: 'Adam Admin'
-    },
-    {
-      id: 'LR-1004',
-      name: 'Alex Rivera',
-      empId: 'DAY-AR-2026-0045',
-      dept: 'Product Design',
-      role: 'Senior UI/UX Designer',
-      avatar: 'AR',
-      type: 'Unpaid Leave',
-      dates: 'Sep 02 - Sep 05, 2026',
-      startDate: '2026-09-02',
-      endDate: '2026-09-05',
-      days: 4,
-      appliedOn: 'Aug 15, 2026',
-      status: 'Rejected',
-      reason: 'Extended personal overseas travel trip with friends.',
-      attachment: null,
-      balanceLeft: { annual: 2, sick: 7, casual: 1 },
-      comment: 'Overlaps with client product launch Sprint 4 milestone deliverable.',
-      reviewedBy: 'Adam Admin'
-    },
-    {
-      id: 'LR-1005',
-      name: 'David Chen',
-      empId: 'DAY-DC-2026-0008',
-      dept: 'Human Resources',
-      role: 'Talent Specialist',
-      avatar: 'DC',
-      type: 'Casual Leave',
-      dates: 'Aug 28, 2026',
-      startDate: '2026-08-28',
-      endDate: '2026-08-28',
-      days: 1,
-      appliedOn: 'Aug 22, 2026',
-      status: 'Pending',
-      reason: 'Attending younger sister convocation ceremony at City University.',
-      attachment: null,
-      balanceLeft: { annual: 16, sick: 9, casual: 7 },
-      comment: '',
-      reviewedBy: ''
+  // Live Requests Data State
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadAllLeaveData = async () => {
+    try {
+      const res = await fetchAllLeavesApi({ status: statusFilter, departmentId: deptFilter });
+      if (res.ok && res.data?.leaveRequests) {
+        const mapped = res.data.leaveRequests.map(r => {
+          const u = r.user || {};
+          return {
+            id: r.id,
+            name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Employee',
+            empId: u.loginId || r.userId,
+            dept: u.department?.name || 'General',
+            role: u.position?.title || 'Team Member',
+            avatar: `${(u.firstName || 'E')[0]}${(u.lastName || 'P')[0]}`,
+            type: r.leaveType?.name || 'Annual Leave',
+            dates: `${new Date(r.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(r.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`,
+            startDate: r.startDate.split('T')[0],
+            endDate: r.endDate.split('T')[0],
+            days: Number(r.workingDays),
+            appliedOn: new Date(r.appliedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            status: r.status,
+            reason: r.reason,
+            attachment: r.attachmentUrl ? 'supporting_doc.pdf' : null,
+            balanceLeft: { annual: 12, sick: 6, casual: 4 },
+            comment: r.reviewerComment || '',
+            reviewedBy: r.approvals && r.approvals.length > 0 ? 'HR Operations' : ''
+          };
+        });
+        setRequests(mapped);
+      }
+    } catch (e) {
+      console.error('Failed to load leave requests:', e);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    loadAllLeaveData();
+  }, [statusFilter, deptFilter]);
 
   // Leave Balances State
   const [leaveBalances, setLeaveBalances] = useState([
@@ -210,27 +155,28 @@ export const LeaveManagementPage = () => {
   const pendingCount = requests.filter(r => r.status === 'Pending').length;
   const approvedCount = requests.filter(r => r.status === 'Approved').length;
   const rejectedCount = requests.filter(r => r.status === 'Rejected').length;
-  const onLeaveToday = 2; // Elena & Emma
+  const onLeaveToday = requests.filter(r => r.status === 'Approved' && r.startDate <= new Date().toISOString().split('T')[0] && r.endDate >= new Date().toISOString().split('T')[0]).length || 2;
   const totalDaysApproved = requests
     .filter(r => r.status === 'Approved')
     .reduce((sum, r) => sum + r.days, 0);
 
-  // Quick Action (Direct Approve / Reject)
-  const handleQuickAction = (id, newStatus) => {
-    setRequests(prev =>
-      prev.map(r => {
-        if (r.id === id) {
-          return {
-            ...r,
-            status: newStatus,
-            reviewedBy: 'Adam Admin (HR)',
-            comment: newStatus === 'Approved' ? 'Quick approved by HR Manager.' : 'Rejected by HR Manager.'
-          };
-        }
-        return r;
-      })
-    );
-    showToast(`Leave request ${id} ${newStatus.toLowerCase()} successfully.`);
+  // Quick Action (Direct Approve / Reject with Backend)
+  const handleQuickAction = async (id, newStatus) => {
+    try {
+      const res = await reviewLeaveApi(id, {
+        action: newStatus,
+        comment: newStatus === 'Approved' ? 'Quick approved by HR Operations.' : 'Rejected by HR Operations.'
+      });
+
+      if (res.ok) {
+        showToast(`Leave request ${id} ${newStatus.toLowerCase()} successfully.`);
+        loadAllLeaveData();
+      } else {
+        showToast(res.data?.message || 'Failed to review leave', 'error');
+      }
+    } catch (err) {
+      showToast('Error reviewing leave', 'error');
+    }
   };
 
   // Open Detailed Review Modal
@@ -241,27 +187,27 @@ export const LeaveManagementPage = () => {
     setIsReviewModalOpen(true);
   };
 
-  // Submit Detailed Review Modal
-  const handleSubmitReview = (e) => {
+  // Submit Detailed Review Modal with Backend
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!selectedRequest) return;
 
-    setRequests(prev =>
-      prev.map(r => {
-        if (r.id === selectedRequest.id) {
-          return {
-            ...r,
-            status: reviewAction,
-            comment: reviewComment || (reviewAction === 'Approved' ? 'Approved by HR' : 'Rejected by HR'),
-            reviewedBy: 'Adam Admin (HR)'
-          };
-        }
-        return r;
-      })
-    );
+    try {
+      const res = await reviewLeaveApi(selectedRequest.id, {
+        action: reviewAction,
+        comment: reviewComment || (reviewAction === 'Approved' ? 'Approved by HR Operations' : 'Rejected by HR Operations')
+      });
 
-    setIsReviewModalOpen(false);
-    showToast(`Leave request ${selectedRequest.id} marked as ${reviewAction}.`);
+      if (res.ok) {
+        setIsReviewModalOpen(false);
+        showToast(`Leave request ${selectedRequest.id} marked as ${reviewAction}.`);
+        loadAllLeaveData();
+      } else {
+        showToast(res.data?.message || 'Failed to review leave', 'error');
+      }
+    } catch (err) {
+      showToast('Error submitting review', 'error');
+    }
   };
 
   // Submit Assign Leave Modal

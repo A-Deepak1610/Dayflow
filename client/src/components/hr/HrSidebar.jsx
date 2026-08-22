@@ -15,6 +15,7 @@ import {
   MonitorSmartphone,
   HeadphonesIcon,
   Lock,
+  LogOut,
 } from 'lucide-react';
 
 export const HrSidebar = () => {
@@ -81,6 +82,30 @@ export const HrSidebar = () => {
             );
           })}
         </nav>
+      </div>
+
+      {/* Sidebar Footer with User & Logout */}
+      <div className="p-4 border-t border-slate-100 shrink-0">
+        <div className="flex items-center gap-3 px-3 py-2.5 mb-2 bg-slate-50 rounded-xl border border-slate-200">
+          <div className="w-9 h-9 rounded-full bg-horilla-primary text-white flex items-center justify-center font-bold text-xs shadow-sm">
+            {user?.firstName?.charAt(0) || 'A'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-[#1F2A52] truncate">
+              {user?.firstName || 'Admin'} {user?.lastName || ''}
+            </p>
+            <p className="text-[10px] text-slate-500 font-mono truncate">
+              {user?.loginId || 'EMP1000'}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl border border-rose-100 transition cursor-pointer"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Sign Out</span>
+        </button>
       </div>
     </aside>
   );

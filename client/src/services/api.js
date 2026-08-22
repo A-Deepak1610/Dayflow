@@ -28,7 +28,9 @@ export const apiCall = async (endpoint, options = {}) => {
 
 export const checkServerHealth = () => apiCall('/health');
 
-// Auth API Endpoints connected to backend
+// --------------------------------------------------------------------------
+// AUTH API
+// --------------------------------------------------------------------------
 export const registerCompanyApi = (payload, logoFile = null) => {
   if (logoFile) {
     const formData = new FormData();

@@ -2,6 +2,12 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
+  fetchEmployeeDashboardApi,
+  clockInApi,
+  clockOutApi,
+  applyLeaveApi
+} from '../../services/api';
+import {
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -170,19 +176,23 @@ export const EmployeeDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Employee Identity (Jane / ACJS20260002)
+  // Employee Identity
   const employeeInfo = {
-    name: user?.firstName || 'Jane',
-    fullName: user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Jane Cooper',
-    employeeId: user?.loginId || 'ACJS20260002',
+    name: user?.firstName || 'Sophia',
+    fullName: user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Sophia Chen',
+    employeeId: user?.loginId || 'EMP1001',
     designation: 'Software Engineer',
     department: 'Engineering'
   };
 
+  // Live Dashboard State
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   // Clock In / Out Live State
-  const [clockedIn, setClockedIn] = useState(true);
-  const [clockInTime, setClockInTime] = useState('09:08 AM');
-  const [elapsedSeconds, setElapsedSeconds] = useState(2 * 3600 + 15 * 60 + 20); // 2h 15m
+  const [clockedIn, setClockedIn] = useState(false);
+  const [clockInTime, setClockInTime] = useState('--');
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
 
   // Quick Apply Leave Modal State
@@ -193,33 +203,56 @@ export const EmployeeDashboard = () => {
   const [quickReason, setQuickReason] = useState('');
   const [leaveSubmitted, setLeaveSubmitted] = useState(false);
 
-  // Notifications State (Interactive Dismissal)
+  // Notifications State
   const [notifications, setNotifications] = useState([
     {
       id: 1,
       title: 'Leave Request Approved',
-      description: 'Your annual leave request for 25 Aug – 29 Aug has been approved by Sarah Williams.',
+      description: 'Your leave application was reviewed and approved.',
       time: 'Today · 10:32 AM',
       unread: true,
       link: '/employee/leaves'
     },
     {
       id: 2,
-      title: 'August Payslip Available',
-      description: 'Your August 2026 salary slip (Net: ₹72,500) has been processed and is ready for download.',
+      title: 'Monthly Payslip Generated',
+      description: 'Your monthly salary slip has been processed and is ready for download.',
       time: 'Yesterday',
       unread: true,
       link: '/employee/payslips'
-    },
-    {
-      id: 3,
-      title: 'Attendance Reminder',
-      description: "Don't forget to check out before leaving. Target schedule: 09:00 AM – 06:00 PM.",
-      time: 'Today · 09:08 AM',
-      unread: false,
-      link: '/employee/attendance'
     }
   ]);
+
+  const loadDashboard = async () => {
+    try {
+      const res = await fetchEmployeeDashboardApi();
+      if (res.ok && res.data) {
+        setDashboardData(res.data);
+        if (res.data.todayAttendance) {
+          setClockedIn(res.data.todayAttendance.clockedIn);
+          setClockInTime(res.data.todayAttendance.clockInTime);
+        }
+        if (res.data.notifications && res.data.notifications.length > 0) {
+          setNotifications(res.data.notifications.map(n => ({
+            id: n.id,
+            title: n.title,
+            description: n.message,
+            time: new Date(n.createdAt).toLocaleDateString(),
+            unread: !n.isRead,
+            link: n.link || '/employee/dashboard'
+          })));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load employee dashboard stats:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
 
   // Live Timer Effect
   useEffect(() => {
@@ -242,28 +275,56 @@ export const EmployeeDashboard = () => {
   };
 
   // Check In / Check Out Handler
-  const handleToggleClock = () => {
+  const handleToggleClock = async () => {
     if (clockedIn) {
-      setClockedIn(false);
-      showToast('Checked out successfully. Today’s attendance session recorded.');
+      const res = await clockOutApi();
+      if (res.ok) {
+        setClockedIn(false);
+        showToast('Checked out successfully. Today’s attendance session recorded.');
+        loadDashboard();
+      } else {
+        showToast(res.data?.message || 'Failed to check out');
+      }
     } else {
-      setClockedIn(true);
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setClockInTime(timeStr);
-      showToast(`Checked in successfully at ${timeStr}.`);
+      const res = await clockInApi({ workMode: 'Office' });
+      if (res.ok) {
+        setClockedIn(true);
+        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setClockInTime(timeStr);
+        setElapsedSeconds(0);
+        showToast(`Checked in successfully at ${timeStr}.`);
+        loadDashboard();
+      } else {
+        showToast(res.data?.message || 'Failed to check in');
+      }
     }
   };
 
   // Quick Apply Leave Submit
-  const handleQuickLeaveSubmit = (e) => {
+  const handleQuickLeaveSubmit = async (e) => {
     e.preventDefault();
     setLeaveSubmitted(true);
-    showToast('Leave request submitted to your manager.');
-    setTimeout(() => {
-      setLeaveSubmitted(false);
-      setShowQuickLeaveModal(false);
-      setQuickReason('');
-    }, 1200);
+    try {
+      await applyLeaveApi({
+        leaveTypeId: quickLeaveType === 'Sick Leave' ? 'SL' : 'AL',
+        startDate: quickStartDate,
+        endDate: quickEndDate,
+        calendarDays: 3,
+        workingDays: 3,
+        reason: quickReason || 'Personal Leave applied via Dashboard',
+        isPaid: true
+      });
+      showToast('Leave request submitted to your manager.');
+      loadDashboard();
+    } catch (err) {
+      showToast('Failed to apply leave');
+    } finally {
+      setTimeout(() => {
+        setLeaveSubmitted(false);
+        setShowQuickLeaveModal(false);
+        setQuickReason('');
+      }, 1000);
+    }
   };
 
   const handleMarkAllRead = () => {

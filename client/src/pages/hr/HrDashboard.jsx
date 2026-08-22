@@ -1,15 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Users, UserCheck, Calendar, Briefcase, Settings, RefreshCcw, Plus
+  Users, UserCheck, Calendar, Briefcase, Settings, RefreshCcw, Plus, Clock, FileCheck2, DollarSign, ArrowRight
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
   AreaChart, Area, PieChart, Pie, Cell, Legend, LineChart, Line
 } from 'recharts';
+import { fetchHrDashboardApi } from '../../services/api';
 
 export const HrDashboard = () => {
   const [activeDateFilter, setActiveDateFilter] = useState('This Month');
+  const [hrStats, setHrStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadHrDashboard = async () => {
+    try {
+      const res = await fetchHrDashboardApi();
+      if (res.ok && res.data) {
+        setHrStats(res.data);
+      }
+    } catch (e) {
+      console.error('Failed to load HR dashboard:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadHrDashboard();
+  }, []);
 
   // Chart Data
   const headcountData = [
@@ -164,8 +184,8 @@ export const HrDashboard = () => {
                 <Users className="w-5 h-5 text-[#E9573F]" />
               </div>
               <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Total Employees</p>
-              <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">179</h3>
-              <p className="text-[12px] text-[#A0A0A0] mt-2">No new joiners</p>
+              <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">{hrStats?.metrics?.totalEmployees || 30}</h3>
+              <p className="text-[12px] text-[#A0A0A0] mt-2">Active corporate roster</p>
               <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-slate-100 rounded-full opacity-50 pointer-events-none"></div>
             </div>
 
@@ -174,8 +194,8 @@ export const HrDashboard = () => {
                 <UserCheck className="w-5 h-5 text-[#10B981]" />
               </div>
               <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Present Today</p>
-              <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">19</h3>
-              <p className="text-[12px] font-bold text-[#F59E0B] mt-2">10.6% rate</p>
+              <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">{hrStats?.metrics?.presentToday || 22}</h3>
+              <p className="text-[12px] font-bold text-[#10B981] mt-2">{hrStats?.metrics?.attendanceRate || 96}% attendance rate</p>
               <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-slate-100 rounded-full opacity-50 pointer-events-none"></div>
             </div>
 
@@ -183,19 +203,19 @@ export const HrDashboard = () => {
               <div className="w-10 h-10 rounded-lg bg-[#FEF3C7] flex items-center justify-center mb-4">
                 <Calendar className="w-5 h-5 text-[#F59E0B]" />
               </div>
-              <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">On Leave</p>
-              <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">3</h3>
-              <p className="text-[12px] font-bold text-[#F59E0B] mt-2">12 pending</p>
+              <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Pending Leaves</p>
+              <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">{hrStats?.metrics?.pendingLeavesCount || 4}</h3>
+              <p className="text-[12px] font-bold text-[#F59E0B] mt-2">Requires approval</p>
               <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-slate-100 rounded-full opacity-50 pointer-events-none"></div>
             </div>
 
             <div className="horilla-card p-5">
               <div className="w-10 h-10 rounded-lg bg-[#F3E8FF] flex items-center justify-center mb-4">
-                <Briefcase className="w-5 h-5 text-[#9333EA]" />
+                <DollarSign className="w-5 h-5 text-[#9333EA]" />
               </div>
-              <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Open Recruitments</p>
-              <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">2</h3>
-              <p className="text-[12px] text-[#A0A0A0] mt-2">Active hiring</p>
+              <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Monthly Payroll</p>
+              <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">₹{(hrStats?.metrics?.totalMonthlyPayroll ? (hrStats.metrics.totalMonthlyPayroll / 100000).toFixed(1) + 'L' : '14.5L')}</h3>
+              <p className="text-[12px] text-[#A0A0A0] mt-2">Disbursed net compensation</p>
               <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-slate-100 rounded-full opacity-50 pointer-events-none"></div>
             </div>
           </div>
