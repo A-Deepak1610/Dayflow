@@ -144,7 +144,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         email: signUpEmail,
         phone: signUpPhone,
         password: signUpPassword,
-      });
+      }, logoFile);
 
       if (res.ok) {
         const generatedId = res.data?.loginId || calculateSampleId();

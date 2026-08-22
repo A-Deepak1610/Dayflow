@@ -23,13 +23,13 @@ app.use(cors({
     // Allow requests with no origin (like Postman or server-to-server)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
-      return callback(null, origin);
+      return callback(null, true); // Return true to reflect request origin in Access-Control-Allow-Origin header
     }
-    return callback(null, origin);
+    return callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
 app.use(express.json());
