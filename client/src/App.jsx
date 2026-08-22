@@ -1,54 +1,117 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import MainLayout from './components/layout/MainLayout';
 import Home from './pages/Home';
-import EmployeeDashboard from './pages/EmployeeDashboard';
+
+// HR Pages
+import HrDashboard from './pages/hr/HrDashboard';
+import EmployeeManagement from './pages/hr/EmployeeManagement';
+import LeaveApprovals from './pages/hr/LeaveApprovals';
+
+// Employee Pages
+import EmployeeDashboard from './pages/employee/EmployeeDashboard';
+import MyAttendance from './pages/employee/MyAttendance';
+import { MyLeaves, MyPayslips } from './pages/employee/MyLeaves';
+
+// Protected Route Component for HR / Admin
+const HrRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/" replace />;
+  if (user.role !== 'ADMIN' && user.role !== 'HR') {
+    return <Navigate to="/employee/dashboard" replace />;
+  }
+  return children;
+};
+
+// Protected Route Component for Employee
+const EmployeeRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/" replace />;
+  return children;
+};
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Landing Page */}
+      <Route path="/" element={<Home />} />
+
+      {/* HR / Admin Pages */}
+      <Route
+        path="/hr/dashboard"
+        element={
+          <HrRoute>
+            <HrDashboard />
+          </HrRoute>
+        }
+      />
+      <Route
+        path="/hr/employees"
+        element={
+          <HrRoute>
+            <EmployeeManagement />
+          </HrRoute>
+        }
+      />
+      <Route
+        path="/hr/leaves"
+        element={
+          <HrRoute>
+            <LeaveApprovals />
+          </HrRoute>
+        }
+      />
+
+      {/* Employee Pages */}
+      <Route
+        path="/employee/dashboard"
+        element={
+          <EmployeeRoute>
+            <EmployeeDashboard />
+          </EmployeeRoute>
+        }
+      />
+      <Route
+        path="/employee/attendance"
+        element={
+          <EmployeeRoute>
+            <MyAttendance />
+          </EmployeeRoute>
+        }
+      />
+      <Route
+        path="/employee/leaves"
+        element={
+          <EmployeeRoute>
+            <MyLeaves />
+          </EmployeeRoute>
+        }
+      />
+      <Route
+        path="/employee/payslips"
+        element={
+          <EmployeeRoute>
+            <MyPayslips />
+          </EmployeeRoute>
+        }
+      />
+
+      {/* Catch-all redirect */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
 
 function App() {
-  const [currentView, setCurrentView] = useState('employee-dashboard'); // 'home' | 'employee-dashboard' | 'leave' | 'attendance' | 'profile'
-
-  const handleNavigate = (page) => {
-    setCurrentView(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
-    <MainLayout>
-      {/* Quick View Switcher Bar (Demo) */}
-      <div className="bg-[#1F2A52] text-white px-4 py-2 text-xs flex items-center justify-between border-b border-[#2A386C]">
-        <div className="flex items-center gap-2 font-sora font-semibold">
-          <span className="w-2 h-2 rounded-full bg-[#FF5D7A]" />
-          <span>Dayflow HRMS Demo Environment</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setCurrentView('employee-dashboard')}
-            className={`px-3 py-1 rounded-md transition font-medium cursor-pointer ${
-              currentView === 'employee-dashboard'
-                ? 'bg-[#FF5D7A] text-white'
-                : 'bg-white/10 text-slate-200 hover:bg-white/20'
-            }`}
-          >
-            Employee Dashboard View
-          </button>
-          <button
-            onClick={() => setCurrentView('home')}
-            className={`px-3 py-1 rounded-md transition font-medium cursor-pointer ${
-              currentView === 'home'
-                ? 'bg-[#FF5D7A] text-white'
-                : 'bg-white/10 text-slate-200 hover:bg-white/20'
-            }`}
-          >
-            Landing Page View
-          </button>
-        </div>
-      </div>
-
-      {currentView === 'employee-dashboard' ? (
-        <EmployeeDashboard onNavigate={handleNavigate} />
-      ) : (
-        <Home onNavigateToDashboard={() => setCurrentView('employee-dashboard')} />
-      )}
-    </MainLayout>
+    <AuthProvider>
+      <BrowserRouter>
+        <MainLayout>
+          <AppRoutes />
+        </MainLayout>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

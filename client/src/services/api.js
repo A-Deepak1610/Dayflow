@@ -62,3 +62,9 @@ export const logoutApi = () =>
   apiCall('/auth/logout', {
     method: 'POST',
   });
+
+export const createEmployeeApi = (payload) =>
+  apiCall('/auth/create-employee', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
