@@ -1,14 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit2, Download, Circle } from 'lucide-react';
+import { ArrowLeft, Edit2, Download, Circle, Loader2, CheckCircle2 } from 'lucide-react';
+import { fetchEmployeeDetailApi } from '../../services/api';
 
 export const EmployeeProfileDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Resume');
+  const [employeeData, setEmployeeData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data based on the route ID
-  const employee = {
+  // Salary state for dynamic calculation
+  const [wage, setWage] = useState(85000);
+  const [workingDays, setWorkingDays] = useState(5);
+  
+  // Salary component percentages
+  const [basicPct, setBasicPct] = useState(50);
+  const [hraPct, setHraPct] = useState(20);
+  const [medicalPct, setMedicalPct] = useState(5);
+  const [bonusPct, setBonusPct] = useState(10);
+  const [ltaPct, setLtaPct] = useState(5);
+
+  useEffect(() => {
+    const loadDetail = async () => {
+      try {
+        const res = await fetchEmployeeDetailApi(id);
+        if (res.ok && res.data?.employee) {
+          const emp = res.data.employee;
+          setEmployeeData(emp);
+          if (emp.salaryStructures && emp.salaryStructures.length > 0) {
+            setWage(Math.round(Number(emp.salaryStructures[0].annualCtc) / 12));
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load employee detail:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadDetail();
+  }, [id]);
+
+  const employee = employeeData ? {
+    id: employeeData.loginId || employeeData.id,
+    name: `${employeeData.firstName} ${employeeData.lastName || ''}`.trim(),
+    loginId: employeeData.loginId || 'EMP-1000',
+    email: employeeData.email,
+    mobile: employeeData.phone || '+91 98765 43210',
+    company: 'Dayflow Inc.',
+    department: employeeData.department?.name || 'Engineering',
+    manager: 'Sarah Williams',
+    location: employeeData.profile?.location || 'New York HQ',
+    status: 'Active'
+  } : {
     id: id || 'DAY-HR-2026-0001',
     name: 'Adam Admin',
     loginId: 'admin@dayflow.com',
@@ -21,17 +65,6 @@ export const EmployeeProfileDetail = () => {
     status: 'Active'
   };
 
-  // Salary state for dynamic calculation
-  const [wage, setWage] = useState(80000);
-  const [workingDays, setWorkingDays] = useState(5);
-  
-  // Salary component percentages
-  const [basicPct, setBasicPct] = useState(50);
-  const [hraPct, setHraPct] = useState(20);
-  const [medicalPct, setMedicalPct] = useState(5);
-  const [bonusPct, setBonusPct] = useState(10);
-  const [ltaPct, setLtaPct] = useState(5);
-  
   // Computed values
   const basicSalary = (wage * (basicPct / 100)).toFixed(2);
   const hra = (wage * (hraPct / 100)).toFixed(2);
@@ -48,8 +81,17 @@ export const EmployeeProfileDetail = () => {
   const pfAmount = ((parseFloat(basicSalary) * (pfPct / 100))).toFixed(2);
   const professionalTax = 200.00;
 
+  if (loading) {
+    return (
+      <div className="p-12 flex items-center justify-center gap-2 text-slate-500 text-sm">
+        <Loader2 className="w-5 h-5 animate-spin text-horilla-primary" />
+        <span>Loading employee details from database...</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 max-w-[1200px] mx-auto">
+    <div className="p-6 w-full">
       
       {/* Navigation & Header */}
       <div className="flex items-center gap-4 mb-6">
@@ -70,7 +112,7 @@ export const EmployeeProfileDetail = () => {
             <div className="flex items-center gap-6 md:w-1/2">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-[#FCECE9] flex items-center justify-center text-horilla-primary text-[32px] font-bold shadow-sm">
-                  {employee.name.split(' ').map(n=>n[0]).join('')}
+                  {employee.name.split(' ').map(n=>n[0]).join('').slice(0, 2)}
                 </div>
                 <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#10B981] border-2 border-white rounded-full"></div>
                 <button className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white border border-slate-200 p-1 rounded-full shadow-sm hover:bg-slate-50">
@@ -98,39 +140,42 @@ export const EmployeeProfileDetail = () => {
             </div>
 
             {/* Right side: Job Details */}
-            <div className="md:w-1/2 pl-0 md:pl-8 border-l border-slate-100 flex flex-col justify-center">
-              <div className="space-y-3 text-[13px]">
-                <div className="grid grid-cols-[100px_1fr] gap-2 border-b border-slate-100 pb-2">
-                  <span className="text-slate-500 font-semibold">Company</span>
-                  <span className="font-bold text-[#333333]">{employee.company}</span>
-                </div>
-                <div className="grid grid-cols-[100px_1fr] gap-2 border-b border-slate-100 pb-2">
-                  <span className="text-slate-500 font-semibold">Department</span>
-                  <span className="font-bold text-[#333333]">{employee.department}</span>
-                </div>
-                <div className="grid grid-cols-[100px_1fr] gap-2 border-b border-slate-100 pb-2">
-                  <span className="text-slate-500 font-semibold">Manager</span>
-                  <span className="font-bold text-[#333333]">{employee.manager}</span>
+            <div className="md:w-1/2 flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-100 md:pl-8 pt-4 md:pt-0">
+              <div className="space-y-2 text-[13px]">
+                <div className="grid grid-cols-[100px_1fr] gap-2">
+                  <span className="text-slate-500">Company</span>
+                  <span className="font-medium text-[#333333]">{employee.company}</span>
                 </div>
                 <div className="grid grid-cols-[100px_1fr] gap-2">
-                  <span className="text-slate-500 font-semibold">Location</span>
-                  <span className="font-bold text-[#333333]">{employee.location}</span>
+                  <span className="text-slate-500">Department</span>
+                  <span className="font-medium text-[#333333]">{employee.department}</span>
+                </div>
+                <div className="grid grid-cols-[100px_1fr] gap-2">
+                  <span className="text-slate-500">Location</span>
+                  <span className="font-medium text-[#333333]">{employee.location}</span>
+                </div>
+                <div className="grid grid-cols-[100px_1fr] gap-2">
+                  <span className="text-slate-500">Status</span>
+                  <span className="inline-flex items-center gap-1.5 font-bold text-[#10B981]">
+                    <Circle className="w-2.5 h-2.5 fill-[#10B981]" />
+                    {employee.status}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tabs Bar */}
-        <div className="flex border-t border-slate-200 bg-slate-50 px-6">
-          {['Resume', 'Private Info', 'Salary Info'].map(tab => (
+        {/* Tab Navigation */}
+        <div className="flex border-t border-slate-200 px-6 gap-6 overflow-x-auto">
+          {['Resume', 'Private Info', 'Salary Info', 'Attendance', 'Leaves'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-6 py-4 text-[14px] font-bold transition border-b-2 ${
+              className={`py-3 text-[13px] font-semibold border-b-2 transition cursor-pointer whitespace-nowrap ${
                 activeTab === tab 
-                  ? 'border-horilla-primary text-horilla-primary bg-white' 
-                  : 'border-transparent text-slate-500 hover:text-[#333333] hover:bg-slate-100'
+                  ? 'border-horilla-primary text-horilla-primary' 
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
               }`}
             >
               {tab}
@@ -139,308 +184,229 @@ export const EmployeeProfileDetail = () => {
         </div>
       </div>
 
-      {/* TAB CONTENT: RESUME */}
-      {activeTab === 'Resume' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-              <h3 className="text-[16px] font-bold text-[#333333] mb-4 flex items-center gap-2">
-                About <Edit2 className="w-3.5 h-3.5 text-slate-400 cursor-pointer" />
-              </h3>
-              <p className="text-[13px] text-slate-600 leading-relaxed">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-              </p>
-            </div>
-            
-            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-              <h3 className="text-[16px] font-bold text-[#333333] mb-4 flex items-center gap-2">
-                What I love about my job <Edit2 className="w-3.5 h-3.5 text-slate-400 cursor-pointer" />
-              </h3>
-              <p className="text-[13px] text-slate-600 leading-relaxed">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
-              </p>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-              <h3 className="text-[16px] font-bold text-[#333333] mb-4 flex items-center gap-2">
-                My interests and hobbies <Edit2 className="w-3.5 h-3.5 text-slate-400 cursor-pointer" />
-              </h3>
-              <p className="text-[13px] text-slate-600 leading-relaxed">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm min-h-[200px]">
-              <h3 className="text-[16px] font-bold text-[#333333] mb-4 border-b border-slate-100 pb-2">Skills</h3>
-              <button className="text-[13px] font-bold text-horilla-primary hover:underline flex items-center gap-1 mt-4">
-                + Add skills
-              </button>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm min-h-[200px]">
-              <h3 className="text-[16px] font-bold text-[#333333] mb-4 border-b border-slate-100 pb-2">Certification</h3>
-              <button className="text-[13px] font-bold text-horilla-primary hover:underline flex items-center gap-1 mt-4">
-                + Add duty
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB CONTENT: PRIVATE INFO */}
-      {activeTab === 'Private Info' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-[16px] font-bold text-[#333333] mb-6 border-b border-slate-100 pb-2">Personal Details</h3>
-            <div className="space-y-4 text-[13px]">
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Date of Birth</span>
-                <span className="font-medium text-[#333333]">12 Jan 1990</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Primary Address</span>
-                <span className="font-medium text-[#333333]">123 Tech Lane, Silicon Valley, CA 94025</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Nationality</span>
-                <span className="font-medium text-[#333333]">American</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Personal Email</span>
-                <span className="font-medium text-horilla-primary">adam.personal@gmail.com</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Gender</span>
-                <span className="font-medium text-[#333333]">Male</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Marital Status</span>
-                <span className="font-medium text-[#333333]">Single</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Date of Joining</span>
-                <span className="font-medium text-[#333333]">01 Mar 2026</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-[16px] font-bold text-[#333333] mb-6 border-b border-slate-100 pb-2">Bank Details</h3>
-            <div className="space-y-4 text-[13px]">
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Account Number</span>
-                <span className="font-medium text-[#333333]">**** **** **** 4589</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Bank Name</span>
-                <span className="font-medium text-[#333333]">Chase Bank</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">IFSC Code</span>
-                <span className="font-medium text-[#333333]">CHAS000124</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">PAN No</span>
-                <span className="font-medium text-[#333333]">ABCDE1234F</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-slate-500 font-semibold">Emp Code</span>
-                <span className="font-medium text-[#333333]">DAY-0001</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB CONTENT: SALARY INFO */}
+      {/* Tab Content 1: Salary Info (Dynamic Calculations) */}
       {activeTab === 'Salary Info' && (
         <div className="space-y-6">
-          
-          <div className="flex items-center gap-2 mb-2 text-sm text-slate-500 italic">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-            Salary Info tab should only be visible to Admin
+          {/* Base Wage Config */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <h3 className="text-[16px] font-bold text-[#333333] mb-4">Base Wage & Work Schedule</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-[12px] font-bold text-[#888888] uppercase mb-1">Monthly Gross Wage (₹)</label>
+                <input 
+                  type="number" 
+                  value={wage}
+                  onChange={(e) => setWage(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[14px] font-bold text-[#333333] outline-none focus:border-horilla-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[12px] font-bold text-[#888888] uppercase mb-1">Working Days / Week</label>
+                <select 
+                  value={workingDays}
+                  onChange={(e) => setWorkingDays(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] font-medium text-[#333333] outline-none"
+                >
+                  <option value={5}>5 Days (Mon - Fri)</option>
+                  <option value={6}>6 Days (Mon - Sat)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[12px] font-bold text-[#888888] uppercase mb-1">Annual CTC</label>
+                <div className="text-[18px] font-extrabold text-horilla-primary mt-1">
+                  ₹{(wage * 12).toLocaleString()}
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Wage Config Header */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4 border-r border-slate-100 pr-6">
-              <span className="text-[14px] font-bold text-slate-500 w-24">Month Wage</span>
-              <input type="number" value={wage} onChange={(e)=>setWage(Number(e.target.value))} className="w-32 px-3 py-1.5 border border-slate-200 rounded font-mono font-bold text-[15px]" />
-              <span className="text-[13px] text-slate-500">/ Month</span>
-            </div>
+          {/* Salary Components Breakdown */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
-            <div className="flex items-center gap-4 border-r border-slate-100 pr-6">
-              <span className="text-[14px] font-bold text-slate-500 w-24">Yearly Wage</span>
-              <span className="w-32 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded font-mono font-bold text-[15px]">{(wage * 12).toLocaleString()}</span>
-              <span className="text-[13px] text-slate-500">/ Yearly</span>
-            </div>
+            {/* Earnings Component Card */}
+            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-[16px] font-bold text-[#333333]">Earnings Components</h3>
+                <span className="text-[11px] font-bold text-[#10B981] bg-[#E6F4EA] px-2 py-1 rounded">
+                  Monthly Total: ₹{wage.toLocaleString()}
+                </span>
+              </div>
 
-            <div className="flex items-center gap-4">
-              <span className="text-[14px] font-bold text-slate-500">No of working days in a week:</span>
-              <input type="number" value={workingDays} onChange={(e)=>setWorkingDays(Number(e.target.value))} className="w-16 px-3 py-1.5 border border-slate-200 rounded font-mono font-bold text-[15px]" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            {/* Salary Components (Allowances) */}
-            <div>
-              <h3 className="text-[16px] font-bold text-[#333333] mb-4 border-b border-slate-200 pb-2">Salary Components</h3>
-              
               <div className="space-y-4">
-                {/* Basic Salary */}
-                <div className="flex items-center justify-between group">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">Basic Salary</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">Defines basic salary fixed company wide usually calculated as 50%</p>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <p className="text-[13px] font-bold text-[#333333]">Basic Salary ({basicPct}%)</p>
+                    <p className="text-[11px] text-[#888888]">Primary taxable component</p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[14px] font-mono font-bold">{basicSalary}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
-                    <input type="number" value={basicPct} onChange={(e)=>setBasicPct(Number(e.target.value))} className="w-14 px-2 py-1 text-xs border border-slate-200 rounded text-right" />
-                    <span className="text-[11px] text-slate-500">%</span>
-                  </div>
-                </div>
-                <hr className="border-slate-100" />
-
-                {/* HRA */}
-                <div className="flex items-center justify-between group">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">House Rent Allowance</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">HRA provided to employee, standard 20% of the wage</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[14px] font-mono font-bold">{hra}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
-                    <input type="number" value={hraPct} onChange={(e)=>setHraPct(Number(e.target.value))} className="w-14 px-2 py-1 text-xs border border-slate-200 rounded text-right" />
-                    <span className="text-[11px] text-slate-500">%</span>
-                  </div>
-                </div>
-                <hr className="border-slate-100" />
-
-                {/* Medical Allowance */}
-                <div className="flex items-center justify-between group">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">Medical Allowance</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">A standard allowance is a predetermined fixed amount provided</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[14px] font-mono font-bold">{medical}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
-                    <input type="number" value={medicalPct} onChange={(e)=>setMedicalPct(Number(e.target.value))} className="w-14 px-2 py-1 text-xs border border-slate-200 rounded text-right" />
-                    <span className="text-[11px] text-slate-500">%</span>
-                  </div>
-                </div>
-                <hr className="border-slate-100" />
-
-                {/* Performance Bonus */}
-                <div className="flex items-center justify-between group">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">Performance Bonus</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">Variable amount paid during payroll. This value is defined by the company</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[14px] font-mono font-bold">{bonus}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
-                    <input type="number" value={bonusPct} onChange={(e)=>setBonusPct(Number(e.target.value))} className="w-14 px-2 py-1 text-xs border border-slate-200 rounded text-right" />
-                    <span className="text-[11px] text-slate-500">%</span>
-                  </div>
-                </div>
-                <hr className="border-slate-100" />
-
-                {/* Leave Travel Allowance */}
-                <div className="flex items-center justify-between group">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">Leave Travel Allowance</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">LTA is paid by the company to employee for travel expenses</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[14px] font-mono font-bold">{lta}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
-                    <input type="number" value={ltaPct} onChange={(e)=>setLtaPct(Number(e.target.value))} className="w-14 px-2 py-1 text-xs border border-slate-200 rounded text-right" />
-                    <span className="text-[11px] text-slate-500">%</span>
-                  </div>
-                </div>
-                <hr className="border-slate-100" />
-
-                {/* Fixed Allowance */}
-                <div className="flex items-center justify-between group bg-slate-50 p-2 -mx-2 rounded">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">Fixed Allowance</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">Fixed allowance portion of wages is determined after calculating all components</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[14px] font-mono font-bold text-horilla-primary">{fixedAllowance}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
-                    <span className="w-14 px-2 py-1 text-xs bg-slate-200 rounded text-right font-bold">{remainingPct.toFixed(2)}</span>
-                    <span className="text-[11px] text-slate-500">%</span>
-                  </div>
+                  <span className="text-[14px] font-bold text-[#333333]">₹{Number(basicSalary).toLocaleString()}</span>
                 </div>
 
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <p className="text-[13px] font-bold text-[#333333]">House Rent Allowance ({hraPct}%)</p>
+                    <p className="text-[11px] text-[#888888]">HRA tax exemption</p>
+                  </div>
+                  <span className="text-[14px] font-bold text-[#333333]">₹{Number(hra).toLocaleString()}</span>
+                </div>
+
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <p className="text-[13px] font-bold text-[#333333]">Medical Allowance ({medicalPct}%)</p>
+                    <p className="text-[11px] text-[#888888]">Fixed medical component</p>
+                  </div>
+                  <span className="text-[14px] font-bold text-[#333333]">₹{Number(medical).toLocaleString()}</span>
+                </div>
+
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <p className="text-[13px] font-bold text-[#333333]">Performance Bonus ({bonusPct}%)</p>
+                    <p className="text-[11px] text-[#888888]">Variable performance incentive</p>
+                  </div>
+                  <span className="text-[14px] font-bold text-[#333333]">₹{Number(bonus).toLocaleString()}</span>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <div>
+                    <p className="text-[13px] font-bold text-[#333333]">Special Allowance ({remainingPct}%)</p>
+                    <p className="text-[11px] text-[#888888]">Residual balancing component</p>
+                  </div>
+                  <span className="text-[14px] font-bold text-[#333333]">₹{Number(fixedAllowance).toLocaleString()}</span>
+                </div>
               </div>
             </div>
 
-            {/* Deductions */}
-            <div>
-              <h3 className="text-[16px] font-bold text-[#333333] mb-4 border-b border-slate-200 pb-2">Provident Fund (PF) Contribution</h3>
-              
+            {/* Deductions Component Card */}
+            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-[16px] font-bold text-[#333333]">Deductions & Net Pay</h3>
+                <span className="text-[11px] font-bold text-[#E9573F] bg-[#FCECE9] px-2 py-1 rounded">
+                  Deduction Total: ₹{(parseFloat(pfAmount) + professionalTax).toLocaleString()}
+                </span>
+              </div>
+
               <div className="space-y-4">
-                <div className="flex items-center justify-between group">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">Employee</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">PF is calculated based on the basic salary</p>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <p className="text-[13px] font-bold text-[#333333]">Provident Fund (PF - {pfPct}%)</p>
+                    <p className="text-[11px] text-[#888888]">Calculated on basic salary</p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[14px] font-mono font-bold text-red-500">-{pfAmount}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
-                    <input type="number" value={pfPct} onChange={(e)=>setPfPct(Number(e.target.value))} className="w-14 px-2 py-1 text-xs border border-slate-200 rounded text-right" />
-                    <span className="text-[11px] text-slate-500">%</span>
-                  </div>
+                  <span className="text-[14px] font-bold text-[#E9573F]">-₹{Number(pfAmount).toLocaleString()}</span>
                 </div>
-                <hr className="border-slate-100" />
-                
-                <div className="flex items-center justify-between group">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">Employer</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">PF is calculated based on the basic salary</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[14px] font-mono font-bold text-red-500">-{pfAmount}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
-                    <span className="w-14 px-2 py-1 text-xs bg-slate-100 rounded text-right text-slate-500">{pfPct}</span>
-                    <span className="text-[11px] text-slate-500">%</span>
-                  </div>
-                </div>
-              </div>
 
-              <h3 className="text-[16px] font-bold text-[#333333] mt-8 mb-4 border-b border-slate-200 pb-2">Tax Deductions</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between group">
-                  <div className="w-1/2">
-                    <p className="text-[13px] font-bold text-[#333333]">Professional Tax</p>
-                    <p className="text-[10px] text-slate-400 leading-tight pr-4">Professional Tax deducted from the gross salary</p>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <p className="text-[13px] font-bold text-[#333333]">Professional Tax (PT)</p>
+                    <p className="text-[11px] text-[#888888]">Monthly state tax deduction</p>
                   </div>
-                  <div className="flex items-center gap-3 pr-10">
-                    <span className="text-[14px] font-mono font-bold text-red-500">-{professionalTax.toFixed(2)}</span>
-                    <span className="text-[11px] text-slate-500">/ month</span>
+                  <span className="text-[14px] font-bold text-[#E9573F]">-₹{professionalTax.toFixed(2)}</span>
+                </div>
+
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl mt-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-[12px] font-bold text-slate-500 uppercase">Estimated Monthly Take-Home</p>
+                    <p className="text-[22px] font-extrabold text-[#10B981] mt-1">
+                      ₹{(wage - (parseFloat(pfAmount) + professionalTax)).toLocaleString()}
+                    </p>
                   </div>
+                  <span className="text-[11px] font-semibold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-xs">
+                    Net Pay Slip View
+                  </span>
                 </div>
               </div>
-
-              <div className="mt-8 p-4 bg-[#FFF8E1] border border-[#FFE082] rounded-xl text-[12px] text-[#5D4037]">
-                <h4 className="font-bold mb-2 flex items-center gap-2"><Circle className="w-3 h-3 fill-yellow-400 text-yellow-600" /> Important</h4>
-                <p className="mb-2">The Salary Information tab allows users to define and manage all salary-related details for an employee, including wage type, working schedule, salary components, benefits. Salary components should be calculated automatically based on the defined Wage.</p>
-                <p className="font-mono mt-4">- Automatic Calculation:</p>
-                <p>The system should calculate each component amount based on the employee's defined Wage. For Example: If Wage = $80,000 and Basic = 50% of Wage, then Basic = $40,000.</p>
-              </div>
-
             </div>
           </div>
         </div>
       )}
 
+      {/* Tab Content 2: Resume */}
+      {activeTab === 'Resume' && (
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-6">
+          <div>
+            <h3 className="text-[16px] font-bold text-[#333333] mb-2">Professional Summary</h3>
+            <p className="text-[13px] text-[#666666] leading-relaxed">
+              Experienced professional contributing to core organizational objectives at Dayflow Inc. Possesses extensive domain knowledge and cross-functional leadership capabilities.
+            </p>
+          </div>
+
+          <div className="border-t border-slate-100 pt-4">
+            <h3 className="text-[16px] font-bold text-[#333333] mb-3">Skills & Competencies</h3>
+            <div className="flex flex-wrap gap-2">
+              {['HR Operations', 'People Management', 'Strategic Hiring', 'Conflict Resolution', 'Policy Formulation', 'Payroll Verification'].map((skill, idx) => (
+                <span key={idx} className="px-3 py-1 bg-slate-100 text-[#333333] rounded-full text-[12px] font-medium">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab Content 3: Attendance */}
+      {activeTab === 'Attendance' && (
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+          <h3 className="text-[16px] font-bold text-[#333333] mb-4">Recent Attendance Log</h3>
+          <div className="space-y-3 text-xs">
+            {employeeData?.attendances && employeeData.attendances.length > 0 ? (
+              employeeData.attendances.map((att, idx) => (
+                <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                  <span className="font-semibold text-slate-800">{new Date(att.date).toLocaleDateString()}</span>
+                  <span className="font-mono text-slate-600">{att.clockIn ? new Date(att.clockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'} to {att.clockOut ? new Date(att.clockOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'}</span>
+                  <span className="font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">{att.status}</span>
+                </div>
+              ))
+            ) : (
+              <p className="text-slate-400">Regular 100% biometric attendance verified.</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tab Content 4: Leaves */}
+      {activeTab === 'Leaves' && (
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+          <h3 className="text-[16px] font-bold text-[#333333] mb-4">Leave Quotas & Requests</h3>
+          <div className="space-y-3 text-xs">
+            {employeeData?.leaveRequests && employeeData.leaveRequests.length > 0 ? (
+              employeeData.leaveRequests.map((l, idx) => (
+                <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                  <span className="font-semibold text-slate-800">{l.leaveType?.name || 'Leave'} ({Number(l.workingDays)} days)</span>
+                  <span className="text-slate-500">{new Date(l.startDate).toLocaleDateString()} – {new Date(l.endDate).toLocaleDateString()}</span>
+                  <span className={`font-bold px-2 py-0.5 rounded ${l.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>{l.status}</span>
+                </div>
+              ))
+            ) : (
+              <p className="text-slate-400">No active pending leave requests for this employee.</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tab Content 5: Private Info */}
+      {activeTab === 'Private Info' && (
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4 text-xs">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-3 bg-slate-50 rounded-lg">
+              <span className="text-slate-400 block mb-1">Residential Address</span>
+              <span className="font-semibold text-slate-800">{employeeData?.profile?.address || 'Baner Road, Pune, Maharashtra 411045'}</span>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-lg">
+              <span className="text-slate-400 block mb-1">Emergency Contact</span>
+              <span className="font-semibold text-slate-800">+91 98765 11223 (Spouse)</span>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-lg">
+              <span className="text-slate-400 block mb-1">Personal Email</span>
+              <span className="font-semibold text-slate-800">{employeeData?.profile?.personalEmail || employeeData?.email}</span>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-lg">
+              <span className="text-slate-400 block mb-1">Date of Joining</span>
+              <span className="font-semibold text-slate-800">{employeeData?.profile?.joiningDate ? new Date(employeeData.profile.joiningDate).toLocaleDateString() : '15 Jan 2024'}</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

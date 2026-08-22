@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { Search, UserPlus, Mail, Phone, Briefcase, Building, Sparkles } from 'lucide-react';
 
@@ -7,20 +7,41 @@ export const EmployeeProfilesPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const employees = [
-    { id: 'DAY-HR-2026-0001', name: 'Adam Admin', email: 'admin@dayflow.com', phone: '+1 555-0100', role: 'ADMIN', dept: 'Executive', status: 'Active', salary: '120000' },
-    { id: 'DAY-SJ-2026-0012', name: 'Sarah Jenkins', email: 'sarah.j@dayflow.com', phone: '+1 555-0142', role: 'EMPLOYEE', dept: 'Engineering', status: 'Active', salary: '95000' },
-    { id: 'DAY-AR-2026-0045', name: 'Alex Rivera', email: 'alex.r@dayflow.com', phone: '+1 555-0188', role: 'EMPLOYEE', dept: 'Product Design', status: 'Active', salary: '88000' },
-    { id: 'DAY-DC-2026-0008', name: 'David Chen', email: 'david.c@dayflow.com', phone: '+1 555-0199', role: 'HR', dept: 'Human Resources', status: 'Active', salary: '78000' },
-    { id: 'DAY-EW-2026-0033', name: 'Emma Watson', email: 'emma.w@dayflow.com', phone: '+1 555-0122', role: 'EMPLOYEE', dept: 'Operations', status: 'Active', salary: '72000' },
-    { id: 'DAY-AM-2026-0051', name: 'Alice Murphy', email: 'alice.m@dayflow.com', phone: '+1 555-0133', role: 'EMPLOYEE', dept: 'Marketing', status: 'Active', salary: '81000' },
-    { id: 'DAY-JS-2026-0077', name: 'John Smith', email: 'john.s@dayflow.com', phone: '+1 555-0155', role: 'EMPLOYEE', dept: 'Sales', status: 'On Leave', salary: '75000' },
-  ];
+  const loadEmployees = async () => {
+    try {
+      const res = await fetchAllEmployeesApi({ departmentId: deptFilter, search: searchTerm });
+      if (res.ok && res.data?.employees) {
+        const mapped = res.data.employees.map(e => ({
+          id: e.id,
+          loginId: e.loginId || 'EMP-1000',
+          name: `${e.firstName} ${e.lastName || ''}`.trim(),
+          email: e.email,
+          phone: e.phone || '+91 98765 43210',
+          role: e.role?.name || 'EMPLOYEE',
+          dept: e.department?.name || 'General',
+          position: e.position?.title || 'Team Member',
+          status: 'Active',
+          salary: e.salaryStructures?.[0]?.annualCtc ? `₹${(Number(e.salaryStructures[0].annualCtc) / 100000).toFixed(1)}L` : '₹9.6L'
+        }));
+        setEmployees(mapped);
+      }
+    } catch (err) {
+      console.error('Failed to load employees:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadEmployees();
+  }, [deptFilter, searchTerm]);
 
   const filtered = employees.filter(e => {
     const matchesSearch = e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          e.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          e.loginId.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           e.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDept = deptFilter === 'ALL' || e.dept === deptFilter;
     return matchesSearch && matchesDept;
@@ -76,6 +97,14 @@ export const EmployeeProfilesPage = () => {
         </div>
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="p-8 flex items-center justify-center gap-2 text-slate-500 text-sm">
+          <Loader2 className="w-5 h-5 animate-spin text-horilla-primary" />
+          <span>Loading employee directory from database...</span>
+        </div>
+      )}
+
       {/* Employee Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filtered.map((emp) => (
@@ -121,6 +150,7 @@ export const EmployeeProfilesPage = () => {
                 </div>
               </div>
             </div>
+          ))}
 
             <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between">
               <span className="text-[10px] text-slate-500 font-mono">{emp.id}</span>

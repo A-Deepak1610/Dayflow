@@ -4,8 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard,
   Users,
-  CheckCircle2,
-  XCircle,
+  Clock,
+  Calendar,
   DollarSign,
   TrendingUp,
   HeadphonesIcon,
@@ -24,13 +24,15 @@ export const HrSidebar = () => {
 
   const navItems = [
     { label: 'Dashboard', path: '/hr/dashboard', icon: LayoutDashboard },
-    { label: 'Employee', path: '/hr/employees', icon: Users },
-    { label: 'Attendance', path: '/hr/attendance', icon: CheckCircle2 },
-    { label: 'Leave', path: '/hr/leaves', icon: XCircle },
+    { label: 'Employees', path: '/hr/employees', icon: Users },
+    { label: 'Attendance', path: '/hr/attendance', icon: Clock },
+    { label: 'Leaves', path: '/hr/leaves', icon: Calendar },
     { label: 'Payroll', path: '/hr/payroll', icon: DollarSign },
     { label: 'Performance', path: '/hr/performance', icon: TrendingUp },
     { label: 'Helpdesk', path: '/hr/helpdesk', icon: HeadphonesIcon },
   ];
+
+  if (!user) return null;
 
   return (
     <aside className="w-[260px] bg-[#0a0a0a] border-r border-white/10 flex flex-col justify-between h-screen sticky top-0 z-30 shrink-0 font-inter">
@@ -86,6 +88,31 @@ export const HrSidebar = () => {
             <span>Sign Out</span>
           </button>
         </div>
+      </div>
+
+      {/* Sidebar Footer with User & Logout */}
+      <div className="p-4 border-t border-slate-100">
+        <div className="flex items-center gap-3 px-3 py-3 mb-3 bg-slate-50 rounded-xl border border-slate-200">
+          <div className="w-10 h-10 rounded-full bg-[#1F2A52] text-white flex items-center justify-center font-bold text-sm shadow-sm relative">
+            {user?.firstName?.charAt(0) || 'A'}
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute bottom-0 right-0 border-2 border-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-[#1F2A52] truncate">
+              {user?.firstName} {user?.lastName || ''}
+            </p>
+            <p className="text-[10px] text-slate-500 font-mono truncate">
+              {user?.loginId || 'EMP1000'}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Logout</span>
+        </button>
       </div>
     </aside>
   );
