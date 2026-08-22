@@ -19,14 +19,16 @@ import {
   Plus
 } from 'lucide-react';
 
+import { clockInApi, clockOutApi, getMyAttendanceApi } from '../../services/api';
+
 export const EmployeeDashboard = () => {
   const { user, logoutUser } = useAuth();
   const navigate = useNavigate();
 
   // Clock In / Out State
-  const [clockedIn, setClockedIn] = useState(true);
-  const [clockInTime, setClockInTime] = useState('08:58 AM');
-  const [elapsedSeconds, setElapsedSeconds] = useState(7 * 3600 + 14 * 60 + 22);
+  const [clockedIn, setClockedIn] = useState(false);
+  const [clockInTime, setClockInTime] = useState('--:--');
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Leave Form Modal
   const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -43,6 +45,26 @@ export const EmployeeDashboard = () => {
   ]);
 
   useEffect(() => {
+    const fetchTodayState = async () => {
+      const res = await getMyAttendanceApi();
+      if (res.ok && res.data.logs.length > 0) {
+        const today = new Date().toLocaleDateString();
+        const latestLog = res.data.logs[0];
+        const logDate = new Date(latestLog.date).toLocaleDateString();
+        
+        if (today === logDate && !latestLog.clockOut) {
+          setClockedIn(true);
+          setClockInTime(new Date(latestLog.clockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+          
+          const diff = Math.floor((new Date() - new Date(latestLog.clockIn)) / 1000);
+          setElapsedSeconds(diff);
+        }
+      }
+    };
+    fetchTodayState();
+  }, []);
+
+  useEffect(() => {
     let timer;
     if (clockedIn) {
       timer = setInterval(() => setElapsedSeconds(prev => prev + 1), 1000);
@@ -57,12 +79,23 @@ export const EmployeeDashboard = () => {
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleToggleClock = () => {
+  const handleToggleClock = async () => {
     if (clockedIn) {
-      setClockedIn(false);
+      const res = await clockOutApi();
+      if (res.ok) {
+        setClockedIn(false);
+      } else {
+        alert(res.error || res.data?.message || 'Error clocking out');
+      }
     } else {
-      setClockedIn(true);
-      setClockInTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      const res = await clockInApi();
+      if (res.ok) {
+        setClockedIn(true);
+        setClockInTime(new Date(res.data.log.clockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        setElapsedSeconds(0);
+      } else {
+        alert(res.error || res.data?.message || 'Error clocking in');
+      }
     }
   };
 
