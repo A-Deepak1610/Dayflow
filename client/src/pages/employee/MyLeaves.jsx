@@ -1,5 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  fetchLeaveTypesApi,
+  fetchMyLeaveBalancesApi,
+  fetchMyLeavesApi,
+  applyLeaveApi,
+  cancelLeaveApi,
+  fetchHolidaysApi
+} from '../../services/api';
 import {
   Calendar,
   Clock,
@@ -288,225 +296,158 @@ export const MyLeaves = () => {
   const [attachedFile, setAttachedFile] = useState(null);
   const [submittedRequestId, setSubmittedRequestId] = useState(null);
 
-  // --------------------------------------------------------------------------
-  // USER LEAVE REQUESTS STATE (Employee: Alex Johnson EMP-1024)
-  // --------------------------------------------------------------------------
-  const [requests, setRequests] = useState([
-    {
-      id: 'LV-2026-00842',
-      typeId: 'AL',
-      typeName: 'Annual Leave',
-      startDate: '2026-08-25',
-      endDate: '2026-08-29',
-      dateRangeDisplay: '25 Aug – 29 Aug 2026',
-      calendarDays: 5,
-      workingDays: 4.0,
-      weekendDays: 1,
-      holidayDays: 0,
-      durationLabel: '4.0 working days',
-      reason: 'Family vacation and personal downtime.',
-      status: 'Pending',
-      submittedOn: '22 Aug 2026, 09:30 AM',
-      handoverTo: 'Sophia Chen',
-      handoverNotes: 'Sophia covering active sprint Jira tickets for auth module.',
-      hasAttachment: false,
-      attachmentName: null,
-      timeline: [
-        { title: 'Request Submitted', date: '22 Aug 2026, 09:30 AM', by: 'You (Alex Johnson)', status: 'completed' },
-        { title: 'Manager Review', date: 'In Review', by: 'Sarah Williams (Engineering Lead)', status: 'current' },
-        { title: 'HR Final Decision', date: 'Pending Manager Signoff', by: 'HR Operations', status: 'upcoming' }
-      ]
-    },
-    {
-      id: 'LV-2026-00714',
-      typeId: 'CL',
-      typeName: 'Casual Leave',
-      startDate: '2026-07-14',
-      endDate: '2026-07-14',
-      dateRangeDisplay: '14 Jul 2026',
-      calendarDays: 1,
-      workingDays: 1.0,
-      weekendDays: 0,
-      holidayDays: 0,
-      durationLabel: '1.0 working day',
-      reason: 'Urgent home maintenance and utility repair.',
-      status: 'Approved',
-      submittedOn: '10 Jul 2026, 11:20 AM',
-      approvedBy: 'Sarah Williams',
-      approvedOn: '11 Jul 2026, 02:45 PM',
-      leaveDeducted: '1.0 day',
-      balanceRemaining: '3.0 days',
-      handoverTo: 'Liam Patel',
-      handoverNotes: 'Liam monitored deployment alerts during morning shift.',
-      hasAttachment: false,
-      attachmentName: null,
-      timeline: [
-        { title: 'Request Submitted', date: '10 Jul 2026, 11:20 AM', by: 'You (Alex Johnson)', status: 'completed' },
-        { title: 'Manager Approved', date: '11 Jul 2026, 02:45 PM', by: 'Sarah Williams', status: 'completed' },
-        { title: 'HR Final Decision & Quota Deducted', date: '11 Jul 2026, 03:00 PM', by: 'HR Operations', status: 'completed' }
-      ]
-    },
-    {
-      id: 'LV-2026-00602',
-      typeId: 'SL',
-      typeName: 'Sick Leave',
-      startDate: '2026-06-02',
-      endDate: '2026-06-03',
-      dateRangeDisplay: '02 Jun – 03 Jun 2026',
-      calendarDays: 2,
-      workingDays: 2.0,
-      weekendDays: 0,
-      holidayDays: 0,
-      durationLabel: '2.0 working days',
-      reason: 'Viral fever recovery and doctor-prescribed rest.',
-      status: 'Approved',
-      submittedOn: '02 Jun 2026, 08:15 AM',
-      approvedBy: 'Sarah Williams',
-      approvedOn: '02 Jun 2026, 09:30 AM',
-      leaveDeducted: '2.0 days',
-      balanceRemaining: '6.0 days',
-      handoverTo: 'Marcus Vance',
-      handoverNotes: 'Marcus handled smoke tests for v2.3 release candidate.',
-      hasAttachment: true,
-      attachmentName: 'medical_certificate.pdf',
-      timeline: [
-        { title: 'Request Submitted', date: '02 Jun 2026, 08:15 AM', by: 'You (Alex Johnson)', status: 'completed' },
-        { title: 'Manager Fast-Track Approved', date: '02 Jun 2026, 09:30 AM', by: 'Sarah Williams', status: 'completed' },
-        { title: 'Medical Certificate Verified', date: '04 Jun 2026, 02:00 PM', by: 'HR Medical Officer', status: 'completed' }
-      ]
-    },
-    {
-      id: 'LV-2026-00310',
-      typeId: 'AL',
-      typeName: 'Annual Leave',
-      startDate: '2026-03-10',
-      endDate: '2026-03-13',
-      dateRangeDisplay: '10 Mar – 13 Mar 2026',
-      calendarDays: 4,
-      workingDays: 4.0,
-      weekendDays: 0,
-      holidayDays: 0,
-      durationLabel: '4.0 working days',
-      reason: 'Spring break trip and personal travel.',
-      status: 'Approved',
-      submittedOn: '25 Feb 2026, 11:00 AM',
-      approvedBy: 'Sarah Williams',
-      approvedOn: '26 Feb 2026, 03:40 PM',
-      leaveDeducted: '4.0 days',
-      balanceRemaining: '12.0 days',
-      handoverTo: 'Sophia Chen',
-      handoverNotes: 'Handed over sprint tickets to Sophia.',
-      hasAttachment: false,
-      attachmentName: null,
-      timeline: [
-        { title: 'Request Submitted', date: '25 Feb 2026, 11:00 AM', by: 'You (Alex Johnson)', status: 'completed' },
-        { title: 'Manager Approved', date: '26 Feb 2026, 03:40 PM', by: 'Sarah Williams', status: 'completed' },
-        { title: 'HR Finalized', date: '26 Feb 2026, 04:00 PM', by: 'HR Operations', status: 'completed' }
-      ]
-    },
-    {
-      id: 'LV-2026-00118',
-      typeId: 'COMP',
-      typeName: 'Compensatory Off',
-      startDate: '2026-01-18',
-      endDate: '2026-01-18',
-      dateRangeDisplay: '18 Jan 2026',
-      calendarDays: 1,
-      workingDays: 1.0,
-      weekendDays: 0,
-      holidayDays: 0,
-      durationLabel: '1.0 working day',
-      reason: 'Availing comp-off for Saturday data migration support.',
-      status: 'Cancelled',
-      submittedOn: '15 Jan 2026, 10:20 AM',
-      cancelledOn: '16 Jan 2026, 02:15 PM',
-      cancelledBy: 'You (Alex Johnson)',
-      cancellationReason: 'Migration was rescheduled; chose to work regular day.',
-      handoverTo: 'None',
-      handoverNotes: 'N/A',
-      hasAttachment: false,
-      attachmentName: null,
-      timeline: [
-        { title: 'Request Submitted', date: '15 Jan 2026, 10:20 AM', by: 'You (Alex Johnson)', status: 'completed' },
-        { title: 'Cancelled by Employee', date: '16 Jan 2026, 02:15 PM', by: 'You (Alex Johnson)', status: 'cancelled' }
-      ]
-    },
-    {
-      id: 'LV-2025-00918',
-      typeId: 'AL',
-      typeName: 'Annual Leave',
-      startDate: '2025-11-20',
-      endDate: '2025-11-21',
-      dateRangeDisplay: '20 Nov – 21 Nov 2025',
-      calendarDays: 2,
-      workingDays: 2.0,
-      weekendDays: 0,
-      holidayDays: 0,
-      durationLabel: '2.0 working days',
-      reason: 'Personal workshop attendance.',
-      status: 'Rejected',
-      submittedOn: '18 Nov 2025, 05:00 PM',
-      rejectedBy: 'Sarah Williams',
-      rejectedOn: '19 Nov 2025, 10:30 AM',
-      rejectionReason: 'Team capacity is limited during this period.',
-      handoverTo: 'Liam Patel',
-      handoverNotes: 'None',
-      hasAttachment: false,
-      attachmentName: null,
-      timeline: [
-        { title: 'Request Submitted', date: '18 Nov 2025, 05:00 PM', by: 'You (Alex Johnson)', status: 'completed' },
-        { title: 'Request Rejected', date: '19 Nov 2025, 10:30 AM', by: 'Sarah Williams (Manager)', status: 'rejected' }
-      ]
-    }
-  ]);
-
   // Toast Helper
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3800);
   };
 
-  // Selected Type in Wizard
+  // Live Data State from Backend
+  const [leaveBalances, setLeaveBalances] = useState([]);
+  const [leaveTypes, setLeaveTypes] = useState([]);
+  const [companyHolidays, setCompanyHolidays] = useState(COMPANY_HOLIDAYS_2026);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadLeaveData = async () => {
+    try {
+      const [balRes, reqRes, typeRes, holRes] = await Promise.all([
+        fetchMyLeaveBalancesApi(),
+        fetchMyLeavesApi(),
+        fetchLeaveTypesApi(),
+        fetchHolidaysApi()
+      ]);
+
+      if (balRes.ok && balRes.data?.balances) {
+        setLeaveBalances(balRes.data.balances);
+      }
+      if (reqRes.ok && reqRes.data?.leaveRequests) {
+        const mapped = reqRes.data.leaveRequests.map(r => ({
+          id: r.id,
+          typeId: r.leaveTypeId,
+          typeName: r.leaveType?.name || 'Leave',
+          startDate: r.startDate.split('T')[0],
+          endDate: r.endDate.split('T')[0],
+          dateRangeDisplay: `${new Date(r.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} – ${new Date(r.endDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}`,
+          calendarDays: r.calendarDays,
+          workingDays: Number(r.workingDays),
+          weekendDays: r.weekendDays,
+          holidayDays: r.holidayDays,
+          durationLabel: `${Number(r.workingDays)} working day${Number(r.workingDays) > 1 ? 's' : ''}`,
+          reason: r.reason,
+          status: r.status,
+          submittedOn: new Date(r.appliedAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
+          handoverTo: r.handoverUserId || 'Team Member',
+          handoverNotes: r.handoverNotes || '',
+          hasAttachment: !!r.attachmentUrl,
+          timeline: (r.events && r.events.length > 0) ? r.events.map(e => ({
+            title: e.event,
+            date: new Date(e.createdAt).toLocaleDateString(),
+            by: e.note || 'HR Team',
+            status: 'completed'
+          })) : [
+            { title: 'Application Submitted', date: new Date(r.appliedAt).toLocaleDateString(), by: 'Employee Portal', status: 'completed' },
+            { title: 'HR / Manager Review', date: r.status === 'Pending' ? 'In Progress' : 'Reviewed', by: 'Operations', status: r.status === 'Pending' ? 'current' : 'completed' }
+          ]
+        }));
+        setRequests(mapped);
+      }
+      if (typeRes.ok && typeRes.data?.leaveTypes) {
+        setLeaveTypes(typeRes.data.leaveTypes);
+      }
+      if (holRes.ok && holRes.data?.holidays) {
+        setCompanyHolidays(holRes.data.holidays.map(h => ({
+          date: h.date.split('T')[0],
+          name: h.name,
+          day: new Date(h.date).toLocaleDateString('en-US', { weekday: 'long' })
+        })));
+      }
+    } catch (e) {
+      console.error('Failed to load live leaves:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLeaveData();
+  }, []);
+
+  // Dynamic leave types configuration combining master UI icons/colors with live backend balances
+  const dynamicLeaveTypes = useMemo(() => {
+    return LEAVE_TYPES_CONFIG.map(cfg => {
+      const liveBal = leaveBalances.find(b => b.leaveType?.name.toLowerCase() === cfg.name.toLowerCase() || b.leaveTypeId === cfg.id);
+      if (liveBal) {
+        return {
+          ...cfg,
+          id: liveBal.leaveTypeId || cfg.id,
+          totalQuota: Number(liveBal.totalDays),
+          used: Number(liveBal.usedDays),
+          pending: Number(liveBal.pendingDays),
+          available: Number(liveBal.remainingDays),
+        };
+      }
+      return cfg;
+    });
+  }, [leaveBalances]);
+
+  // Current Type Configuration in Apply Wizard
   const currentTypeConfig = useMemo(() => {
-    return LEAVE_TYPES_CONFIG.find(t => t.id === selectedType) || LEAVE_TYPES_CONFIG[0];
-  }, [selectedType]);
+    return dynamicLeaveTypes.find(t => t.id === selectedType) || dynamicLeaveTypes[0] || LEAVE_TYPES_CONFIG[0];
+  }, [dynamicLeaveTypes, selectedType]);
 
   // --------------------------------------------------------------------------
-  // SMART WORKING DAYS & DEDUCTION CALCULATION ENGINE
+  // LIVE WORKING DAYS & DEDUCTION CALCULATION ENGINE
   // --------------------------------------------------------------------------
   const calculatedDeduction = useMemo(() => {
-    const isHalfDay = durationMode === 'HALF_FIRST' || durationMode === 'HALF_SECOND';
-    const effectiveEndDate = durationMode === 'SINGLE' || isHalfDay ? startDate : endDate;
-
-    if (!startDate || !effectiveEndDate) {
-      return { calendarDays: 0, workingDays: 0, weekends: 0, holidays: 0, holidayNames: [], isValid: false };
+    if (!startDate || !endDate) {
+      return {
+        calendarDays: 0,
+        workingDays: 0,
+        weekends: 0,
+        holidays: 0,
+        holidayNames: [],
+        isValid: false,
+        balanceAfter: currentTypeConfig?.available || 0,
+        isOverBalance: false
+      };
     }
 
     const start = new Date(startDate);
-    const end = new Date(effectiveEndDate);
+    const end = new Date(durationMode === 'SINGLE' || durationMode.startsWith('HALF') ? startDate : endDate);
 
     if (start > end) {
-      return { calendarDays: 0, workingDays: 0, weekends: 0, holidays: 0, holidayNames: [], isValid: false, error: 'End date cannot be before start date' };
+      return {
+        calendarDays: 0,
+        workingDays: 0,
+        weekends: 0,
+        holidays: 0,
+        holidayNames: [],
+        isValid: false,
+        balanceAfter: currentTypeConfig?.available || 0,
+        isOverBalance: false
+      };
     }
 
     let current = new Date(start);
     let calendarCount = 0;
     let weekendCount = 0;
     let holidayCount = 0;
-    let holidayNames = [];
+    const holidayNames = [];
 
     while (current <= end) {
       calendarCount++;
-      const dayOfWeek = current.getDay(); // 0 = Sun, 6 = Sat
-      const dateString = current.toISOString().split('T')[0];
+      const dayOfWeek = current.getDay(); // 0 = Sunday, 6 = Saturday
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-      const holiday = COMPANY_HOLIDAYS_2026.find(h => h.date === dateString);
+      const dateStr = current.toISOString().split('T')[0];
+      const matchedHoliday = companyHolidays.find(h => h.date === dateStr);
 
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
+      if (isWeekend) {
         weekendCount++;
-      } else if (holiday) {
+      } else if (matchedHoliday) {
         holidayCount++;
-        holidayNames.push(`${holiday.name} (${holiday.date})`);
+        holidayNames.push(matchedHoliday.name);
       }
 
       current.setDate(current.getDate() + 1);
@@ -515,13 +456,12 @@ export const MyLeaves = () => {
     let netWorkingDays = calendarCount - weekendCount - holidayCount;
     if (netWorkingDays < 0) netWorkingDays = 0;
 
-    if (isHalfDay) {
+    if (durationMode === 'HALF_FIRST' || durationMode === 'HALF_SECOND') {
       netWorkingDays = netWorkingDays > 0 ? 0.5 : 0;
     }
 
-    const currentBal = currentTypeConfig.available;
-    const balanceAfter = currentBal - netWorkingDays;
-    const isOverBalance = balanceAfter < 0;
+    const balanceAfter = (currentTypeConfig?.available || 0) - netWorkingDays;
+    const isOverBalance = currentTypeConfig?.category !== 'Unpaid' && balanceAfter < 0;
 
     return {
       calendarDays: calendarCount,
@@ -533,97 +473,70 @@ export const MyLeaves = () => {
       balanceAfter,
       isOverBalance
     };
-  }, [startDate, endDate, durationMode, currentTypeConfig]);
+  }, [startDate, endDate, durationMode, currentTypeConfig, companyHolidays]);
 
   // --------------------------------------------------------------------------
-  // CONFIRM LEAVE CANCELLATION HANDLER
+  // CONFIRM LEAVE CANCELLATION HANDLER (BACKEND CONNECTED)
   // --------------------------------------------------------------------------
-  const handleConfirmCancel = () => {
+  const handleConfirmCancel = async () => {
     if (!cancelModalRequest) return;
-    setRequests(prev =>
-      prev.map(r => {
-        if (r.id === cancelModalRequest.id) {
-          return {
-            ...r,
-            status: 'Cancelled',
-            cancelledOn: '22 Aug 2026',
-            cancelledBy: 'You (Alex Johnson)',
-            cancellationReason: cancelReason || 'Cancelled by employee before leave commencement.'
-          };
-        }
-        return r;
-      })
-    );
-    showToast(`Leave request ${cancelModalRequest.id} has been cancelled.`);
-    setCancelModalRequest(null);
-    setCancelReason('');
-    if (selectedRequestDetails?.id === cancelModalRequest.id) {
-      setSelectedRequestDetails(null);
+    try {
+      const res = await cancelLeaveApi(cancelModalRequest.id);
+      if (res.ok) {
+        showToast(`Leave request ${cancelModalRequest.id} has been cancelled.`);
+        setCancelModalRequest(null);
+        setCancelReason('');
+        loadLeaveData();
+      } else {
+        showToast(res.data?.message || 'Failed to cancel leave request', 'error');
+      }
+    } catch (err) {
+      showToast('Error cancelling leave', 'error');
     }
   };
 
   // --------------------------------------------------------------------------
-  // SUBMIT LEAVE REQUEST (WIZARD STEP 4 -> 5)
+  // SUBMIT LEAVE REQUEST (WIZARD STEP 4 -> 5 - BACKEND CONNECTED)
   // --------------------------------------------------------------------------
-  const handleFinalSubmit = (e) => {
+  const handleFinalSubmit = async (e) => {
     e.preventDefault();
     if (calculatedDeduction.workingDays === 0) {
       showToast('No working days detected in selected date range.', 'error');
       return;
     }
 
-    const newId = `LV-2026-00${Math.floor(800 + Math.random() * 200)}`;
     const isHalfDay = durationMode === 'HALF_FIRST' || durationMode === 'HALF_SECOND';
     const effectiveEndDate = durationMode === 'SINGLE' || isHalfDay ? startDate : endDate;
 
-    const newReq = {
-      id: newId,
-      typeId: currentTypeConfig.id,
-      typeName: currentTypeConfig.name,
-      startDate,
-      endDate: effectiveEndDate,
-      dateRangeDisplay:
-        startDate === effectiveEndDate
-          ? `${startDate}${isHalfDay ? ` (${durationMode === 'HALF_FIRST' ? 'First Half' : 'Second Half'})` : ''}`
-          : `${startDate} – ${effectiveEndDate}`,
-      calendarDays: calculatedDeduction.calendarDays,
-      workingDays: calculatedDeduction.workingDays,
-      weekendDays: calculatedDeduction.weekends,
-      holidayDays: calculatedDeduction.holidays,
-      durationLabel: `${calculatedDeduction.workingDays} working day(s)${isHalfDay ? ` (${durationMode === 'HALF_FIRST' ? '1st Half' : '2nd Half'})` : ''}`,
-      reason: reasonText,
-      status: 'Pending',
-      submittedOn: '22 Aug 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      handoverTo: handoverColleague,
-      handoverNotes: handoverNotes || 'Project responsibilities communicated with handover contact.',
-      hasAttachment: !!attachedFile,
-      attachmentName: attachedFile ? attachedFile.name : null,
-      timeline: [
-        {
-          title: 'Request Submitted',
-          date: '22 Aug 2026',
-          by: 'You (Alex Johnson)',
-          status: 'completed'
-        },
-        {
-          title: 'Manager Review',
-          date: 'Awaiting Review',
-          by: 'Sarah Williams (Engineering Lead)',
-          status: 'current'
-        },
-        {
-          title: 'HR Final Decision',
-          date: 'Scheduled',
-          by: 'HR Operations',
-          status: 'upcoming'
-        }
-      ]
-    };
+    try {
+      const targetType = leaveTypes.find(t => t.id === currentTypeConfig.id || t.name.toLowerCase() === currentTypeConfig.name.toLowerCase()) || { id: currentTypeConfig.id };
 
-    setRequests([newReq, ...requests]);
-    setSubmittedRequestId(newId);
-    setApplyStep(5);
-    showToast(`Leave request ${newId} submitted successfully!`);
+      const res = await applyLeaveApi({
+        leaveTypeId: targetType.id,
+        startDate,
+        endDate: effectiveEndDate,
+        calendarDays: calculatedDeduction.calendarDays,
+        workingDays: calculatedDeduction.workingDays,
+        weekendDays: calculatedDeduction.weekends,
+        holidayDays: calculatedDeduction.holidays,
+        reason: reasonText,
+        handoverUserId: handoverColleague,
+        handoverNotes: handoverNotes || 'Project responsibilities communicated with handover contact.',
+        isPaid: currentTypeConfig.category !== 'Unpaid',
+      });
+
+      if (res.ok) {
+        const newId = res.data?.leave?.id || `LV-${Date.now()}`;
+        setSubmittedRequestId(newId);
+        setApplyStep(5);
+        showToast(`Leave request ${newId} submitted successfully!`);
+        loadLeaveData();
+      } else {
+        showToast(res.data?.message || 'Failed to submit leave request.', 'error');
+      }
+    } catch (err) {
+      showToast('Error submitting leave application.', 'error');
+    }
   };
 
   // Reset Apply Wizard

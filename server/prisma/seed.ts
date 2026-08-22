@@ -137,6 +137,127 @@ async function main() {
     ),
   );
 
+  const hrRole = roles.find((role) => role.name === "HR")!;
+
+  const namedUsers = [
+    {
+      id: "seed-user-alex",
+      email: "alex.johnson@dayflow.io",
+      loginId: "EMP1000",
+      firstName: "Alex",
+      lastName: "Johnson",
+      roleId: adminRole.id,
+      deptIndex: 0,
+      posIndex: 0,
+    },
+    {
+      id: "seed-user-sarah",
+      email: "sarah.williams@dayflow.io",
+      loginId: "EMP1003",
+      firstName: "Sarah",
+      lastName: "Williams",
+      roleId: hrRole.id,
+      deptIndex: 4,
+      posIndex: 4,
+    },
+    {
+      id: "seed-user-sophia",
+      email: "sophia.chen@dayflow.io",
+      loginId: "EMP1001",
+      firstName: "Sophia",
+      lastName: "Chen",
+      roleId: employeeRole.id,
+      deptIndex: 0,
+      posIndex: 0,
+    },
+    {
+      id: "seed-user-liam",
+      email: "liam.patel@dayflow.io",
+      loginId: "EMP1002",
+      firstName: "Liam",
+      lastName: "Patel",
+      roleId: employeeRole.id,
+      deptIndex: 1,
+      posIndex: 1,
+    },
+    {
+      id: "seed-user-marcus",
+      email: "marcus.vance@dayflow.io",
+      loginId: "EMP1004",
+      firstName: "Marcus",
+      lastName: "Vance",
+      roleId: employeeRole.id,
+      deptIndex: 2,
+      posIndex: 2,
+    },
+    {
+      id: "seed-user-admin-legacy",
+      email: "admin@dayflow.com",
+      loginId: "DAY-HR-2026-0001",
+      firstName: "Adam",
+      lastName: "Admin",
+      roleId: adminRole.id,
+      deptIndex: 0,
+      posIndex: 0,
+    }
+  ];
+
+  for (const nu of namedUsers) {
+    const targetUser = await prisma.user.upsert({
+      where: { email: nu.email },
+      update: {
+        password,
+        loginId: nu.loginId,
+        roleId: nu.roleId,
+        firstName: nu.firstName,
+        lastName: nu.lastName,
+      },
+      create: {
+        companyId: company.id,
+        firstName: nu.firstName,
+        lastName: nu.lastName,
+        email: nu.email,
+        loginId: nu.loginId,
+        password,
+        isFirstLogin: false,
+        roleId: nu.roleId,
+        departmentId: departmentRecords[nu.deptIndex].id,
+        positionId: positionRecords[nu.posIndex].id,
+      }
+    });
+
+    await prisma.employeeProfile.upsert({
+      where: { userId: targetUser.id },
+      update: {
+        address: "742 Evergreen Terrace, New York, NY",
+        employmentType: "Full-time",
+      },
+      create: {
+        userId: targetUser.id,
+        about: `${nu.firstName} is a core contributor at Dayflow.`,
+        jobInterests: "Enterprise SaaS & HR Tech",
+        hobbies: "Reading, technology and travel",
+        skills: ["Strategy", "Leadership", "Communication"],
+        certifications: ["Dayflow Certified Professional"],
+        dateOfBirth: date("1992-05-15"),
+        address: "742 Evergreen Terrace, New York, NY",
+        nationality: "American",
+        gender: "Female",
+        maritalStatus: "Single",
+        personalEmail: nu.email,
+        location: "New York HQ, Floor 4",
+        employmentType: "Full-time",
+        joiningDate: date("2023-01-15"),
+        bankAccountName: `${nu.firstName} ${nu.lastName}`,
+        bankAccountNumber: "DFBK00998822",
+        bankIfsc: "DFBK0001234",
+        pan: "ABCDE1234F",
+        uan: "100000000099",
+        pfNumber: "PF/DF/99",
+      }
+    });
+  }
+
   const users = [] as Array<{
     id: string;
     firstName: string;
@@ -152,6 +273,7 @@ async function main() {
         lastName: lastNames[index],
         departmentId: departmentRecords[index].id,
         positionId: positionRecords[index].id,
+        password,
       },
       create: {
         id: userId,

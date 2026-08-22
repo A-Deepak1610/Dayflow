@@ -1,4 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  fetchAllAttendanceApi,
+  fetchAllRegularizationsApi,
+  reviewRegularizationApi
+} from '../../services/api';
 import {
   Clock,
   Calendar,
@@ -48,184 +53,79 @@ export const AttendanceMonitorPage = () => {
   const [formNotes, setFormNotes] = useState('');
 
   // Primary Attendance Records State
-  const [attendanceRecords, setAttendanceRecords] = useState([
-    {
-      id: 'ATT-101',
-      empId: 'DAY-HR-2026-0001',
-      name: 'Adam Admin',
-      dept: 'Executive',
-      role: 'Chief HR Officer',
-      avatar: 'AA',
-      shift: 'General (09:00 - 18:00)',
-      checkIn: '08:52 AM',
-      checkOut: '06:05 PM',
-      totalHours: '9h 13m',
-      overtime: '0h 13m',
-      breakTime: '45m',
-      status: 'Present',
-      notes: 'On time, biometric punch verified'
-    },
-    {
-      id: 'ATT-102',
-      empId: 'DAY-SJ-2026-0012',
-      name: 'Sarah Jenkins',
-      dept: 'Engineering',
-      role: 'Lead Architect',
-      avatar: 'SJ',
-      shift: 'General (09:00 - 18:00)',
-      checkIn: '09:02 AM',
-      checkOut: '06:30 PM',
-      totalHours: '9h 28m',
-      overtime: '0h 28m',
-      breakTime: '50m',
-      status: 'Present',
-      notes: 'Standard shift'
-    },
-    {
-      id: 'ATT-103',
-      empId: 'DAY-AR-2026-0045',
-      name: 'Alex Rivera',
-      dept: 'Product Design',
-      role: 'Senior UI/UX Designer',
-      avatar: 'AR',
-      shift: 'General (09:00 - 18:00)',
-      checkIn: '08:58 AM',
-      checkOut: '06:02 PM',
-      totalHours: '9h 04m',
-      overtime: '0h 04m',
-      breakTime: '40m',
-      status: 'Present',
-      notes: 'Morning design review completed'
-    },
-    {
-      id: 'ATT-104',
-      empId: 'DAY-DC-2026-0008',
-      name: 'David Chen',
-      dept: 'Human Resources',
-      role: 'Talent Specialist',
-      avatar: 'DC',
-      shift: 'General (09:00 - 18:00)',
-      checkIn: '09:48 AM',
-      checkOut: '06:00 PM',
-      totalHours: '8h 12m',
-      overtime: '0h 00m',
-      breakTime: '45m',
-      status: 'Late',
-      notes: 'Reported traffic delay'
-    },
-    {
-      id: 'ATT-105',
-      empId: 'DAY-EW-2026-0033',
-      name: 'Emma Watson',
-      dept: 'Operations',
-      role: 'Operations Lead',
-      avatar: 'EW',
-      shift: 'General (09:00 - 18:00)',
-      checkIn: '09:00 AM',
-      checkOut: '01:30 PM',
-      totalHours: '4h 30m',
-      overtime: '0h 00m',
-      breakTime: '30m',
-      status: 'Half-day',
-      notes: 'Pre-approved personal appointment'
-    },
-    {
-      id: 'ATT-106',
-      empId: 'DAY-ER-2026-0012',
-      name: 'Elena Rostova',
-      dept: 'Engineering',
-      role: 'Full Stack Engineer',
-      avatar: 'ER',
-      shift: 'General (09:00 - 18:00)',
-      checkIn: '--',
-      checkOut: '--',
-      totalHours: '0h 00m',
-      overtime: '0h 00m',
-      breakTime: '--',
-      status: 'On Leave',
-      notes: 'Approved Annual Leave'
-    },
-    {
-      id: 'ATT-107',
-      empId: 'DAY-AM-2026-0051',
-      name: 'Alice Murphy',
-      dept: 'Marketing',
-      role: 'Growth Marketing Lead',
-      avatar: 'AM',
-      shift: 'General (09:00 - 18:00)',
-      checkIn: '08:45 AM',
-      checkOut: '05:50 PM',
-      totalHours: '9h 05m',
-      overtime: '0h 00m',
-      breakTime: '45m',
-      status: 'Present',
-      notes: 'Client campaign execution'
-    },
-    {
-      id: 'ATT-108',
-      empId: 'DAY-JS-2026-0077',
-      name: 'John Smith',
-      dept: 'Sales',
-      role: 'Account Executive',
-      avatar: 'JS',
-      shift: 'General (09:00 - 18:00)',
-      checkIn: '--',
-      checkOut: '--',
-      totalHours: '0h 00m',
-      overtime: '0h 00m',
-      breakTime: '--',
-      status: 'Absent',
-      notes: 'Unexcused absence - auto flagged'
-    }
-  ]);
+  const [attendanceRecords, setAttendanceRecords] = useState([]);
+  const [regularizations, setRegularizations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Regularization Requests State
-  const [regularizations, setRegularizations] = useState([
-    {
-      id: 'REG-201',
-      empId: 'DAY-SJ-2026-0012',
-      name: 'Sarah Jenkins',
-      dept: 'Engineering',
-      date: '2026-08-21',
-      requestedCheckIn: '08:55 AM',
-      requestedCheckOut: '06:15 PM',
-      originalCheckIn: 'Missed Punch',
-      originalCheckOut: '06:15 PM',
-      reason: 'Biometric fingerprint scanner malfunction at North Gate entrance',
-      status: 'Pending',
-      submittedOn: 'Aug 21, 2026, 06:30 PM'
-    },
-    {
-      id: 'REG-202',
-      empId: 'DAY-DC-2026-0008',
-      name: 'David Chen',
-      dept: 'Human Resources',
-      date: '2026-08-20',
-      requestedCheckIn: '09:00 AM',
-      requestedCheckOut: '06:00 PM',
-      originalCheckIn: '09:45 AM',
-      originalCheckOut: '06:00 PM',
-      reason: 'Was attending offsite HR Campus recruitment drive in the morning',
-      status: 'Pending',
-      submittedOn: 'Aug 20, 2026, 07:15 PM'
-    },
-    {
-      id: 'REG-203',
-      empId: 'DAY-AR-2026-0045',
-      name: 'Alex Rivera',
-      dept: 'Product Design',
-      date: '2026-08-19',
-      requestedCheckIn: '09:00 AM',
-      requestedCheckOut: '06:00 PM',
-      originalCheckIn: '09:30 AM',
-      originalCheckOut: '06:00 PM',
-      reason: 'Client design workshop ran through breakfast',
-      status: 'Approved',
-      submittedOn: 'Aug 19, 2026, 06:10 PM',
-      reviewedBy: 'Adam Admin',
-      reviewNote: 'Approved as per manager pre-clearance'
+  const loadAllAttendanceData = async () => {
+    try {
+      const [attRes, regRes] = await Promise.all([
+        fetchAllAttendanceApi({ date: selectedDate, departmentId: deptFilter, status: statusFilter }),
+        fetchAllRegularizationsApi()
+      ]);
+
+      if (attRes.ok && attRes.data?.attendances) {
+        const mapped = attRes.data.attendances.map(a => {
+          const u = a.user || {};
+          const inTime = a.clockIn ? new Date(a.clockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--';
+          const outTime = a.clockOut ? new Date(a.clockOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--';
+          const totalH = Math.floor((a.totalMinutes || 0) / 60);
+          const totalM = (a.totalMinutes || 0) % 60;
+          const otH = Math.floor((a.overtimeMinutes || 0) / 60);
+          const otM = (a.overtimeMinutes || 0) % 60;
+
+          return {
+            id: a.id,
+            empId: u.loginId || a.userId,
+            name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Employee',
+            dept: u.department?.name || 'General',
+            role: u.position?.title || 'Team Member',
+            avatar: `${(u.firstName || 'E')[0]}${(u.lastName || 'P')[0]}`,
+            shift: a.shift || 'General (09:00 - 18:00)',
+            checkIn: inTime,
+            checkOut: outTime,
+            totalHours: `${totalH}h ${String(totalM).padStart(2, '0')}m`,
+            overtime: `${otH}h ${String(otM).padStart(2, '0')}m`,
+            breakTime: `${a.breakMinutes || 45}m`,
+            status: a.status || 'Present',
+            notes: a.notes || 'Biometric punch verified'
+          };
+        });
+        setAttendanceRecords(mapped);
+      }
+
+      if (regRes.ok && regRes.data?.regularizations) {
+        const regMapped = regRes.data.regularizations.map(r => {
+          const u = r.user || {};
+          return {
+            id: r.id,
+            empId: u.loginId || r.userId,
+            name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Employee',
+            dept: u.department?.name || 'General',
+            date: r.date.split('T')[0],
+            requestedCheckIn: r.requestedClockIn ? new Date(r.requestedClockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '09:00 AM',
+            requestedCheckOut: r.requestedClockOut ? new Date(r.requestedClockOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '06:00 PM',
+            originalCheckIn: r.originalClockIn ? new Date(r.originalClockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Missed Punch',
+            originalCheckOut: r.originalClockOut ? new Date(r.originalClockOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '06:00 PM',
+            reason: r.reason,
+            status: r.status,
+            submittedOn: new Date(r.submittedAt).toLocaleDateString() + ', ' + new Date(r.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            reviewedBy: r.reviewer ? `${r.reviewer.firstName} ${r.reviewer.lastName}` : null,
+            reviewNote: r.reviewNote || ''
+          };
+        });
+        setRegularizations(regMapped);
+      }
+    } catch (e) {
+      console.error('Failed to load HR attendance monitor:', e);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    loadAllAttendanceData();
+  }, [selectedDate, deptFilter, statusFilter]);
 
   // Weekly Matrix Mock Data
   const weeklyMatrix = [
@@ -345,41 +245,22 @@ export const AttendanceMonitorPage = () => {
   };
 
   // Regularization Actions
-  const handleRegularizationAction = (id, newStatus) => {
-    setRegularizations(prev =>
-      prev.map(reg => {
-        if (reg.id === id) {
-          return {
-            ...reg,
-            status: newStatus,
-            reviewedBy: 'Adam Admin (HR)',
-            reviewNote: newStatus === 'Approved' ? 'Regularization approved & shift timings corrected.' : 'Rejected due to incomplete verification.'
-          };
-        }
-        return reg;
-      })
-    );
+  const handleRegularizationAction = async (id, newStatus) => {
+    try {
+      const res = await reviewRegularizationApi(id, {
+        action: newStatus,
+        reviewNote: newStatus === 'Approved' ? 'Regularization approved by HR & shift timings corrected.' : 'Rejected by HR operations.'
+      });
 
-    // If approved, update the corresponding employee's attendance record
-    const targetReg = regularizations.find(r => r.id === id);
-    if (targetReg && newStatus === 'Approved') {
-      setAttendanceRecords(prev =>
-        prev.map(att => {
-          if (att.empId === targetReg.empId) {
-            return {
-              ...att,
-              checkIn: targetReg.requestedCheckIn,
-              checkOut: targetReg.requestedCheckOut,
-              status: 'Present',
-              notes: `Regularized via ${targetReg.id}`
-            };
-          }
-          return att;
-        })
-      );
+      if (res.ok) {
+        showToast(`Regularization request ${id} ${newStatus.toLowerCase()} successfully.`);
+        loadAllAttendanceData();
+      } else {
+        showToast(res.data?.message || 'Failed to update regularization', 'error');
+      }
+    } catch (err) {
+      showToast('Error reviewing regularization', 'error');
     }
-
-    showToast(`Regularization request ${id} ${newStatus.toLowerCase()} successfully.`);
   };
 
   // Export Attendance CSV
