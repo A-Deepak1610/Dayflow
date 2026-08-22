@@ -1,134 +1,134 @@
 import React, { useState } from 'react';
-import {
-  Clock,
-  Calendar,
-  UserCheck,
-  DollarSign,
-  ShieldCheck,
-  Check,
+import { 
+  Users, 
+  CalendarClock, 
+  FileCheck, 
+  Wallet, 
+  Check, 
   ArrowRight,
-  Sparkles,
+  ShieldCheck,
   Lock,
-  Eye
+  Eye,
+  Sparkles
 } from 'lucide-react';
 
-export const FeaturesSection = ({ onOpenAuthModal }) => {
+const FeaturesSection = ({ onOpenAuthModal }) => {
   const [selectedTab, setSelectedTab] = useState('admin');
 
   const features = [
     {
-      id: 'attendance',
-      icon: Clock,
-      title: 'Attendance Tracking',
-      badge: 'Real-Time & Geo-Fenced',
-      description: 'Capture exact check-in/out timestamps with automated IP validation, shift schedule enforcement, and overtime calculations.',
+      id: 'onboarding',
+      title: 'Digital Onboarding',
+      description: 'Go paperless from day one. Auto-generate employee IDs, collect digital signatures, and securely store KYC documents in a centralized vault.',
+      icon: Users,
+      badge: 'Zero Paper',
       highlights: [
-        'One-touch mobile & desktop clock-in',
-        'Automated late arrival & early exit flags',
-        'Custom shift rules & break tracking'
+        'Automated ID generation',
+        'Secure document vault',
+        'Self-service profile completion'
       ],
       color: 'bg-blue-50/50',
-      accentColor: 'text-blue-600',
-      borderColor: 'hover:border-blue-300'
+      bgGradient: 'from-blue-500 to-blue-600',
+      accentColor: 'text-blue-400',
+      borderColor: 'hover:border-blue-500/50'
     },
     {
-      id: 'leave',
-      icon: Calendar,
-      title: 'Leave & Time-Off Management',
-      badge: 'Instant Auto-Accruals',
-      description: 'Streamline vacation requests, sick leave, and paid time off with 1-click HR approvals and real-time team balance tracking.',
+      id: 'attendance',
+      title: 'Smart Attendance',
+      description: 'Real-time clock-in/out tracking with IP and geofencing capabilities. Employees see exactly what the HR sees, fostering absolute trust.',
+      icon: CalendarClock,
+      badge: 'Real-time',
       highlights: [
-        'Multi-policy leave accrual engine',
-        'Shared team availability calendar',
-        'Automatic weekend & holiday exclusions'
+        'One-click clock-in/out',
+        'Timesheet anomaly detection',
+        'Live presence dashboard'
       ],
-      color: 'bg-rose-50/50',
-      accentColor: 'text-[#FF5D7A]',
-      borderColor: 'hover:border-rose-300'
+      color: 'bg-indigo-50/50',
+      bgGradient: 'from-indigo-500 to-indigo-600',
+      accentColor: 'text-indigo-400',
+      borderColor: 'hover:border-indigo-500/50'
     },
     {
-      id: 'profiles',
-      icon: UserCheck,
-      title: '360° Employee Profiles',
-      badge: 'Unified Digital Directory',
-      description: 'Centralize employee records, contracts, emergency contacts, performance milestones, and automated onboarding workflows.',
+      id: 'leaves',
+      title: 'Leave Management',
+      description: 'A transparent approval matrix. Employees can check balances and apply for time-off in seconds. Managers can approve with one click.',
+      icon: FileCheck,
+      badge: 'Automated',
       highlights: [
-        'Secure cloud document vault',
-        'Auto-generated employee IDs',
-        'Interactive org chart & team directory'
+        'Real-time balance tracking',
+        'Custom approval workflows',
+        'Holiday calendar integration'
       ],
       color: 'bg-purple-50/50',
-      accentColor: 'text-purple-600',
-      borderColor: 'hover:border-purple-300'
+      bgGradient: 'from-purple-500 to-purple-600',
+      accentColor: 'text-purple-400',
+      borderColor: 'hover:border-purple-500/50'
     },
     {
       id: 'payroll',
-      icon: DollarSign,
       title: 'Payroll Visibility',
-      badge: '100% Transparent Engine',
-      description: 'Eliminate end-of-month pay errors with real-time gross-to-net salary previews, bonus additions, and instant payslip PDF downloads.',
+      description: 'No more payroll mysteries. Employees get instant access to beautiful, clear PDF payslips the moment salaries are disbursed.',
+      icon: Wallet,
+      badge: 'Compliant',
       highlights: [
-        'Automated attendance-to-payroll sync',
-        'Itemized tax & deduction breakdowns',
+        'Clear breakdown of deductions',
+        'One-click PDF downloads',
         'Direct digital payslip delivery'
       ],
       color: 'bg-emerald-50/50',
-      accentColor: 'text-emerald-600',
-      borderColor: 'hover:border-emerald-300'
+      bgGradient: 'from-emerald-500 to-emerald-600',
+      accentColor: 'text-emerald-400',
+      borderColor: 'hover:border-emerald-500/50'
     }
   ];
 
   return (
-    <section id="features" className="py-20 lg:py-28 relative bg-white">
+    <section id="features" className="py-20 lg:py-28 relative bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Core Modules</span>
           </div>
-
-          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-[#1F2A52] tracking-tight leading-tight mb-4">
+          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
             Everything your HR team needs, <br />
             <span className="text-[#FF5D7A]">without the clutter.</span>
           </h2>
-
-          <p className="text-slate-600 text-base sm:text-lg">
+          <p className="text-slate-400 text-base sm:text-lg">
             Purpose-built tools designed to save HR managers up to 20 hours per week while offering employees a transparent self-service portal.
           </p>
         </div>
 
-        {/* Feature Cards 2x2 Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-20">
           {features.map((feature) => {
-            const IconComponent = feature.icon;
+            const Icon = feature.icon;
             return (
-              <div
-                key={feature.id}
-                className={`relative group bg-white border border-slate-200 rounded-3xl p-8 transition-all duration-300 ${feature.borderColor} hover:shadow-xl flex flex-col justify-between overflow-hidden`}
+              <div 
+                key={feature.id} 
+                className="group relative bg-[#111] rounded-3xl p-8 border border-white/10 hover:border-[#FF5D7A]/50 transition-all duration-300 hover:-translate-y-1 shadow-lg"
               >
-                <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
-                      <IconComponent className={`w-6 h-6 ${feature.accentColor}`} />
-                    </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                      {feature.badge}
-                    </span>
-                  </div>
+                {/* Decorative Background Gradient on Hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgGradient} opacity-0 group-hover:opacity-10 rounded-3xl transition-opacity duration-300`} />
 
-                  <h3 className="font-sora text-2xl font-bold text-[#1F2A52] mb-3">
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${feature.bgGradient} mb-6 shadow-sm`}>
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  
+                  <h3 className="font-sora text-xl font-bold text-white mb-3">
                     {feature.title}
                   </h3>
-
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                  
+                  <p className="text-sm text-slate-400 leading-relaxed mb-6 flex-1">
                     {feature.description}
                   </p>
 
-                  <div className="space-y-2.5 pt-4 border-t border-slate-100">
+                  <div className="space-y-2.5 pt-4 border-t border-white/10">
                     {feature.highlights.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-2.5 text-xs font-medium text-slate-700">
+                      <div key={idx} className="flex items-center gap-2.5 text-xs font-medium text-slate-300">
                         <Check className={`w-4 h-4 ${feature.accentColor} shrink-0`} />
                         <span>{item}</span>
                       </div>
@@ -136,11 +136,11 @@ export const FeaturesSection = ({ onOpenAuthModal }) => {
                   </div>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs text-slate-400 font-mono">Dayflow Module v2.4</span>
+                <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between relative z-10">
+                  <span className="text-xs text-slate-500 font-mono">Dayflow Module v2.4</span>
                   <button
                     onClick={() => onOpenAuthModal && onOpenAuthModal('signup')}
-                    className="text-xs font-semibold text-[#FF5D7A] hover:text-[#1F2A52] flex items-center gap-1 group/btn cursor-pointer"
+                    className="text-xs font-semibold text-[#FF5D7A] hover:text-white flex items-center gap-1 group/btn cursor-pointer transition-colors"
                   >
                     <span>Explore Module</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
@@ -152,7 +152,7 @@ export const FeaturesSection = ({ onOpenAuthModal }) => {
         </div>
 
         {/* Role-Based Access Highlight Box (Admin/HR vs Employee) */}
-        <div className="relative bg-gradient-to-br from-slate-900 via-[#1F2A52] to-[#121A36] text-white rounded-3xl p-6 sm:p-10 shadow-xl">
+        <div className="relative bg-gradient-to-br from-slate-900 via-[#1F2A52] to-[#121A36] text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-white/10">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             
             <div className="lg:w-1/2">
@@ -213,7 +213,7 @@ export const FeaturesSection = ({ onOpenAuthModal }) => {
                       <span className="text-emerald-400 font-mono text-[10px]">ADMIN ONLY</span>
                     </div>
                     <div className="p-2.5 rounded-lg bg-[#121A36] border border-slate-800 flex items-center justify-between">
-                      <span>✓ Auto-generate Employee IDs & Issuance</span>
+                      <span>✓ Auto-generate Employee IDs</span>
                       <span className="text-emerald-400 font-mono text-[10px]">HR + ADMIN</span>
                     </div>
                     <div className="p-2.5 rounded-lg bg-[#121A36] border border-slate-800 flex items-center justify-between">
