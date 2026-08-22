@@ -5,13 +5,14 @@ import FeaturesSection from '../components/landing/FeaturesSection';
 import HowItWorksSection from '../components/landing/HowItWorksSection';
 import PricingSection from '../components/landing/PricingSection';
 import SocialProofSection from '../components/landing/SocialProofSection';
-import AuthPanel from '../components/auth/AuthPanel';
+import AuthModal from '../components/auth/AuthModal';
 import Footer from '../components/common/Footer';
 import { checkServerHealth } from '../services/api';
-import { Activity, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
 export const Home = () => {
-  const [authMode, setAuthMode] = useState('login');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
   const [health, setHealth] = useState(null);
   const [showHealthToast, setShowHealthToast] = useState(false);
 
@@ -27,58 +28,56 @@ export const Home = () => {
     fetchHealth();
   }, []);
 
-  const handleOpenAuth = (mode = 'login') => {
+  const handleOpenAuthModal = (mode = 'login') => {
     setAuthMode(mode);
-    const authElement = document.getElementById('auth-panel');
-    if (authElement) {
-      authElement.scrollIntoView({ behavior: 'smooth' });
-    }
+    setIsAuthModalOpen(true);
   };
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden bg-slate-50 text-slate-900 selection:bg-[#FF5D7A] selection:text-white">
       {/* Sticky Navigation Bar */}
-      <Navbar onOpenAuth={handleOpenAuth} />
+      <Navbar onOpenAuthModal={handleOpenAuthModal} />
 
       {/* Main Landing Sections */}
       <main>
-        <HeroSection onOpenAuth={handleOpenAuth} />
-        
-        {/* Auth Section Panel */}
-        <section className="bg-gradient-to-b from-[#0B1120] via-[#121A36]/80 to-[#0B1120] py-8 border-y border-slate-800/60">
-          <AuthPanel initialMode={authMode} key={authMode} />
-        </section>
-
-        <FeaturesSection onOpenAuth={handleOpenAuth} />
-        <HowItWorksSection onOpenAuth={handleOpenAuth} />
-        <PricingSection onOpenAuth={handleOpenAuth} />
+        <HeroSection onOpenAuthModal={handleOpenAuthModal} />
+        <FeaturesSection onOpenAuthModal={handleOpenAuthModal} />
+        <HowItWorksSection onOpenAuthModal={handleOpenAuthModal} />
+        <PricingSection onOpenAuthModal={handleOpenAuthModal} />
         <SocialProofSection />
       </main>
 
       {/* Footer */}
-      <Footer onOpenAuth={handleOpenAuth} />
+      <Footer onOpenAuthModal={handleOpenAuthModal} />
+
+      {/* Pop-up Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authMode}
+      />
 
       {/* Subtle Bottom System Status Floating Badge */}
-      <div className="fixed bottom-4 left-4 z-40">
+      <div className="fixed bottom-4 left-4 z-30">
         <button
           onClick={() => setShowHealthToast(!showHealthToast)}
-          className="flex items-center gap-2 px-3 py-1.5 bg-[#121A36]/90 backdrop-blur-md border border-slate-700/80 rounded-full text-[11px] text-slate-300 shadow-xl hover:border-[#FF5D7A]/50 transition cursor-pointer"
+          className="flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-full text-[11px] text-slate-700 shadow-md hover:border-[#FF5D7A] transition cursor-pointer"
         >
           <Activity className="w-3.5 h-3.5 text-[#FF5D7A] animate-pulse" />
           <span>Server API:</span>
-          <span className={`font-semibold ${health?.status === 'ok' ? 'text-emerald-400' : 'text-amber-400'}`}>
+          <span className={`font-semibold ${health?.status === 'ok' ? 'text-emerald-600' : 'text-amber-600'}`}>
             {health?.status === 'ok' ? 'Online' : 'Checking / Standby'}
           </span>
         </button>
 
         {showHealthToast && (
-          <div className="mt-2 p-3 bg-[#0F172A] border border-slate-700 rounded-xl shadow-2xl text-xs space-y-1 w-64 animate-fadeIn">
-            <div className="flex items-center justify-between font-bold text-white mb-1">
+          <div className="mt-2 p-3 bg-white border border-slate-200 rounded-xl shadow-xl text-xs space-y-1 w-64 animate-fadeIn">
+            <div className="flex items-center justify-between font-bold text-[#1F2A52] mb-1">
               <span>System Telemetry</span>
-              <span className="text-[10px] text-slate-400">TiDB MySQL</span>
+              <span className="text-[10px] text-slate-500">TiDB MySQL</span>
             </div>
-            <p className="text-[11px] text-slate-400 font-mono">Backend: http://localhost:5000</p>
-            <p className="text-[11px] text-slate-400 font-mono">DB Status: {health?.database?.status || 'Connected'}</p>
+            <p className="text-[11px] text-slate-500 font-mono">Backend: http://localhost:5000</p>
+            <p className="text-[11px] text-slate-500 font-mono">DB Status: {health?.database?.status || 'Connected'}</p>
           </div>
         )}
       </div>

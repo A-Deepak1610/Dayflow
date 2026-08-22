@@ -1,7 +1,7 @@
 import React from 'react';
 import { Building, Key, CheckCircle2, Sparkles, ArrowRight, Shield } from 'lucide-react';
 
-export const HowItWorksSection = ({ onOpenAuth }) => {
+export const HowItWorksSection = ({ onOpenAuthModal }) => {
   const steps = [
     {
       step: '01',
@@ -27,22 +27,22 @@ export const HowItWorksSection = ({ onOpenAuth }) => {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 lg:py-32 relative bg-[#121A36]/60 border-y border-slate-800/80">
+    <section id="how-it-works" className="py-20 lg:py-28 relative bg-slate-50 border-y border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F2A52] border border-[#FF5D7A]/30 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Friction-Free Onboarding</span>
           </div>
 
-          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
+          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-[#1F2A52] tracking-tight leading-tight mb-4">
             How Dayflow aligns your workday in <br />
             <span className="text-[#FF5D7A]">3 simple steps.</span>
           </h2>
 
-          <p className="text-slate-300 text-base sm:text-lg">
+          <p className="text-slate-600 text-base sm:text-lg">
             No long implementation cycles or steep learning curves. Get your entire team aligned in a single afternoon.
           </p>
         </div>
@@ -54,29 +54,29 @@ export const HowItWorksSection = ({ onOpenAuth }) => {
             return (
               <div
                 key={index}
-                className="relative bg-[#0F172A] border border-slate-800 rounded-3xl p-8 shadow-xl flex flex-col justify-between group hover:border-[#FF5D7A]/50 transition-all duration-300"
+                className="relative bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-[#FF5D7A]/40 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <span className="font-sora text-4xl font-extrabold text-[#1F2A52] group-hover:text-[#FF5D7A] transition-colors">
+                    <span className="font-sora text-4xl font-extrabold text-slate-300 group-hover:text-[#FF5D7A] transition-colors">
                       {item.step}
                     </span>
-                    <div className="w-12 h-12 rounded-2xl bg-[#1F2A52] border border-slate-700 flex items-center justify-center text-[#FF5D7A] shadow-md">
-                      <IconComponent className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#1F2A52] shadow-sm">
+                      <IconComponent className="w-6 h-6 text-[#FF5D7A]" />
                     </div>
                   </div>
 
-                  <h3 className="font-sora text-xl font-bold text-white mb-3">
+                  <h3 className="font-sora text-xl font-bold text-[#1F2A52] mb-3">
                     {item.title}
                   </h3>
 
-                  <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                  <p className="text-slate-600 text-sm leading-relaxed mb-4">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-slate-800/80">
-                  <div className="p-3 bg-[#121A36] rounded-xl border border-slate-800 text-[11px] font-mono text-slate-300 flex items-start gap-2">
+                <div className="pt-4 border-t border-slate-100">
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] font-mono text-slate-700 flex items-start gap-2">
                     <Shield className="w-4 h-4 text-[#FF5D7A] shrink-0 mt-0.5" />
                     <span>{item.detail}</span>
                   </div>
@@ -89,8 +89,8 @@ export const HowItWorksSection = ({ onOpenAuth }) => {
         {/* Banner CTA */}
         <div className="mt-16 text-center">
           <button
-            onClick={() => onOpenAuth && onOpenAuth('signup')}
-            className="px-8 py-3.5 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-semibold text-sm rounded-xl transition duration-200 shadow-xl shadow-[#FF5D7A]/25 inline-flex items-center gap-2 cursor-pointer"
+            onClick={() => onOpenAuthModal && onOpenAuthModal('signup')}
+            className="px-8 py-3.5 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-semibold text-sm rounded-xl transition duration-200 shadow-lg shadow-[#FF5D7A]/20 inline-flex items-center gap-2 cursor-pointer"
           >
             <span>Start Your 14-Day Free Trial</span>
             <ArrowRight className="w-4 h-4" />
