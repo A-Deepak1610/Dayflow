@@ -3,10 +3,17 @@ import bcrypt from 'bcryptjs';
 import prisma from '../lib/prisma';
 import { generateAccessToken, generateRefreshToken, setTokenCookies, clearTokenCookies } from '../utils/jwt';
 import { generateEmployeeId, generateRandomPassword } from '../utils/helpers';
+import { sendEmployeeWelcomeEmail } from '../utils/mailer';
 
 export const registerCompany = async (req: Request, res: Response) => {
   try {
-    const { companyName, logoUrl, firstName, lastName, email, phone, password } = req.body;
+    const { companyName, firstName, lastName, email, phone, password } = req.body;
+
+    // If an image was uploaded, create the URL path
+    let logoUrl = null;
+    if (req.file) {
+      logoUrl = `/uploads/${req.file.filename}`;
+    }
 
     // Check if company exists
     const existingCompany = await prisma.company.findUnique({ where: { name: companyName } });
@@ -113,12 +120,15 @@ export const createEmployee = async (req: Request, res: Response) => {
       },
     });
 
+    // Send Welcome Email asynchronously
+    sendEmployeeWelcomeEmail(email, firstName, loginId, rawPassword);
+
     res.status(201).json({
       message: 'Employee created successfully',
       employee: {
         loginId: newEmployee.loginId,
         email: newEmployee.email,
-        generatedPassword: rawPassword, // Send this back so admin can give it to employee
+        generatedPassword: rawPassword, // Send this back so admin can give it to employee if email fails
       },
     });
   } catch (error: any) {

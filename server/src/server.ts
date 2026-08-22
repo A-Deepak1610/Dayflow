@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 import { config } from './config/env';
 import routes from './routes';
 import { errorHandler } from './middlewares/errorHandler';
@@ -14,6 +15,9 @@ app.use(cors({ origin: true, credentials: true })); // Ensure credentials (cooki
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Serve static files for uploaded images
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // API Routes
 app.use('/api', routes);
