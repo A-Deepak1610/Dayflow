@@ -1,13 +1,18 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import prisma from '../lib/prisma';
-import { generateAccessToken, generateRefreshToken, setTokenCookies, clearTokenCookies } from '../utils/jwt';
-import { generateEmployeeId, generateRandomPassword } from '../utils/helpers';
-import { sendEmployeeWelcomeEmail } from '../utils/mailer';
+import {Request, Response} from "express";
+import bcrypt from "bcryptjs";
+import prisma from "../lib/prisma";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  setTokenCookies,
+  clearTokenCookies,
+} from "../utils/jwt";
+import {generateEmployeeId, generateRandomPassword} from "../utils/helpers";
+import {sendEmployeeWelcomeEmail} from "../utils/mailer";
 
 export const registerCompany = async (req: Request, res: Response) => {
   try {
-    const { companyName, firstName, lastName, email, phone, password } = req.body;
+    const {companyName, firstName, lastName, email, phone, password} = req.body;
 
     // If an image was uploaded, create the URL path
     let logoUrl = null;
@@ -16,21 +21,23 @@ export const registerCompany = async (req: Request, res: Response) => {
     }
 
     // Check if company exists
-    const existingCompany = await prisma.company.findUnique({ where: { name: companyName } });
+    const existingCompany = await prisma.company.findUnique({
+      where: {name: companyName},
+    });
     if (existingCompany) {
-      return res.status(400).json({ message: 'Company already exists' });
+      return res.status(400).json({message: "Company already exists"});
     }
 
     // Check if email exists
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findUnique({where: {email}});
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already exists' });
+      return res.status(400).json({message: "Email already exists"});
     }
 
     // Ensure ADMIN role exists
-    let adminRole = await prisma.role.findUnique({ where: { name: 'ADMIN' } });
+    let adminRole = await prisma.role.findUnique({where: {name: "ADMIN"}});
     if (!adminRole) {
-      adminRole = await prisma.role.create({ data: { name: 'ADMIN' } });
+      adminRole = await prisma.role.create({data: {name: "ADMIN"}});
     }
 
     // Hash password
@@ -39,7 +46,7 @@ export const registerCompany = async (req: Request, res: Response) => {
     // Create Company and Admin User in a transaction
     const result = await prisma.$transaction(async (tx) => {
       const company = await tx.company.create({
-        data: { name: companyName, logoUrl },
+        data: {name: companyName, logoUrl},
       });
 
       const adminUser = await tx.user.create({
@@ -53,58 +60,79 @@ export const registerCompany = async (req: Request, res: Response) => {
           companyId: company.id,
           roleId: adminRole.id,
           isFirstLogin: false, // Admin sets their own password at sign up
+          profile: {create: {}},
         },
       });
 
-      return { company, adminUser };
+      return {company, adminUser};
     });
 
     res.status(201).json({
-      message: 'Company and Admin account created successfully',
+      message: "Company and Admin account created successfully",
       loginId: result.adminUser.loginId,
     });
   } catch (error: any) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({message: "Server error", error: error.message});
   }
 };
 
 export const createEmployee = async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email, phone, roleName } = req.body;
+    const {firstName, lastName, email, phone, roleName, department} = req.body;
     // req.user is set by auth middleware
     const adminCompanyId = req.user!.companyId;
 
     // Validate Role (only HR or ADMIN can create, but that's handled by middleware)
-    if (!['EMPLOYEE', 'HR', 'ADMIN'].includes(roleName)) {
-      return res.status(400).json({ message: 'Invalid role' });
+    if (!["EMPLOYEE", "HR", "ADMIN"].includes(roleName)) {
+      return res.status(400).json({message: "Invalid role"});
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findUnique({where: {email}});
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already exists' });
+      return res.status(400).json({message: "Email already exists"});
     }
 
     // Ensure Role exists
-    let role = await prisma.role.findUnique({ where: { name: roleName } });
+    let role = await prisma.role.findUnique({where: {name: roleName}});
     if (!role) {
-      role = await prisma.role.create({ data: { name: roleName } });
+      role = await prisma.role.create({data: {name: roleName}});
     }
 
     // Get company details for ID generation
-    const company = await prisma.company.findUnique({ where: { id: adminCompanyId } });
+    const company = await prisma.company.findUnique({
+      where: {id: adminCompanyId},
+    });
     if (!company) {
-      return res.status(400).json({ message: 'Company not found' });
+      return res.status(400).json({message: "Company not found"});
     }
 
     // Generate loginId
     const currentYearUsersCount = await prisma.user.count({
-      where: { companyId: adminCompanyId, createdAt: { gte: new Date(`${new Date().getFullYear()}-01-01`) } }
+      where: {
+        companyId: adminCompanyId,
+        createdAt: {gte: new Date(`${new Date().getFullYear()}-01-01`)},
+      },
     });
-    const loginId = generateEmployeeId(company.name, firstName, lastName, currentYearUsersCount + 1);
+    const loginId = generateEmployeeId(
+      company.name,
+      firstName,
+      lastName,
+      currentYearUsersCount + 1,
+    );
 
     // Generate random password & hash it
     const rawPassword = generateRandomPassword();
     const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+    const departmentRecord = department
+      ? await prisma.department.upsert({
+          where: {
+            companyId_name: {companyId: adminCompanyId, name: department},
+          },
+          update: {},
+          create: {companyId: adminCompanyId, name: department},
+        })
+      : null;
 
     const newEmployee = await prisma.user.create({
       data: {
@@ -117,6 +145,8 @@ export const createEmployee = async (req: Request, res: Response) => {
         companyId: adminCompanyId,
         roleId: role.id,
         isFirstLogin: true,
+        departmentId: departmentRecord?.id,
+        profile: {create: {}},
       },
     });
 
@@ -124,7 +154,7 @@ export const createEmployee = async (req: Request, res: Response) => {
     sendEmployeeWelcomeEmail(email, firstName, loginId, rawPassword);
 
     res.status(201).json({
-      message: 'Employee created successfully',
+      message: "Employee created successfully",
       employee: {
         loginId: newEmployee.loginId,
         email: newEmployee.email,
@@ -132,31 +162,35 @@ export const createEmployee = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({message: "Server error", error: error.message});
   }
 };
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { loginIdOrEmail, password } = req.body;
+    const {loginIdOrEmail, password} = req.body;
 
     const user = await prisma.user.findFirst({
       where: {
-        OR: [{ loginId: loginIdOrEmail }, { email: loginIdOrEmail }],
+        OR: [{loginId: loginIdOrEmail}, {email: loginIdOrEmail}],
       },
-      include: { role: true },
+      include: {role: true},
     });
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({message: "Invalid credentials"});
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({message: "Invalid credentials"});
     }
 
-    const tokenPayload = { userId: user.id, role: user.role.name, companyId: user.companyId };
+    const tokenPayload = {
+      userId: user.id,
+      role: user.role.name,
+      companyId: user.companyId,
+    };
     const accessToken = generateAccessToken(tokenPayload);
     const refreshToken = generateRefreshToken(tokenPayload);
 
@@ -166,13 +200,13 @@ export const login = async (req: Request, res: Response) => {
         token: refreshToken,
         userId: user.id,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      }
+      },
     });
 
     setTokenCookies(res, accessToken, refreshToken);
 
     res.json({
-      message: 'Login successful',
+      message: "Login successful",
       user: {
         loginId: user.loginId,
         firstName: user.firstName,
@@ -182,7 +216,7 @@ export const login = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({message: "Server error", error: error.message});
   }
 };
 
@@ -192,14 +226,14 @@ export const logout = async (req: Request, res: Response) => {
     if (refreshToken) {
       // Revoke in DB
       await prisma.refreshToken.updateMany({
-        where: { token: refreshToken },
-        data: { revoked: true },
+        where: {token: refreshToken},
+        data: {revoked: true},
       });
     }
 
     clearTokenCookies(res);
-    res.json({ message: 'Logged out successfully' });
+    res.json({message: "Logged out successfully"});
   } catch (error: any) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({message: "Server error", error: error.message});
   }
 };
