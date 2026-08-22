@@ -7,18 +7,14 @@ import {
   CheckCircle2,
   XCircle,
   DollarSign,
-  Briefcase,
-  UserPlus,
-  UserMinus,
   TrendingUp,
-  FolderKanban,
-  MonitorSmartphone,
   HeadphonesIcon,
-  Lock,
+  LogOut,
+  Sparkles
 } from 'lucide-react';
 
 export const HrSidebar = () => {
-  const { user, logoutUser } = useAuth();
+  const { logoutUser } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -32,31 +28,29 @@ export const HrSidebar = () => {
     { label: 'Attendance', path: '/hr/attendance', icon: CheckCircle2 },
     { label: 'Leave', path: '/hr/leaves', icon: XCircle },
     { label: 'Payroll', path: '/hr/payroll', icon: DollarSign },
-    // { label: 'Recruitment', path: '/hr/recruitment', icon: Briefcase },
-    // { label: 'Onboarding', path: '/hr/onboarding', icon: UserPlus },
-    // { label: 'Offboarding', path: '/hr/offboarding', icon: UserMinus },
     { label: 'Performance', path: '/hr/performance', icon: TrendingUp },
-    // { label: 'Project', path: '/hr/project', icon: FolderKanban },
-    // { label: 'Assets', path: '/hr/assets', icon: MonitorSmartphone },
     { label: 'Helpdesk', path: '/hr/helpdesk', icon: HeadphonesIcon },
   ];
 
   return (
-    <aside className="w-[260px] bg-white border-r border-slate-200 flex flex-col justify-between h-screen sticky top-0 z-30 shrink-0">
+    <aside className="w-[260px] bg-[#0a0a0a] border-r border-white/10 flex flex-col justify-between h-screen sticky top-0 z-30 shrink-0 font-inter">
       <div className="flex flex-col h-full overflow-y-auto overflow-x-hidden no-scrollbar">
-        {/* Horilla Logo Header */}
-        <div className="px-6 py-5 flex items-center gap-3 shrink-0">
-          <div className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center bg-slate-50 text-slate-700">
-            <Lock className="w-4 h-4" />
+        {/* Brand Logo Header */}
+        <div className="px-6 py-5 flex items-center gap-3 shrink-0 border-b border-white/10">
+          <div className="w-9 h-9 rounded-xl bg-[#FF5D7A] text-white flex items-center justify-center font-sora font-extrabold text-sm shadow-md shadow-[#FF5D7A]/20">
+            DF
           </div>
           <div>
-            <p className="font-bold text-[15px] text-[#333333] leading-tight">Your Compa...</p>
-            <p className="text-[11px] text-[#888888]">My Company</p>
+            <p className="font-sora font-extrabold text-base text-white leading-tight">Dayflow</p>
+            <p className="text-[11px] text-[#FF5D7A] font-medium flex items-center gap-1">
+              <Sparkles className="w-3 h-3" /> HR Admin Portal
+            </p>
           </div>
         </div>
 
         {/* Navigation Menu Links */}
-        <nav className="px-3 pb-6 flex-1">
+        <nav className="px-3 py-6 flex-1 space-y-1">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-slate-500 px-3 mb-2">Main Menu</p>
           {navItems.map((item) => {
             const IconComponent = item.icon;
             return (
@@ -64,16 +58,16 @@ export const HrSidebar = () => {
                 key={item.label}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-2.5 mb-1 rounded-xl text-[14px] font-medium transition-colors ${
+                  `flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-horilla-primary text-white shadow-md shadow-red-500/20'
-                      : 'text-[#666666] hover:bg-slate-50 hover:text-[#333333]'
+                      ? 'bg-[#FF5D7A] text-white shadow-lg shadow-[#FF5D7A]/25'
+                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <IconComponent className={`w-5 h-5 ${isActive ? 'text-white' : 'text-[#888888]'}`} />
+                    <IconComponent className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                     <span>{item.label}</span>
                   </>
                 )}
@@ -81,6 +75,17 @@ export const HrSidebar = () => {
             );
           })}
         </nav>
+
+        {/* Bottom Logout Button */}
+        <div className="p-4 border-t border-white/10">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 rounded-xl transition cursor-pointer border border-rose-500/20"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
+        </div>
       </div>
     </aside>
   );
