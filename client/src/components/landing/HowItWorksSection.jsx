@@ -27,22 +27,27 @@ export const HowItWorksSection = ({ onOpenAuthModal }) => {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 lg:py-28 relative bg-[#111] border-y border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="w-full py-20 lg:py-28 relative bg-gradient-to-tr from-[#E5DAE2] via-[#F8F2F6] to-[#EFE7EC] border-y border-[#E2D5E0] text-[#281A26] font-inter overflow-hidden">
+      
+      {/* Hero-matched Ambient Shading Blobs */}
+      <div className="absolute top-1/3 right-10 w-[550px] h-[550px] bg-[#FF5D7A]/12 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-[450px] h-[450px] bg-[#3D273A]/10 rounded-full blur-[130px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0a0a0a] border border-white/10 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FDFBFD]/80 backdrop-blur-md border border-[#E2D5E0] text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Friction-Free Onboarding</span>
           </div>
 
-          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
+          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-[#281A26] tracking-tight leading-tight mb-4">
             How Dayflow aligns your workday in <br />
             <span className="text-[#FF5D7A]">3 simple steps.</span>
           </h2>
 
-          <p className="text-slate-400 text-base sm:text-lg">
+          <p className="text-[#6B5667] text-base sm:text-lg">
             No long implementation cycles or steep learning curves. Get your entire team aligned in a single afternoon.
           </p>
         </div>
@@ -54,29 +59,29 @@ export const HowItWorksSection = ({ onOpenAuthModal }) => {
             return (
               <div
                 key={index}
-                className="relative bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-[#FF5D7A]/40 transition-all duration-300 flex flex-col justify-between group"
+                className="relative bg-[#FDFBFD]/90 backdrop-blur-md border border-[#E2D5E0] rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-[#FF5D7A]/40 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <span className="font-sora text-4xl font-extrabold text-slate-300 group-hover:text-[#FF5D7A] transition-colors">
                       {item.step}
                     </span>
-                    <div className="w-12 h-12 rounded-2xl bg-[#222] border border-white/10 flex items-center justify-center text-white shadow-sm">
+                    <div className="w-12 h-12 rounded-2xl bg-[#F5ECF2] border border-[#E2D5E0] flex items-center justify-center text-[#FF5D7A] shadow-sm">
                       <IconComponent className="w-6 h-6 text-[#FF5D7A]" />
                     </div>
                   </div>
 
-                  <h3 className="font-sora text-xl font-bold text-white mb-3">
+                  <h3 className="font-sora text-xl font-bold text-[#281A26] mb-3">
                     {item.title}
                   </h3>
 
-                  <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                  <p className="text-[#6B5667] text-sm leading-relaxed mb-4">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-white/5">
-                  <div className="p-3 bg-[#111] rounded-xl border border-white/10 text-[11px] font-mono text-slate-300 flex items-start gap-2">
+                <div className="pt-4 border-t border-[#E2D5E0]">
+                  <div className="p-3 bg-[#F5ECF2] rounded-xl border border-[#E2D5E0] text-[11px] font-mono text-[#281A26] flex items-start gap-2">
                     <Shield className="w-4 h-4 text-[#FF5D7A] shrink-0 mt-0.5" />
                     <span>{item.detail}</span>
                   </div>
