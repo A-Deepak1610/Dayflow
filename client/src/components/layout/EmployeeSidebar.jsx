@@ -22,6 +22,7 @@ export const EmployeeSidebar = () => {
 
   const employeeLinks = [
     { name: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },
+    { name: 'My Profile', path: '/employee/profile', icon: User },
     { name: 'Employees', path: '/employee/directory', icon: Users },
     { name: 'My Attendance', path: '/employee/attendance', icon: Clock },
     { name: 'My Leaves', path: '/employee/leaves', icon: Calendar },

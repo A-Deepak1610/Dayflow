@@ -76,10 +76,18 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/employee/profile"
+        element={
+          <EmployeeRoute>
+            <EmployeeDirectory initialTab="my-profile" />
+          </EmployeeRoute>
+        }
+      />
+      <Route
         path="/employee/directory"
         element={
           <EmployeeRoute>
-            <EmployeeDirectory />
+            <EmployeeDirectory initialTab="directory" />
           </EmployeeRoute>
         }
       />

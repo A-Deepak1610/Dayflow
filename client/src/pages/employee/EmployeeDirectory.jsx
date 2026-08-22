@@ -203,11 +203,11 @@ const EMPLOYEES_MASTER = [
   }
 ];
 
-export const EmployeeDirectory = () => {
+export const EmployeeDirectory = ({ initialTab = 'directory' }) => {
   const { user } = useAuth();
 
   // Active View Tab: 'directory' | 'my-profile'
-  const [activeTab, setActiveTab] = useState('directory');
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // Search & Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -732,6 +732,97 @@ export const EmployeeDirectory = () => {
                   <span className="text-slate-500">Assigned Seating / Desk:</span>
                   <span className="font-semibold text-slate-900">{myProfileData.workLocation}</span>
                 </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Row 2: Salary Structure Overview (Read-Only) & Personal Documents Repository */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Box 1: Salary Structure Overview */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-[#1F2A52] text-[15px]">My Salary Structure</h3>
+                  <p className="text-xs text-slate-500">Confidential monthly compensation breakdown (Read-Only)</p>
+                </div>
+                <DollarSign className="w-4 h-4 text-emerald-600" />
+              </div>
+
+              <div className="space-y-2.5 text-xs text-slate-700">
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between">
+                  <span className="text-slate-500">Basic Salary (50%):</span>
+                  <span className="font-mono font-bold text-slate-900">₹40,000 / month</span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between">
+                  <span className="text-slate-500">House Rent Allowance (HRA 25%):</span>
+                  <span className="font-mono font-bold text-slate-900">₹20,000 / month</span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between">
+                  <span className="text-slate-500">Special & Conveyance Allowance:</span>
+                  <span className="font-mono font-bold text-slate-900">₹20,000 / month</span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between">
+                  <span className="text-slate-500">Total Monthly Gross:</span>
+                  <span className="font-mono font-extrabold text-[#1F2A52]">₹80,000 / month</span>
+                </div>
+                <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 flex justify-between text-emerald-900">
+                  <span className="font-medium">Estimated Monthly Take-Home:</span>
+                  <span className="font-mono font-extrabold text-emerald-700">₹72,500</span>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                <span className="text-slate-400">Total Annual CTC: ₹9,60,000 / yr</span>
+                <Link to="/employee/payslips" className="font-bold text-horilla-primary hover:underline">
+                  View Payslips &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Box 2: Personal Documents Repository */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-[#1F2A52] text-[15px]">Personal Documents</h3>
+                  <p className="text-xs text-slate-500">Verified employment and identity credentials</p>
+                </div>
+                <ShieldCheck className="w-4 h-4 text-indigo-600" />
+              </div>
+
+              <div className="space-y-2.5 text-xs">
+                {[
+                  { name: 'Offer_Letter_Dayflow_2024.pdf', size: '1.2 MB', type: 'Contract', verified: true },
+                  { name: 'National_Identity_Card_Aadhaar.pdf', size: '850 KB', type: 'KYC', verified: true },
+                  { name: 'Degree_Certificate_BE_CS.pdf', size: '2.4 MB', type: 'Education', verified: true },
+                  { name: 'Form_16_Tax_Declaration_2025.pdf', size: '640 KB', type: 'Tax Document', verified: true }
+                ].map((doc, idx) => (
+                  <div key={idx} className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between hover:border-slate-300 transition">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-[10px]">
+                        PDF
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-800 block truncate max-w-[200px] sm:max-w-xs">{doc.name}</span>
+                        <span className="text-[10px] text-slate-400">{doc.type} • {doc.size}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Verified ✓
+                      </span>
+                      <button
+                        onClick={() => showToast(`Downloading ${doc.name}...`)}
+                        className="p-1.5 hover:bg-slate-200 text-slate-600 rounded-lg transition"
+                        title="Download Document"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
