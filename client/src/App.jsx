@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import OfflineBanner from './components/common/OfflineBanner';
 import MainLayout from './components/layout/MainLayout';
 import EmployeeLayout from './components/layout/EmployeeLayout';
 
@@ -134,6 +135,7 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <ToastProvider>
+          <OfflineBanner />
           <AuthProvider>
             <BrowserRouter>
               <AppRoutes />

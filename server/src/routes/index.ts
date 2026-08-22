@@ -1,26 +1,25 @@
 import { Router } from 'express';
 import healthRoutes from './health.routes';
 import authRoutes from './auth.routes';
-import attendanceRoutes from './attendance.routes';
-import leaveRoutes from './leave.routes';
-import payrollRoutes from './payroll.routes';
-import employeeRoutes from './employee.routes';
-import dashboardRoutes from './dashboard.routes';
-import helpdeskRoutes from './helpdesk.routes';
-import performanceRoutes from './performance.routes';
 import domainRoutes from './domain.routes';
+import attendanceRoutes from './attendance.routes';
+import salaryRoutes from './salary.routes';
 
 const router = Router();
 
+// API Health Check
 router.use('/health', healthRoutes);
+
+// Auth Routes
 router.use('/auth', authRoutes);
-router.use('/attendance', attendanceRoutes);
-router.use('/leaves', leaveRoutes);
-router.use('/payroll', payrollRoutes);
-router.use('/employees', employeeRoutes);
-router.use('/dashboard', dashboardRoutes);
-router.use('/helpdesk', helpdeskRoutes);
-router.use('/performance', performanceRoutes);
+
+// Domain Routes
 router.use('/', domainRoutes);
+
+// Attendance Routes
+router.use('/attendance', attendanceRoutes);
+
+// Salary Routes
+router.use('/salary', salaryRoutes);
 
 export default router;

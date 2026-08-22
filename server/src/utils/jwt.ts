@@ -4,6 +4,7 @@ import { config } from '../config/env';
 
 export interface TokenPayload {
   userId: string;
+  id?: string;
   role: string;
   companyId: string;
 }
