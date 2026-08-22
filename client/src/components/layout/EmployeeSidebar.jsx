@@ -1,32 +1,33 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Clock, 
-  Calendar, 
-  FileText, 
+import React from "react";
+import {NavLink, useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext";
+import {
+  LayoutDashboard,
+  Users,
+  Clock,
+  Calendar,
+  FileText,
   LogOut,
-  Building
-} from 'lucide-react';
+  Building,
+  User,
+} from "lucide-react";
 
 export const EmployeeSidebar = () => {
-  const { user, logoutUser, isHr, isEmployee } = useAuth();
+  const {user, logoutUser, isHr, isEmployee} = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logoutUser();
-    navigate('/');
+    navigate("/");
   };
 
   const employeeLinks = [
-    { name: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },
-    { name: 'My Profile', path: '/employee/profile', icon: User },
-    { name: 'Employees', path: '/employee/directory', icon: Users },
-    { name: 'My Attendance', path: '/employee/attendance', icon: Clock },
-    { name: 'My Leaves', path: '/employee/leaves', icon: Calendar },
-    { name: 'My Payslips', path: '/employee/payslips', icon: FileText },
+    {name: "Dashboard", path: "/employee/dashboard", icon: LayoutDashboard},
+    {name: "My Profile", path: "/employee/profile", icon: User},
+    {name: "Employees", path: "/employee/directory", icon: Users},
+    {name: "My Attendance", path: "/employee/attendance", icon: Clock},
+    {name: "My Leaves", path: "/employee/leaves", icon: Calendar},
+    {name: "My Payslips", path: "/employee/payslips", icon: FileText},
   ];
 
   const links = employeeLinks;
@@ -52,11 +53,11 @@ export const EmployeeSidebar = () => {
             <NavLink
               key={link.name}
               to={link.path}
-              className={({ isActive }) =>
+              className={({isActive}) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-[#FF5D7A]/10 text-[#FF5D7A]'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-[#1F2A52]'
+                    ? "bg-[#FF5D7A]/10 text-[#FF5D7A]"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-[#1F2A52]"
                 }`
               }
             >
@@ -70,11 +71,15 @@ export const EmployeeSidebar = () => {
       <div className="p-4 border-t border-slate-100">
         <div className="flex items-center gap-3 px-3 py-3 mb-3 bg-slate-50 rounded-xl border border-slate-200">
           <div className="w-10 h-10 rounded-full bg-[#1F2A52] text-white flex items-center justify-center font-bold text-sm">
-            {user.firstName?.charAt(0) || 'U'}
+            {user.firstName?.charAt(0) || "U"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-[#1F2A52] truncate">{user.firstName}</p>
-            <p className="text-[10px] text-slate-500 font-mono truncate">{user.loginId}</p>
+            <p className="text-sm font-bold text-[#1F2A52] truncate">
+              {user.firstName}
+            </p>
+            <p className="text-[10px] text-slate-500 font-mono truncate">
+              {user.loginId}
+            </p>
           </div>
         </div>
         <button
