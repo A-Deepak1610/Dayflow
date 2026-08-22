@@ -2,8 +2,8 @@ import React from 'react';
 
 export const MainLayout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-[#0B1120] text-slate-100 flex flex-col font-inter selection:bg-[#FF5D7A] selection:text-white">
-      {children}
+    <div className="min-h-screen w-full bg-slate-50 text-slate-900 flex flex-col font-sans">
+      <main className="flex-1 w-full">{children}</main>
     </div>
   );
 };
