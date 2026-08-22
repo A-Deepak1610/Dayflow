@@ -1,197 +1,110 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 
-/**
- * Helper to get UTC midnight Date object for current day (Prisma @db.Date format)
- */
-const getTodayUtcDate = (): Date => {
-  const now = new Date();
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-};
-
-/**
- * POST /api/attendance/check-in
- * Employee Clock-In Endpoint
- */
-export const checkIn = async (req: Request, res: Response, next: NextFunction) => {
+// Clock In (creates a new attendance record for today)
+export const clockIn = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.userId || req.body.userId;
-    const notes = req.body.notes || null;
-
+    const userId = req.user?.id;
     if (!userId) {
-      return res.status(400).json({ message: 'User ID is required.' });
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
     }
 
-    const todayDate = getTodayUtcDate();
-    const now = new Date();
+    // Check if already clocked in today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // Check if user already clocked in today
-    const existingAttendance = await prisma.attendance.findUnique({
+    const existingLog = await prisma.attendance.findFirst({
       where: {
-        userId_date: {
-          userId,
-          date: todayDate,
-        },
+        userId,
+        date: today,
       },
     });
 
-    if (existingAttendance) {
-      return res.status(200).json({
-        message: 'Already clocked in for today.',
-        attendance: existingAttendance,
-      });
+    if (existingLog) {
+      res.status(400).json({ message: 'Already clocked in for today.' });
+      return;
     }
 
-    // Determine status: "On Time" if before 9:15 AM local time, else "Late"
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const status = (hours < 9 || (hours === 9 && minutes <= 15)) ? 'On Time' : 'Late';
+    const clockInTime = new Date();
+    // Simple logic: if clocked in after 9:15 AM, status is 'Late', else 'On Time'
+    const status = (clockInTime.getHours() > 9 || (clockInTime.getHours() === 9 && clockInTime.getMinutes() > 15)) ? 'Late' : 'On Time';
 
-    const attendance = await prisma.attendance.create({
+    const log = await prisma.attendance.create({
       data: {
         userId,
-        date: todayDate,
-        clockIn: now,
+        date: today,
+        clockIn: clockInTime,
         status,
-        notes,
       },
     });
 
-    return res.status(201).json({
-      message: 'Clocked in successfully!',
-      attendance,
-    });
-  } catch (error) {
-    next(error);
+    res.status(201).json({ message: 'Clocked in successfully', log });
+  } catch (error: any) {
+    console.error('Error clocking in:', error);
+    res.status(500).json({ message: 'Server error clocking in' });
   }
 };
 
-/**
- * POST /api/attendance/check-out
- * Employee Clock-Out Endpoint
- */
-export const checkOut = async (req: Request, res: Response, next: NextFunction) => {
+// Clock Out (updates today's record)
+export const clockOut = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.userId || req.body.userId;
-
+    const userId = req.user?.id;
     if (!userId) {
-      return res.status(400).json({ message: 'User ID is required.' });
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
     }
 
-    const todayDate = getTodayUtcDate();
-    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // Find active attendance record for today
-    const existingAttendance = await prisma.attendance.findUnique({
+    const existingLog = await prisma.attendance.findFirst({
       where: {
-        userId_date: {
-          userId,
-          date: todayDate,
-        },
+        userId,
+        date: today,
       },
     });
 
-    if (!existingAttendance) {
-      return res.status(404).json({
-        message: 'No active clock-in record found for today. Please clock in first.',
-      });
+    if (!existingLog) {
+      res.status(400).json({ message: 'No clock-in record found for today.' });
+      return;
     }
 
-    if (existingAttendance.clockOut) {
-      return res.status(200).json({
-        message: 'Already clocked out for today.',
-        attendance: existingAttendance,
-      });
+    if (existingLog.clockOut) {
+      res.status(400).json({ message: 'Already clocked out for today.' });
+      return;
     }
 
-    // Calculate duration in hours if clocked out
-    const updatedAttendance = await prisma.attendance.update({
-      where: {
-        id: existingAttendance.id,
-      },
-      data: {
-        clockOut: now,
-      },
+    const log = await prisma.attendance.update({
+      where: { id: existingLog.id },
+      data: { clockOut: new Date() },
     });
 
-    return res.status(200).json({
-      message: 'Clocked out successfully!',
-      attendance: updatedAttendance,
-    });
-  } catch (error) {
-    next(error);
+    res.status(200).json({ message: 'Clocked out successfully', log });
+  } catch (error: any) {
+    console.error('Error clocking out:', error);
+    res.status(500).json({ message: 'Server error clocking out' });
   }
 };
 
-/**
- * GET /api/attendance/today
- * Get Today's Clock-In Status for Authenticated User
- */
-export const getTodayStatus = async (req: Request, res: Response, next: NextFunction) => {
+// Get My Attendance Logs
+export const getMyAttendance = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.userId || (req.query.userId as string);
-
+    const userId = req.user?.id;
     if (!userId) {
-      return res.status(400).json({ message: 'User ID is required.' });
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
     }
 
-    const todayDate = getTodayUtcDate();
-
-    const attendance = await prisma.attendance.findUnique({
-      where: {
-        userId_date: {
-          userId,
-          date: todayDate,
-        },
-      },
+    const logs = await prisma.attendance.findMany({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      take: 30, // Last 30 days
     });
 
-    return res.status(200).json({
-      date: todayDate.toISOString().slice(0, 10),
-      hasClockedIn: !!attendance,
-      hasClockedOut: !!attendance?.clockOut,
-      attendance: attendance || null,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * GET /api/attendance/history
- * Get Attendance Logs for User or All Employees (HR/Admin)
- */
-export const getAttendanceHistory = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const userId = req.user?.userId || (req.query.userId as string);
-    const limit = Number(req.query.limit) || 30;
-
-    const whereClause = userId ? { userId } : {};
-
-    const history = await prisma.attendance.findMany({
-      where: whereClause,
-      take: limit,
-      orderBy: {
-        date: 'desc',
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            loginId: true,
-          },
-        },
-      },
-    });
-
-    return res.status(200).json({
-      count: history.length,
-      history,
-    });
-  } catch (error) {
-    next(error);
+    res.status(200).json({ logs });
+  } catch (error: any) {
+    console.error('Error fetching attendance logs:', error);
+    res.status(500).json({ message: 'Server error fetching attendance logs' });
   }
 };

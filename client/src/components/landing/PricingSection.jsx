@@ -61,33 +61,33 @@ export const PricingSection = ({ onOpenAuthModal }) => {
   ];
 
   return (
-    <section id="pricing" className="py-20 lg:py-28 relative bg-white">
+    <section id="pricing" className="py-20 lg:py-28 relative bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#222] border border-white/10 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4">
             <Zap className="w-3.5 h-3.5" />
             <span>Transparent Pricing</span>
           </div>
 
-          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-[#1F2A52] tracking-tight leading-tight mb-4">
+          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
             Predictable plans for <br />
             <span className="text-[#FF5D7A]">teams of all sizes.</span>
           </h2>
 
-          <p className="text-slate-600 text-base sm:text-lg mb-8">
+          <p className="text-slate-400 text-base sm:text-lg mb-8">
             No hidden setup fees or surprise charges. Upgrade, downgrade, or cancel anytime.
           </p>
 
           {/* Billing Cycle Toggle */}
-          <div className="inline-flex items-center gap-3 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 shadow-inner">
+          <div className="inline-flex items-center gap-3 p-1.5 bg-[#222] rounded-2xl border border-white/10 shadow-inner">
             <button
               onClick={() => setBillingCycle('monthly')}
               className={`px-5 py-2 rounded-xl text-xs font-sora font-semibold transition cursor-pointer ${
                 billingCycle === 'monthly'
-                  ? 'bg-white text-[#1F2A52] shadow-sm border border-slate-200'
-                  : 'text-slate-600 hover:text-[#1F2A52]'
+                  ? 'bg-[#0a0a0a] text-white shadow-sm border border-white/10'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               Monthly Billing
@@ -97,11 +97,11 @@ export const PricingSection = ({ onOpenAuthModal }) => {
               className={`px-5 py-2 rounded-xl text-xs font-sora font-semibold transition flex items-center gap-2 cursor-pointer ${
                 billingCycle === 'annual'
                   ? 'bg-[#FF5D7A] text-white shadow-md'
-                  : 'text-slate-600 hover:text-[#1F2A52]'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <span>Annual Billing</span>
-              <span className="bg-white/25 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-[#0a0a0a]/25 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                 Save 25%
               </span>
             </button>
@@ -113,10 +113,10 @@ export const PricingSection = ({ onOpenAuthModal }) => {
           {plans.map((plan, idx) => (
             <div
               key={idx}
-              className={`relative bg-white border rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 ${
+              className={`relative bg-[#0a0a0a] border rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 ${
                 plan.popular
                   ? 'border-[#FF5D7A] shadow-xl ring-2 ring-[#FF5D7A]/20 lg:-translate-y-2'
-                  : 'border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md'
+                  : 'border-white/10 hover:border-white/20 shadow-sm hover:shadow-md'
               }`}
             >
               {plan.popular && (
@@ -128,25 +128,25 @@ export const PricingSection = ({ onOpenAuthModal }) => {
 
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-sora text-2xl font-bold text-[#1F2A52]">{plan.name}</h3>
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                  <h3 className="font-sora text-2xl font-bold text-white">{plan.name}</h3>
+                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#222] text-slate-300 border border-white/10">
                     {plan.badge}
                   </span>
                 </div>
 
-                <p className="text-slate-600 text-xs leading-relaxed mb-6">
+                <p className="text-slate-400 text-xs leading-relaxed mb-6">
                   {plan.description}
                 </p>
 
-                <div className="mb-6 pb-6 border-b border-slate-100">
+                <div className="mb-6 pb-6 border-b border-white/5">
                   {plan.priceMonthly === 'Custom' ? (
-                    <div className="text-3xl font-sora font-extrabold text-[#1F2A52]">Custom Quote</div>
+                    <div className="text-3xl font-sora font-extrabold text-white">Custom Quote</div>
                   ) : (
                     <div className="flex items-baseline gap-1">
-                      <span className="font-sora text-4xl sm:text-5xl font-extrabold text-[#1F2A52]">
+                      <span className="font-sora text-4xl sm:text-5xl font-extrabold text-white">
                         {billingCycle === 'annual' ? plan.priceAnnual : plan.priceMonthly}
                       </span>
-                      <span className="text-slate-500 text-sm">/ month / employee</span>
+                      <span className="text-slate-400 text-sm">/ month / employee</span>
                     </div>
                   )}
                   {billingCycle === 'annual' && plan.priceMonthly !== 'Custom' && (
@@ -158,7 +158,7 @@ export const PricingSection = ({ onOpenAuthModal }) => {
 
                 <div className="space-y-3 mb-8">
                   {plan.features.map((feat, i) => (
-                    <div key={i} className="flex items-start gap-2.5 text-xs text-slate-700">
+                    <div key={i} className="flex items-start gap-2.5 text-xs text-slate-300">
                       <Check className="w-4 h-4 text-[#FF5D7A] shrink-0 mt-0.5" />
                       <span>{feat}</span>
                     </div>

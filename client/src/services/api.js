@@ -68,3 +68,25 @@ export const createEmployeeApi = (payload) =>
     method: 'POST',
     body: JSON.stringify(payload),
   });
+
+// --- Attendance API Endpoints ---
+export const clockInApi = () =>
+  apiCall('/attendance/clock-in', {
+    method: 'POST',
+  });
+
+export const clockOutApi = () =>
+  apiCall('/attendance/clock-out', {
+    method: 'POST',
+  });
+
+export const getMyAttendanceApi = () =>
+  apiCall('/attendance/me', {
+    method: 'GET',
+  });
+
+// --- Salary API Endpoints ---
+export const getMySalaryApi = () =>
+  apiCall('/salary/me', {
+    method: 'GET',
+  });

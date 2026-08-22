@@ -1,16 +1,11 @@
 import { Router } from 'express';
-import {
-  checkIn,
-  checkOut,
-  getTodayStatus,
-  getAttendanceHistory,
-} from '../controllers/attendance.controller';
+import { clockIn, clockOut, getMyAttendance } from '../controllers/attendance.controller';
+import { authenticate } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.post('/check-in', checkIn);
-router.post('/check-out', checkOut);
-router.get('/today', getTodayStatus);
-router.get('/history', getAttendanceHistory);
+router.post('/clock-in', authenticate, clockIn);
+router.post('/clock-out', authenticate, clockOut);
+router.get('/me', authenticate, getMyAttendance);
 
 export default router;
