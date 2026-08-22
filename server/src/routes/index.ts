@@ -1,23 +1,25 @@
-import { Router } from 'express';
-import healthRoutes from './health.routes';
-import authRoutes from './auth.routes';
-import attendanceRoutes from './attendance.routes';
-import salaryRoutes from './salary.routes';
+import { Router } from "express";
+import healthRoutes from "./health.routes";
+import authRoutes from "./auth.routes";
+import domainRoutes from "./domain.routes";
+import attendanceRoutes from "./attendance.routes";
+import salaryRoutes from "./salary.routes";
 
 const router = Router();
 
 // API Health Check
-router.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Dayflow API is running' });
-});
+router.use("/health", healthRoutes);
 
 // Auth Routes
-router.use('/auth', authRoutes);
+router.use("/auth", authRoutes);
+
+// Domain Routes
+router.use("/", domainRoutes);
 
 // Attendance Routes
-router.use('/attendance', attendanceRoutes);
+router.use("/attendance", attendanceRoutes);
 
 // Salary Routes
-router.use('/salary', salaryRoutes);
+router.use("/salary", salaryRoutes);
 
 export default router;
