@@ -5,10 +5,16 @@ import MainLayout from './components/layout/MainLayout';
 import EmployeeLayout from './components/layout/EmployeeLayout';
 import Home from './pages/Home';
 
-// HR Pages
+// HR Pages & Layout
+import HrLayout from './pages/hr/HrLayout';
 import HrDashboard from './pages/hr/HrDashboard';
-import EmployeeManagement from './pages/hr/EmployeeManagement';
-import LeaveApprovals from './pages/hr/LeaveApprovals';
+import EmployeeProfilesPage from './pages/hr/EmployeeProfilesPage';
+import AttendanceMonitorPage from './pages/hr/AttendanceMonitorPage';
+import LeaveManagementPage from './pages/hr/LeaveManagementPage';
+import PayrollAnalyticsPage from './pages/hr/PayrollAnalyticsPage';
+import EmployeeProfileDetail from './pages/hr/EmployeeProfileDetail';
+import PerformanceAnalyticsPage from './pages/hr/PerformanceAnalyticsPage';
+import HelpdeskPage from './pages/hr/HelpdeskPage';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -38,33 +44,27 @@ function AppRoutes() {
       {/* Landing Page */}
       <Route path="/" element={<MainLayout><Home /></MainLayout>} />
 
-      {/* HR / Admin Pages */}
+      {/* HR / Admin Portal Suite with Dedicated Sidebar */}
       <Route
-        path="/hr/dashboard"
+        path="/hr"
         element={
           <HrRoute>
-            <HrDashboard />
+            <HrLayout />
           </HrRoute>
         }
-      />
-      <Route
-        path="/hr/employees"
-        element={
-          <HrRoute>
-            <EmployeeManagement />
-          </HrRoute>
-        }
-      />
-      <Route
-        path="/hr/leaves"
-        element={
-          <HrRoute>
-            <LeaveApprovals />
-          </HrRoute>
-        }
-      />
+      >
+        <Route index element={<Navigate to="/hr/dashboard" replace />} />
+        <Route path="dashboard" element={<HrDashboard />} />
+        <Route path="employees" element={<EmployeeProfilesPage />} />
+        <Route path="employees/:id" element={<EmployeeProfileDetail />} />
+        <Route path="attendance" element={<AttendanceMonitorPage />} />
+        <Route path="leaves" element={<LeaveManagementPage />} />
+        <Route path="payroll" element={<PayrollAnalyticsPage />} />
+        <Route path="performance" element={<PerformanceAnalyticsPage />} />
+        <Route path="helpdesk" element={<HelpdeskPage />} />
+      </Route>
 
-      {/* Employee Pages */}
+      {/* Employee Self-Service Pages */}
       <Route
         path="/employee/dashboard"
         element={
