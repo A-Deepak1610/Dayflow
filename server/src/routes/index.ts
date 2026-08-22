@@ -4,6 +4,7 @@ import authRoutes from './auth.routes';
 import domainRoutes from './domain.routes';
 import attendanceRoutes from './attendance.routes';
 import salaryRoutes from './salary.routes';
+import aiRoutes from './ai.routes';
 
 const router = Router();
 
@@ -13,7 +14,10 @@ router.use('/health', healthRoutes);
 // Auth Routes
 router.use('/auth', authRoutes);
 
-// Domain Routes
+// AI Chatbot Routes (Publicly accessible for landing page & portal)
+router.use('/ai', aiRoutes);
+
+// Domain Routes (Protected HR & Employee domain endpoints)
 router.use('/', domainRoutes);
 
 // Attendance Routes

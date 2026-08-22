@@ -239,3 +239,11 @@ export const updateHelpdeskTicketApi = (id, payload) =>
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
+
+// --- AI Chatbot API Endpoint ---
+export const sendAiChatMessageApi = (message, history = []) =>
+  apiCall('/ai/chat', {
+    method: 'POST',
+    body: JSON.stringify({ message, history }),
+  });
+

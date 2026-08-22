@@ -71,25 +71,6 @@ export const HrDashboard = () => {
   ];
 
   const leaveBreakdownData = [
-    { name: 'Casual Leave', value: 14, fill: '#FF5D7A' }
-  ];
-
-  const attendanceOverviewData = [
-    { name: 'Engineering', onTime: 92, late: 6, off: 2 },
-    { name: 'Product Design', onTime: 95, late: 3, off: 2 },
-    { name: 'Human Resources', onTime: 98, late: 2, off: 0 },
-    { name: 'Operations', onTime: 88, late: 8, off: 4 },
-    { name: 'Sales & Mktg', onTime: 85, late: 10, off: 5 },
-  ];
-
-  const attendanceTrendData = [
-    { date: 'Week 1', rate: 94 },
-    { date: 'Week 2', rate: 96 },
-    { date: 'Week 3', rate: 95 },
-    { date: 'Week 4', rate: 97 },
-  ];
-
-  const leaveBreakdownData = [
     { name: 'Annual Leave', value: 18, color: '#3B82F6' },
     { name: 'Sick Leave', value: 8, color: '#EF4444' },
     { name: 'Casual Leave', value: 12, color: '#F59E0B' },
@@ -311,33 +292,9 @@ export const HrDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600 hover:underline cursor-pointer" onClick={() => navigate('/hr/attendance')}>
-            <span>Attendance Monitor</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </div>
-        </div>
-
-          {/* Pending Approvals */}
-          <div className="horilla-card p-5">
-            <h3 className="text-sm font-sora font-bold text-white mb-4">Approval Matrix</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 text-center hover:border-[#FF5D7A]/40 transition">
-                <h2 className="text-xl font-sora font-extrabold text-white">12</h2>
-                <p className="text-[10px] font-mono text-slate-400 uppercase mt-0.5">LEAVE</p>
-              </div>
-              <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 text-center hover:border-emerald-500/40 transition">
-                <h2 className="text-xl font-sora font-extrabold text-white">0</h2>
-                <p className="text-[10px] font-mono text-slate-400 uppercase mt-0.5">ATTENDANCE</p>
-              </div>
-              <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 text-center hover:border-purple-500/40 transition">
-                <h2 className="text-xl font-sora font-extrabold text-white">3</h2>
-                <p className="text-[10px] font-mono text-slate-400 uppercase mt-0.5">ASSETS</p>
-              </div>
-              <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 text-center hover:border-blue-500/40 transition">
-                <h2 className="text-xl font-sora font-extrabold text-white">5</h2>
-                <p className="text-[10px] font-mono text-slate-400 uppercase mt-0.5">PAYROLL</p>
-              </div>
+            <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-[#FF5D7A] hover:underline cursor-pointer" onClick={() => navigate('/hr/attendance')}>
+              <span>Attendance Monitor</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </div>
           </div>
         </div>

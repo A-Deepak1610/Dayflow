@@ -132,7 +132,7 @@ export const EmployeeDashboard = () => {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleToggleClock = () => {
+  const handleToggleClock = async () => {
     if (clockedIn) {
       setClockedIn(false);
       showToast('Checked out successfully.');

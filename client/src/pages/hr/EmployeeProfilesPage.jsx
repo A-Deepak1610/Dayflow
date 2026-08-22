@@ -149,15 +149,13 @@ export const EmployeeProfilesPage = () => {
                   <span className="truncate">{emp.phone}</span>
                 </div>
               </div>
+                <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between">
+                  <span className="text-[10px] text-slate-500 font-mono">{emp.id}</span>
+                  <span className="text-xs font-bold text-[#FF5D7A]">Profile &rarr;</span>
+                </div>
+              </div>
             </div>
           ))}
-
-            <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between">
-              <span className="text-[10px] text-slate-500 font-mono">{emp.id}</span>
-              <span className="text-xs font-bold text-[#FF5D7A]">Profile &rarr;</span>
-            </div>
-          </div>
-        ))}
 
         {filtered.length === 0 && (
           <div className="col-span-full py-12 text-center horilla-card p-6">
