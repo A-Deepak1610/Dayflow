@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { exportToCSV } from '../../utils';
+
 import {
   DollarSign,
   Download,
@@ -820,41 +822,40 @@ export const PayrollAnalyticsPage = () => {
 
   // Export Bank Transfer Sheet CSV
   const handleExportBankSheet = () => {
-    const headers = [
-      'Employee ID,Employee Name,Department,Bank Name,Account Number,IFSC/Routing,PAN/SSN,Tax Regime,Monthly Net Pay,Status,Payment Reference'
+    const columns = [
+      { header: 'Employee ID', key: 'id' },
+      { header: 'Employee Name', key: 'name' },
+      { header: 'Department', key: 'dept' },
+      { header: 'Bank Name', key: 'bankName' },
+      { header: 'Account Number', key: 'bankAccount' },
+      { header: 'IFSC/Routing', key: 'ifsc' },
+      { header: 'PAN/SSN', key: 'panNo' },
+      { header: 'Tax Regime', key: 'taxRegime' },
+      { header: 'Monthly Net Pay', key: 'netPay' },
+      { header: 'Status', key: 'status' },
     ];
-    const rows = employees.map(
-      e =>
-        `"${e.id}","${e.name}","${e.dept}","${e.bankName}","${e.bankAccount}","${e.ifsc}","${e.panNo}","${e.taxRegime}",$${e.netPay},"${e.status}","ACH-202608-${e.id.slice(-4)}"`
-    );
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers, ...rows].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Dayflow_Payroll_DirectDeposit_${selectedPeriod.replace(' ', '_')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    exportToCSV(`Dayflow_DirectDeposit_${selectedPeriod.replace(/\s+/g, '_')}`, employees, columns);
     showToast('Direct Deposit ACH bank transfer sheet exported.');
   };
 
   // Export Full Compensation Register CSV
   const handleExportFullRegister = () => {
-    const headers = [
-      'Employee ID,Name,Department,Role,Type,Annual CTC,Base Pay,HRA,Special Allowance,Conveyance,Medical,Bonus,LOP Days,LOP Deduct,PF Deduct,Tax (TDS),Health Ins,Loan EMI,Net Take Home,Status'
+    const columns = [
+      { header: 'Employee ID', key: 'id' },
+      { header: 'Name', key: 'name' },
+      { header: 'Department', key: 'dept' },
+      { header: 'Role', key: 'role' },
+      { header: 'Annual CTC', key: 'ctcAnnual' },
+      { header: 'Base Pay', key: 'basePay' },
+      { header: 'HRA', key: 'hra' },
+      { header: 'Special Allowance', key: 'special' },
+      { header: 'Bonus', key: 'bonus' },
+      { header: 'PF Deduct', key: 'pf' },
+      { header: 'Tax (TDS)', key: 'tax' },
+      { header: 'Net Take Home', key: 'netPay' },
+      { header: 'Status', key: 'status' },
     ];
-    const rows = employees.map(
-      e =>
-        `"${e.id}","${e.name}","${e.dept}","${e.role}","${e.empType}",$${e.ctcAnnual},$${e.basePay},$${e.hra},$${e.special},$${e.conveyance},$${e.medical},$${e.bonus},${e.lopDays},$${e.lopDeduction},$${e.pf},$${e.tax},$${e.insurance},$${e.loanEmi},$${e.netPay},"${e.status}"`
-    );
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers, ...rows].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Dayflow_Full_Salary_Register_${selectedPeriod.replace(' ', '_')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    exportToCSV(`Dayflow_Salary_Register_${selectedPeriod.replace(/\s+/g, '_')}`, employees, columns);
     showToast('Comprehensive salary register exported to CSV.');
   };
 

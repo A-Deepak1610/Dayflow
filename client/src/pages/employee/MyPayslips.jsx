@@ -32,6 +32,7 @@ import {
   X,
   Check
 } from 'lucide-react';
+import { printPayslipPDF } from '../../utils';
 
 // ============================================================================
 // MOCK EMPLOYEE PROFILE & SALARY REGISTER (Indian Rupee MNC Standard)
@@ -316,54 +317,17 @@ export const MyPayslips = () => {
     });
   }, [selectedFY, statusFilter, searchQuery]);
 
-  // Handle PDF Download Simulation
+  // Handle PDF Download / Printable Statement
   const handleDownloadPDF = (slip) => {
-    setDownloadingId(slip.id);
-    setTimeout(() => {
-      setDownloadingId(null);
-      // Create and download structured CSV/receipt text representation
-      const content = `=====================================================
-DAYFLOW TECHNOLOGIES - SALARY SLIP
-Every workday, perfectly aligned.
-=====================================================
-Slip ID: ${slip.id}
-Month: ${slip.month}
-Employee: ${EMPLOYEE_PROFILE.name} (${EMPLOYEE_PROFILE.employeeId})
-Department: ${EMPLOYEE_PROFILE.department}
-Designation: ${EMPLOYEE_PROFILE.designation}
-Bank Account: ${EMPLOYEE_PROFILE.bankAccount} (${EMPLOYEE_PROFILE.bankName})
-Pay Period: ${slip.payPeriod}
-Payment Date: ${slip.paymentDate}
-Status: ${slip.status}
-
------------------------------------------------------
-EARNINGS (INR)
------------------------------------------------------
-${slip.earningsBreakdown.map(e => `${e.name.padEnd(35)} : Rs. ${e.amount.toLocaleString('en-IN')}`).join('\n')}
-Gross Earnings                       : Rs. ${slip.grossEarnings.toLocaleString('en-IN')}
-
------------------------------------------------------
-DEDUCTIONS (INR)
------------------------------------------------------
-${slip.deductionsBreakdown.map(d => `${d.name.padEnd(35)} : Rs. ${d.amount.toLocaleString('en-IN')}`).join('\n')}
-Total Deductions                     : Rs. ${slip.totalDeductions.toLocaleString('en-IN')}
-
------------------------------------------------------
-NET SALARY DISBURSED                 : Rs. ${slip.netPay.toLocaleString('en-IN')}
------------------------------------------------------
-Note: System generated confidential statement.
-`;
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Dayflow_Payslip_${slip.month.replace(/\s+/g, '_')}_${EMPLOYEE_PROFILE.employeeId}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      showToast(`Payslip for ${slip.month} downloaded successfully.`);
-    }, 900);
+    printPayslipPDF({
+      ...slip,
+      employeeName: EMPLOYEE_PROFILE.name,
+      employeeId: EMPLOYEE_PROFILE.employeeId,
+      department: EMPLOYEE_PROFILE.department,
+      designation: EMPLOYEE_PROFILE.designation,
+      period: slip.month,
+    });
+    showToast(`Payslip for ${slip.month} opened for print/download.`);
   };
 
   // Handle Print Action
