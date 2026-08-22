@@ -35,7 +35,7 @@ export const EmployeeSidebar = () => {
   if (!user) return null;
 
   return (
-    <div className="w-64 bg-white border-r border-slate-200 h-screen flex flex-col font-inter shrink-0">
+    <aside className="w-64 bg-white border-r border-slate-200 h-screen sticky top-0 z-30 flex flex-col font-inter shrink-0">
       <div className="p-6 flex items-center gap-3 border-b border-slate-100">
         <div className="w-8 h-8 rounded-lg bg-[#1F2A52] flex items-center justify-center font-sora font-bold text-[#FF5D7A] text-sm shadow-md">
           DF
@@ -90,7 +90,7 @@ export const EmployeeSidebar = () => {
           Logout
         </button>
       </div>
-    </div>
+    </aside>
   );
 };
 

@@ -91,7 +91,7 @@ export const EmployeeProfileDetail = () => {
   }
 
   return (
-    <div className="p-6 max-w-[1200px] mx-auto">
+    <div className="p-6 w-full">
       
       {/* Navigation & Header */}
       <div className="flex items-center gap-4 mb-6">
