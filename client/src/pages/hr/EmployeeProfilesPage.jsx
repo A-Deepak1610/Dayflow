@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { Search, UserPlus, Mail, Phone, Briefcase, Building, Sparkles } from 'lucide-react';
+import { Search, UserPlus, Mail, Phone, Briefcase, Building, Loader2 } from 'lucide-react';
+import { fetchAllEmployeesApi } from '../../services/api';
 
 export const EmployeeProfilesPage = () => {
   const { onOpenAddModal } = useOutletContext();
@@ -48,17 +49,17 @@ export const EmployeeProfilesPage = () => {
   });
 
   return (
-    <div className="p-6 bg-[#0a0a0a] min-h-screen text-slate-100 font-inter">
+    <div className="p-6 bg-[#F4F5F7] min-h-screen text-[#1F2A52] font-inter">
       {/* Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-white font-sora">Employee Directory</h1>
-          <p className="text-xs text-slate-400 mt-1">Manage personnel records, roles, and profiles</p>
+          <h1 className="text-2xl font-extrabold text-[#1F2A52] font-sora">Employee Directory</h1>
+          <p className="text-xs text-slate-500 mt-1">Manage personnel records, roles, and profiles</p>
         </div>
 
         <button
           onClick={onOpenAddModal}
-          className="px-4 py-2 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-semibold text-xs rounded-xl shadow-md shadow-[#FF5D7A]/20 cursor-pointer flex items-center gap-2 transition"
+          className="px-4 py-2 bg-[#E9573F] hover:bg-[#d64a32] text-white font-sora font-semibold text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-2 transition"
         >
           <UserPlus className="w-4 h-4" />
           <span>Create Employee</span>
@@ -66,7 +67,7 @@ export const EmployeeProfilesPage = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-[#111113] border border-white/10 rounded-2xl p-4 shadow-md flex flex-col sm:flex-row items-center gap-4 mb-6">
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs flex flex-col sm:flex-row items-center gap-4 mb-6">
         <div className="relative w-full sm:w-96">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -74,7 +75,7 @@ export const EmployeeProfilesPage = () => {
             placeholder="Search by name, email, or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[#18181b] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:border-[#FF5D7A] outline-none transition"
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:border-[#E9573F] focus:bg-white outline-none transition"
           />
         </div>
 
@@ -83,7 +84,7 @@ export const EmployeeProfilesPage = () => {
           <select
             value={deptFilter}
             onChange={(e) => setDeptFilter(e.target.value)}
-            className="w-full sm:w-auto px-4 py-2 bg-[#18181b] border border-white/10 rounded-xl text-xs font-semibold text-white outline-none focus:border-[#FF5D7A]"
+            className="w-full sm:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#1F2A52] outline-none focus:border-[#E9573F]"
           >
             <option value="ALL">All Departments</option>
             <option value="Engineering">Engineering</option>
@@ -100,7 +101,7 @@ export const EmployeeProfilesPage = () => {
       {/* Loading state */}
       {loading && (
         <div className="p-8 flex items-center justify-center gap-2 text-slate-500 text-sm">
-          <Loader2 className="w-5 h-5 animate-spin text-horilla-primary" />
+          <Loader2 className="w-5 h-5 animate-spin text-[#E9573F]" />
           <span>Loading employee directory from database...</span>
         </div>
       )}
@@ -116,11 +117,11 @@ export const EmployeeProfilesPage = () => {
             <div>
               {/* Card Header */}
               <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-[#FF5D7A] text-white flex items-center justify-center font-sora font-extrabold text-sm shadow-md shadow-[#FF5D7A]/20">
+                <div className="w-12 h-12 rounded-xl bg-[#E9573F] text-white flex items-center justify-center font-sora font-extrabold text-sm shadow-xs">
                   {emp.name.split(' ').map(n=>n[0]).join('')}
                 </div>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase tracking-wider ${
-                  emp.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                  emp.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
                 }`}>
                   {emp.status}
                 </span>
@@ -128,40 +129,39 @@ export const EmployeeProfilesPage = () => {
 
               {/* Name & Role */}
               <div>
-                <h3 className="text-base font-sora font-bold text-white">{emp.name}</h3>
-                <p className="text-xs font-semibold text-[#FF5D7A] mt-0.5">{emp.role}</p>
+                <h3 className="text-base font-sora font-bold text-[#1F2A52]">{emp.name}</h3>
+                <p className="text-xs font-semibold text-[#E9573F] mt-0.5">{emp.role}</p>
               </div>
 
-              <div className="my-4 border-t border-white/10"></div>
+              <div className="my-4 border-t border-slate-100"></div>
 
               {/* Details List */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Briefcase className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <span className="truncate">{emp.dept}</span>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <span className="truncate">{emp.email}</span>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <span className="truncate">{emp.phone}</span>
                 </div>
               </div>
-            </div>
-          ))}
 
-            <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between">
-              <span className="text-[10px] text-slate-500 font-mono">{emp.id}</span>
-              <span className="text-xs font-bold text-[#FF5D7A]">Profile &rarr;</span>
+              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-mono">{emp.id}</span>
+                <span className="text-xs font-bold text-[#E9573F]">Profile &rarr;</span>
+              </div>
             </div>
           </div>
         ))}
 
         {filtered.length === 0 && (
           <div className="col-span-full py-12 text-center horilla-card p-6">
-            <p className="text-slate-400 text-xs font-mono">No personnel match the specified search parameters.</p>
+            <p className="text-slate-500 text-xs font-mono">No personnel match the specified search parameters.</p>
           </div>
         )}
       </div>

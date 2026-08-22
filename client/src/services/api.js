@@ -179,6 +179,8 @@ export const fetchCompensationRecordsApi = (params = {}) => {
   const query = new URLSearchParams(params).toString();
   return apiCall(`/payroll/records${query ? `?${query}` : ''}`);
 };
+export const fetchAllPayrollRecordsApi = (params = {}) => fetchCompensationRecordsApi(params);
+export const fetchAllSalaryStructuresApi = () => apiCall('/payroll/structures');
 
 export const createSalaryRevisionApi = (payload) =>
   apiCall('/payroll/revisions', {

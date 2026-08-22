@@ -6,5 +6,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', getPerformanceReviews);
+router.get('/reviews', getPerformanceReviews);
+router.get('/all', getPerformanceReviews);
 
 export default router;

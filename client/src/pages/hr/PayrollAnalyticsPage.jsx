@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { exportToCSV } from '../../utils';
+import { fetchAllPayrollRecordsApi, fetchAllSalaryStructuresApi } from '../../services/api';
 
 import {
   DollarSign,

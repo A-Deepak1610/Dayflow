@@ -17,6 +17,7 @@ router.use(authenticate);
 
 // Employee routes
 router.get('/types', getLeaveTypes);
+router.get('/balances', getMyLeaveBalances);
 router.get('/balances/me', getMyLeaveBalances);
 router.get('/me', getMyLeaveRequests);
 router.post('/apply', applyLeave);

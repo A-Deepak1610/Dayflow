@@ -16,13 +16,13 @@ export const EmployeeLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-slate-100 font-inter flex">
+    <div className="min-h-screen bg-[#F4F5F7] text-[#1F2A52] font-inter flex">
       {/* Employee Navigation Sidebar */}
       <EmployeeSidebar />
 
       {/* Main Content Column */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Top Header Bar matching HR Header */}
+        {/* Top Header Bar */}
         <EmployeeHeader
           clockedIn={clockedIn}
           clockInTime={clockInTime}
@@ -30,7 +30,7 @@ export const EmployeeLayout = ({ children }) => {
         />
 
         {/* Dynamic Page Main Content */}
-        <main className="flex-1 w-full bg-[#0a0a0a] p-6">
+        <main className="flex-1 w-full bg-[#F4F5F7]">
           {children}
         </main>
       </div>
