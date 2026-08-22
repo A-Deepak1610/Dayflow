@@ -79,7 +79,26 @@ export const HrDashboard = () => {
   const genderData = [
     { name: 'Male', value: 36, color: '#3B82F6' },
     { name: 'Female', value: 36, color: '#EC4899' },
+<<<<<<< HEAD
     { name: 'Other', value: 27, color: '#8B5CF6' },
+=======
+    { name: 'Other', value: 27, color: '#A855F7' },
+  ];
+
+  const recruitmentData = [
+    { stage: 'Initial', value: 2, fill: '#94A3B8' },
+    { stage: 'Applied', value: 7, fill: '#FF5D7A' },
+    { stage: 'Interview', value: 1, fill: '#F59E0B' },
+    { stage: 'Cancelled', value: 2, fill: '#EF4444' },
+    { stage: 'Hired', value: 5, fill: '#10B981' },
+  ];
+
+  const leaveBreakdownData = [
+    { name: 'Annual Leave', value: 18, color: '#3B82F6' },
+    { name: 'Sick Leave', value: 8, color: '#EF4444' },
+    { name: 'Casual Leave', value: 12, color: '#F59E0B' },
+    { name: 'Comp-Off', value: 4, color: '#10B981' },
+>>>>>>> 8020857f849795a02600c1a3e2705e2d20beac6e
   ];
 
   return (
@@ -297,6 +316,7 @@ export const HrDashboard = () => {
                 </div>
               ))}
             </div>
+<<<<<<< HEAD
           </div>
 
           {/* Pending Approvals */}
@@ -319,6 +339,11 @@ export const HrDashboard = () => {
                 <h2 className="text-xl font-sora font-extrabold text-[#1F2A52]">5</h2>
                 <p className="text-[10px] font-mono text-slate-500 uppercase mt-0.5 font-bold">PAYROLL</p>
               </div>
+=======
+            <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-[#FF5D7A] hover:underline cursor-pointer" onClick={() => navigate('/hr/attendance')}>
+              <span>Attendance Monitor</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+>>>>>>> 8020857f849795a02600c1a3e2705e2d20beac6e
             </div>
           </div>
         </div>

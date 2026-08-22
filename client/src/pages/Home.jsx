@@ -6,6 +6,7 @@ import PricingSection from '../components/landing/PricingSection';
 import SocialProofSection from '../components/landing/SocialProofSection';
 import AuthModal from '../components/auth/AuthModal';
 import Footer from '../components/common/Footer';
+import AIChatbot from '../components/common/AIChatbot';
 import { checkServerHealth } from '../services/api';
 import { Activity } from 'lucide-react';
 import './Landing.css';
@@ -63,7 +64,10 @@ export const Home = () => {
         initialMode={authMode}
       />
 
-      {/* Floating System Telemetry Badge */}
+      {/* Floating Gemini AI Chatbot Widget (Bottom Right) */}
+      <AIChatbot />
+
+      {/* Floating System Telemetry Badge (Bottom Left) */}
       <div className="fixed bottom-4 left-4 z-30">
         <button
           onClick={() => setShowHealthToast(!showHealthToast)}
