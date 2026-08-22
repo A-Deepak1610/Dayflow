@@ -18,6 +18,7 @@ import HelpdeskPage from './pages/hr/HelpdeskPage';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
+import EmployeeDirectory from './pages/employee/EmployeeDirectory';
 import MyAttendance from './pages/employee/MyAttendance';
 import MyLeaves from './pages/employee/MyLeaves';
 import MyPayslips from './pages/employee/MyPayslips';
@@ -71,6 +72,14 @@ function AppRoutes() {
         element={
           <EmployeeRoute>
             <EmployeeDashboard />
+          </EmployeeRoute>
+        }
+      />
+      <Route
+        path="/employee/directory"
+        element={
+          <EmployeeRoute>
+            <EmployeeDirectory />
           </EmployeeRoute>
         }
       />
