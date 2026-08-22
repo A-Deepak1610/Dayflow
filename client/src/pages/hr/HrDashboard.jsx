@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Users, UserCheck, Calendar, Briefcase, RefreshCcw, Plus
 } from 'lucide-react';
@@ -13,6 +13,7 @@ export const HrDashboard = () => {
   const [activeDateFilter, setActiveDateFilter] = useState('This Month');
   const [hrStats, setHrStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const loadHrDashboard = async () => {
     try {
@@ -31,7 +32,7 @@ export const HrDashboard = () => {
     loadHrDashboard();
   }, []);
 
-  // Chart Data
+  // Department distribution
   const headcountData = [
     { name: 'Engineering', value: 65, color: '#9333EA' },
     { name: 'Sales', value: 45, color: '#FF5D7A' },
@@ -74,46 +75,25 @@ export const HrDashboard = () => {
   ];
 
   const attendanceOverviewData = [
-    { name: 'Eng', onTime: 85, late: 10, early: 5 },
-    { name: 'Sales', onTime: 70, late: 20, early: 10 },
-    { name: 'Support', onTime: 90, late: 5, early: 5 },
-    { name: 'Marketing', onTime: 80, late: 15, early: 5 },
-  ];
-
-  const departmentOvertimeData = [
-    { name: 'Eng', hours: 45 },
-    { name: 'Sales', hours: 10 },
-    { name: 'Support', hours: 25 },
-    { name: 'Market', hours: 5 },
+    { name: 'Engineering', onTime: 92, late: 6, off: 2 },
+    { name: 'Product Design', onTime: 95, late: 3, off: 2 },
+    { name: 'Human Resources', onTime: 98, late: 2, off: 0 },
+    { name: 'Operations', onTime: 88, late: 8, off: 4 },
+    { name: 'Sales & Mktg', onTime: 85, late: 10, off: 5 },
   ];
 
   const attendanceTrendData = [
-    { date: 'Week 1', rate: 95 },
-    { date: 'Week 2', rate: 93 },
-    { date: 'Week 3', rate: 96 },
-    { date: 'Week 4', rate: 94 },
+    { date: 'Week 1', rate: 94 },
+    { date: 'Week 2', rate: 96 },
+    { date: 'Week 3', rate: 95 },
+    { date: 'Week 4', rate: 97 },
   ];
 
-  const recruitmentPipelineData = [
-    { role: 'Frontend Eng', applied: 45, interview: 12, offer: 3 },
-    { role: 'Sales Rep', applied: 30, interview: 8, offer: 2 },
-    { role: 'Support Agent', applied: 60, interview: 15, offer: 5 },
-  ];
-
-  const hiringTimelineData = [
-    { month: 'Jan', joined: 4 },
-    { month: 'Feb', joined: 2 },
-    { month: 'Mar', joined: 6 },
-    { month: 'Apr', joined: 3 },
-    { month: 'May', joined: 5 },
-    { month: 'Jun', joined: 1 },
-  ];
-
-  const employeeTurnoverData = [
-    { name: 'Engineering', newHires: 4, exits: 1 },
-    { name: 'Sales', newHires: 2, exits: 2 },
-    { name: 'Support', newHires: 5, exits: 0 },
-    { name: 'Marketing', newHires: 1, exits: 1 },
+  const leaveBreakdownData = [
+    { name: 'Annual Leave', value: 18, color: '#3B82F6' },
+    { name: 'Sick Leave', value: 8, color: '#EF4444' },
+    { name: 'Casual Leave', value: 12, color: '#F59E0B' },
+    { name: 'Comp-Off', value: 4, color: '#10B981' },
   ];
 
   return (
@@ -332,6 +312,11 @@ export const HrDashboard = () => {
               ))}
             </div>
           </div>
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600 hover:underline cursor-pointer" onClick={() => navigate('/hr/attendance')}>
+            <span>Attendance Monitor</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </div>
+        </div>
 
           {/* Pending Approvals */}
           <div className="horilla-card p-5">
@@ -357,7 +342,6 @@ export const HrDashboard = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

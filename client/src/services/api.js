@@ -29,8 +29,20 @@ export const apiCall = async (endpoint, options = {}) => {
 export const checkServerHealth = () => apiCall('/health');
 
 // --------------------------------------------------------------------------
-// AUTH API
+// AUTH APIs
 // --------------------------------------------------------------------------
+export const sendOtpApi = (payload) =>
+  apiCall('/auth/send-otp', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export const verifyOtpApi = (payload) =>
+  apiCall('/auth/verify-otp', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
 export const registerCompanyApi = (payload, logoFile = null) => {
   if (logoFile) {
     const formData = new FormData();
@@ -71,7 +83,15 @@ export const createEmployeeApi = (payload) =>
     body: JSON.stringify(payload),
   });
 
-// --- Attendance API Endpoints ---
+// --------------------------------------------------------------------------
+// DASHBOARD APIs
+// --------------------------------------------------------------------------
+export const fetchHrDashboardApi = () => apiCall('/dashboard/hr');
+export const fetchEmployeeDashboardApi = () => apiCall('/dashboard/employee');
+
+// --------------------------------------------------------------------------
+// ATTENDANCE APIs
+// --------------------------------------------------------------------------
 export const clockInApi = () =>
   apiCall('/attendance/clock-in', {
     method: 'POST',
@@ -82,13 +102,140 @@ export const clockOutApi = () =>
     method: 'POST',
   });
 
-export const getMyAttendanceApi = () =>
-  apiCall('/attendance/me', {
-    method: 'GET',
+export const getMyAttendanceApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/attendance/me${query ? `?${query}` : ''}`);
+};
+
+export const fetchMyAttendanceApi = (params = {}) => getMyAttendanceApi(params);
+
+export const fetchMyRegularizationsApi = () => apiCall('/attendance/me/regularizations');
+
+export const submitRegularizationApi = (payload) =>
+  apiCall('/attendance/regularize', {
+    method: 'POST',
+    body: JSON.stringify(payload),
   });
 
-// --- Salary API Endpoints ---
-export const getMySalaryApi = () =>
-  apiCall('/salary/me', {
-    method: 'GET',
+export const fetchAllAttendanceApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/attendance/all${query ? `?${query}` : ''}`);
+};
+
+export const fetchAllRegularizationsApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/attendance/regularizations/all${query ? `?${query}` : ''}`);
+};
+
+export const reviewRegularizationApi = (id, payload) =>
+  apiCall(`/attendance/regularize/${id}/review`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+
+// --------------------------------------------------------------------------
+// LEAVE APIs
+// --------------------------------------------------------------------------
+export const fetchMyLeavesApi = () => apiCall('/leaves/me');
+export const getMyLeavesApi = () => apiCall('/leaves/me');
+
+export const fetchLeaveTypesApi = () => apiCall('/leaves/types');
+export const fetchMyLeaveBalancesApi = () => apiCall('/leaves/balances');
+export const fetchLeaveBalancesApi = () => apiCall('/leaves/balances');
+export const fetchHolidaysApi = () => apiCall('/leaves/holidays');
+
+export const applyLeaveApi = (payload) =>
+  apiCall('/leaves/apply', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export const cancelLeaveApi = (id) =>
+  apiCall(`/leaves/${id}/cancel`, {
+    method: 'POST',
+  });
+
+export const fetchAllLeavesApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/leaves/all${query ? `?${query}` : ''}`);
+};
+
+export const reviewLeaveApi = (id, payload) =>
+  apiCall(`/leaves/${id}/review`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+
+// --------------------------------------------------------------------------
+// PAYROLL & COMPENSATION APIs
+// --------------------------------------------------------------------------
+export const getMySalaryApi = () => apiCall('/salary/me');
+export const fetchMyPayslipsApi = () => apiCall('/payroll/me/payslips');
+export const fetchMyPayrollApi = () => apiCall('/payroll/me/payslips');
+export const fetchPayslipDetailApi = (id) => apiCall(`/payroll/payslips/${id}`);
+
+export const fetchPayrollSummaryApi = () => apiCall('/payroll/analytics/summary');
+export const fetchCompensationRecordsApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/payroll/records${query ? `?${query}` : ''}`);
+};
+
+export const createSalaryRevisionApi = (payload) =>
+  apiCall('/payroll/revisions', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+// --------------------------------------------------------------------------
+// EMPLOYEE DIRECTORY & PROFILES APIs
+// --------------------------------------------------------------------------
+export const fetchColleagueDirectoryApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/employees/directory${query ? `?${query}` : ''}`);
+};
+
+export const fetchMyProfileApi = () => apiCall('/employees/me');
+
+export const updateMyProfileApi = (payload) =>
+  apiCall('/employees/me', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+
+export const fetchAllEmployeesApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/employees${query ? `?${query}` : ''}`);
+};
+
+export const fetchEmployeeDetailApi = (id) => apiCall(`/employees/${id}`);
+
+export const updateEmployeeProfileApi = (id, payload) =>
+  apiCall(`/employees/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+
+// --------------------------------------------------------------------------
+// PERFORMANCE & HELPDESK APIs
+// --------------------------------------------------------------------------
+export const fetchPerformanceReviewsApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/performance/reviews${query ? `?${query}` : ''}`);
+};
+
+export const fetchHelpdeskTicketsApi = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiCall(`/helpdesk/tickets${query ? `?${query}` : ''}`);
+};
+
+export const createHelpdeskTicketApi = (payload) =>
+  apiCall('/helpdesk/tickets', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export const updateHelpdeskTicketApi = (id, payload) =>
+  apiCall(`/helpdesk/tickets/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
   });

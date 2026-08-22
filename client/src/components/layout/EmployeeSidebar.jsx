@@ -96,7 +96,7 @@ export const EmployeeSidebar = () => {
           <span>Sign Out</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 };
 

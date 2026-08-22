@@ -9,7 +9,17 @@ export const HrHeader = ({ onOpenAddModal }) => {
   const navigate = useNavigate();
 
   const currentPath = location.pathname.split('/').pop();
-  const pageName = currentPath ? currentPath.charAt(0).toUpperCase() + currentPath.slice(1) : 'Dashboard';
+  const pageTitleMap = {
+    'dashboard': 'Executive Overview',
+    'employees': 'Employee Registry',
+    'attendance': 'Attendance & Shifts',
+    'leaves': 'Leave Approvals',
+    'payroll': 'Payroll & Compensation',
+    'performance': 'Performance Analytics',
+    'helpdesk': 'Helpdesk & Support'
+  };
+
+  const pageName = pageTitleMap[currentPath] || (currentPath ? currentPath.charAt(0).toUpperCase() + currentPath.slice(1) : 'Dashboard');
 
   const handleLogout = async () => {
     await logoutUser();
@@ -61,7 +71,7 @@ export const HrHeader = ({ onOpenAddModal }) => {
           <button
             onClick={handleLogout}
             title="Sign out"
-            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer ml-1"
+            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer ml-1"
           >
             <LogOut className="w-4 h-4" />
           </button>
