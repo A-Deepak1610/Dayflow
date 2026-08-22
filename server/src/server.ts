@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { config } from './config/env';
 import routes from './routes';
 import { errorHandler } from './middlewares/errorHandler';
@@ -9,9 +10,10 @@ import prisma from './lib/prisma';
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({ origin: true, credentials: true })); // Ensure credentials (cookies) are allowed
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // API Routes
 app.use('/api', routes);
