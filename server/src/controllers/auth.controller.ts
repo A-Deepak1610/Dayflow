@@ -11,6 +11,8 @@ import { generateEmployeeId, generateRandomPassword } from '../utils/helpers';
 import { sendEmployeeWelcomeEmail } from '../utils/mailer';
 import { inMemStore } from '../lib/dbFallback';
 
+const db = prisma as any;
+
 export const registerCompany = async (req: Request, res: Response): Promise<void> => {
   try {
     const { companyName, firstName, lastName, email, phone, password } = req.body;
@@ -26,24 +28,24 @@ export const registerCompany = async (req: Request, res: Response): Promise<void
 
     try {
       // Try Prisma TiDB Cloud first
-      const existingCompany = await prisma.company.findUnique({ where: { name: companyName } });
+      const existingCompany = await db.company.findUnique({ where: { name: companyName } });
       if (existingCompany) {
         res.status(400).json({ message: 'Company already exists' });
         return;
       }
 
-      const existingUser = await prisma.user.findUnique({ where: { email } });
+      const existingUser = await db.user.findUnique({ where: { email } });
       if (existingUser) {
         res.status(400).json({ message: 'Email already exists' });
         return;
       }
 
-      let adminRole = await prisma.role.findUnique({ where: { name: 'ADMIN' } });
+      let adminRole = await db.role.findUnique({ where: { name: 'ADMIN' } });
       if (!adminRole) {
-        adminRole = await prisma.role.create({ data: { name: 'ADMIN' } });
+        adminRole = await db.role.create({ data: { name: 'ADMIN' } });
       }
 
-      const dbRes = await prisma.$transaction(async (tx) => {
+      const dbRes = await db.$transaction(async (tx: any) => {
         const company = await tx.company.create({
           data: { name: companyName, logoUrl },
         });
@@ -105,7 +107,7 @@ export const registerCompany = async (req: Request, res: Response): Promise<void
 export const createEmployee = async (req: Request, res: Response): Promise<void> => {
   try {
     const { firstName, lastName, email, phone, roleName, department } = req.body;
-    const adminCompanyId = req.user?.companyId || 'comp-1';
+    const adminCompanyId = (req as any).user?.companyId || 'comp-1';
 
     if (!['EMPLOYEE', 'HR', 'ADMIN'].includes(roleName)) {
       res.status(400).json({ message: 'Invalid role' });
@@ -117,51 +119,59 @@ export const createEmployee = async (req: Request, res: Response): Promise<void>
     const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
     try {
-      const existingUser = await prisma.user.findUnique({ where: { email } });
+      const existingUser = await db.user.findUnique({ where: { email } });
       if (existingUser) {
         res.status(400).json({ message: 'Email already exists' });
         return;
       }
 
-      let role = await prisma.role.findUnique({ where: { name: roleName } });
+      let role = await db.role.findUnique({ where: { name: roleName } });
       if (!role) {
-        role = await prisma.role.create({ data: { name: roleName } });
+        role = await db.role.create({ data: { name: roleName } });
       }
 
-      const company = await prisma.company.findUnique({ where: { id: adminCompanyId } });
+      const company = await db.company.findUnique({ where: { id: adminCompanyId } });
       const companyName = company?.name || 'Company';
 
-      const currentYearUsersCount = await prisma.user.count({
+      const currentYearUsersCount = await db.user.count({
         where: { companyId: adminCompanyId },
       });
 
       createdLoginId = generateEmployeeId(companyName, firstName, lastName, currentYearUsersCount + 1);
 
-      let departmentRecord: any = null;
+      let foundDeptId: string | null = null;
       if (department) {
-        departmentRecord = await prisma.department.findFirst({
+        const foundDept = await db.department.findFirst({
           where: { companyId: adminCompanyId, name: department },
         });
-        if (!departmentRecord) {
-          departmentRecord = await prisma.department.create({
+        if (foundDept) {
+          foundDeptId = foundDept.id;
+        } else {
+          const newDept = await db.department.create({
             data: { companyId: adminCompanyId, name: department },
           });
+          foundDeptId = newDept.id;
         }
       }
 
-      await prisma.user.create({
-        data: {
-          firstName,
-          lastName,
-          email,
-          phone,
-          password: hashedPassword,
-          loginId: createdLoginId,
-          companyId: adminCompanyId,
-          roleId: role.id,
-          isFirstLogin: true,
-          departmentId: departmentRecord?.id,
-        },
+      const newUserData: any = {
+        firstName,
+        lastName,
+        email,
+        phone,
+        password: hashedPassword,
+        loginId: createdLoginId,
+        companyId: adminCompanyId,
+        roleId: role.id,
+        isFirstLogin: true,
+      };
+
+      if (foundDeptId) {
+        newUserData.departmentId = foundDeptId;
+      }
+
+      await db.user.create({
+        data: newUserData,
       });
 
     } catch (dbError) {
@@ -204,7 +214,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     let foundUser: any = null;
 
     try {
-      const user = await prisma.user.findFirst({
+      const user = await db.user.findFirst({
         where: {
           OR: [{ loginId: loginIdOrEmail }, { email: loginIdOrEmail }],
         },
@@ -273,7 +283,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const refreshToken = generateRefreshToken(tokenPayload);
 
     try {
-      await prisma.refreshToken.create({
+      await db.refreshToken.create({
         data: {
           token: refreshToken,
           userId: foundUser.id,
