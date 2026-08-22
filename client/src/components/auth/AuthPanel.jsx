@@ -13,8 +13,10 @@ import {
   EyeOff,
   Info,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
+import { registerCompanyApi, loginApi } from '../../services/api';
 
 export const AuthPanel = ({ initialMode = 'login', onClose }) => {
   const [mode, setMode] = useState(initialMode); // 'login' | 'signup'
@@ -22,6 +24,10 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
+  
+  // Submission Status & Errors
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [submittedSuccess, setSubmittedSuccess] = useState(null);
 
   // Sign In Form State
@@ -35,12 +41,10 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
   const [signUpPhone, setSignUpPhone] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
 
-  // Unique IDs for form accessibility
   const logoInputId = useId();
 
-  // Helper to generate sample preview ID based on inputs
+  // Helper to generate live sample preview ID
   const calculateSampleId = () => {
     const getInitials = (str) =>
       str
@@ -68,33 +72,83 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
     }
   };
 
-  const handleSignInSubmit = (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    setSubmittedSuccess({
-      type: 'login',
-      title: 'Authentication Successful',
-      message: `Welcome back to Dayflow HRMS! Logged in as ${loginIdOrEmail || 'Admin'}.`
-    });
+    setErrorMessage('');
+    setSubmittedSuccess(null);
+    setLoading(true);
+
+    try {
+      const res = await loginApi({
+        loginIdOrEmail,
+        password: loginPassword,
+      });
+
+      if (res.ok) {
+        setSubmittedSuccess({
+          type: 'login',
+          title: 'Login Successful',
+          message: `Welcome back, ${res.data?.user?.firstName || 'User'}! Connected as ${res.data?.user?.role || 'Admin'} (${res.data?.user?.loginId || loginIdOrEmail}).`,
+        });
+      } else {
+        setErrorMessage(res.data?.message || res.error || 'Authentication failed. Please check credentials.');
+      }
+    } catch (err) {
+      setErrorMessage('Server connection error. Please ensure backend server is running.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSignUpSubmit = (e) => {
+  const handleSignUpSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
+    setSubmittedSuccess(null);
+
     if (signUpPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match');
+      setErrorMessage('Passwords do not match');
       return;
     }
-    setPasswordError('');
-    const generatedId = calculateSampleId();
-    setSubmittedSuccess({
-      type: 'signup',
-      title: 'Company Registration Complete!',
-      message: `Your company ${companyName || 'Dayflow Workspace'} has been initialized.`,
-      generatedId
-    });
+
+    setLoading(true);
+
+    const nameParts = adminName.trim().split(' ');
+    const firstName = nameParts[0] || 'Admin';
+    const lastName = nameParts.slice(1).join(' ') || 'User';
+
+    try {
+      const res = await registerCompanyApi({
+        companyName,
+        logoUrl: logoPreview,
+        firstName,
+        lastName,
+        email: signUpEmail,
+        phone: signUpPhone,
+        password: signUpPassword,
+      });
+
+      if (res.ok) {
+        const generatedId = res.data?.loginId || calculateSampleId();
+        setSubmittedSuccess({
+          type: 'signup',
+          title: 'Company Registration Complete!',
+          message: `Your organization "${companyName}" is successfully registered in the backend database.`,
+          generatedId,
+        });
+      } else {
+        setErrorMessage(res.data?.message || res.error || 'Failed to register company. Email or Company Name might already exist.');
+      }
+    } catch (err) {
+      setErrorMessage('Server error during registration. Please check backend connection.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fillDemoAccount = (role) => {
     setMode('login');
+    setErrorMessage('');
+    setSubmittedSuccess(null);
     if (role === 'admin') {
       setLoginIdOrEmail('DAY-HR-2026-0001');
       setLoginPassword('AdminPass2026!');
@@ -111,7 +165,7 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
         {/* Main Glassmorphic Auth Card Container */}
         <div className="relative bg-[#121A36] border border-[#FF5D7A]/30 rounded-3xl p-6 sm:p-10 shadow-2xl overflow-hidden">
           
-          {/* Top Decorative Branding Bar */}
+          {/* Top Branding Bar */}
           <div className="flex items-center justify-between pb-6 mb-8 border-b border-slate-800">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#1F2A52] border border-[#FF5D7A]/50 flex items-center justify-center font-sora font-bold text-[#FF5D7A]">
@@ -119,7 +173,7 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
               </div>
               <div>
                 <h3 className="font-sora text-lg font-bold text-white">Dayflow Authentication</h3>
-                <p className="text-xs text-slate-400">Secure Workforce Portal Access</p>
+                <p className="text-xs text-slate-400">Backend Connected Portal API</p>
               </div>
             </div>
 
@@ -130,6 +184,7 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
                 onClick={() => {
                   setMode('login');
                   setSubmittedSuccess(null);
+                  setErrorMessage('');
                 }}
                 className={`px-4 py-1.5 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
                   mode === 'login'
@@ -144,6 +199,7 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
                 onClick={() => {
                   setMode('signup');
                   setSubmittedSuccess(null);
+                  setErrorMessage('');
                 }}
                 className={`px-4 py-1.5 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
                   mode === 'signup'
@@ -156,6 +212,14 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
             </div>
           </div>
 
+          {/* Backend Error Alert */}
+          {errorMessage && (
+            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/40 rounded-2xl flex items-center gap-3 text-rose-300 text-xs animate-fadeIn">
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           {/* Success Notification Alert */}
           {submittedSuccess && (
             <div className="mb-8 p-5 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-start gap-4 text-emerald-300 animate-fadeIn">
@@ -167,7 +231,7 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
                   <div className="mt-3 p-3 bg-[#0F172A] border border-emerald-500/40 rounded-xl">
                     <p className="text-[11px] text-slate-400 font-mono">Your Auto-Generated HR Admin Login ID:</p>
                     <p className="text-lg font-mono font-bold text-[#FF5D7A] mt-0.5">{submittedSuccess.generatedId}</p>
-                    <p className="text-[10px] text-slate-400 mt-1">A temporary verification password has been dispatched to your email.</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Stored in TiDB database. You can now use this ID to sign in.</p>
                   </div>
                 )}
               </div>
@@ -259,10 +323,20 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
                 {/* Field 3: Sign In Primary Button */}
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-bold text-sm rounded-xl transition duration-200 shadow-xl shadow-[#FF5D7A]/25 cursor-pointer flex items-center justify-center gap-2"
+                  disabled={loading}
+                  className="w-full py-3.5 bg-[#FF5D7A] hover:bg-[#FF4263] disabled:opacity-50 text-white font-sora font-bold text-sm rounded-xl transition duration-200 shadow-xl shadow-[#FF5D7A]/25 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Sign In</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Authenticating with Backend...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Sign In</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </button>
 
                 {/* Field 4: Small Link at Bottom: Don't have an account? Sign Up */}
@@ -274,6 +348,7 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
                       onClick={() => {
                         setMode('signup');
                         setSubmittedSuccess(null);
+                        setErrorMessage('');
                       }}
                       className="text-[#FF5D7A] hover:underline font-semibold cursor-pointer ml-1"
                     >
@@ -307,7 +382,7 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
                     Format: Company Initials + Employee Initials + Join Year + Serial Number <br />
                     Example Preview: {calculateSampleId()}
                   </code>
-                  A temporary login password will also be automatically issued for new team invites.
+                  A temporary password is issued automatically for new employee invites.
                 </div>
               </div>
 
@@ -471,20 +546,23 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
                   </div>
                 </div>
 
-                {passwordError && (
-                  <p className="text-xs text-rose-400 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    <span>{passwordError}</span>
-                  </p>
-                )}
-
                 {/* Field 8: Sign Up Primary Button */}
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-bold text-sm rounded-xl transition duration-200 shadow-xl shadow-[#FF5D7A]/25 cursor-pointer flex items-center justify-center gap-2 mt-4"
+                  disabled={loading}
+                  className="w-full py-3.5 bg-[#FF5D7A] hover:bg-[#FF4263] disabled:opacity-50 text-white font-sora font-bold text-sm rounded-xl transition duration-200 shadow-xl shadow-[#FF5D7A]/25 cursor-pointer flex items-center justify-center gap-2 mt-4"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Sign Up & Create Workspace</span>
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Registering Company...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span>Sign Up & Create Workspace</span>
+                    </>
+                  )}
                 </button>
 
                 {/* Field 9: Small Link at Bottom: Already have an account? Sign In */}
@@ -496,6 +574,7 @@ export const AuthPanel = ({ initialMode = 'login', onClose }) => {
                       onClick={() => {
                         setMode('login');
                         setSubmittedSuccess(null);
+                        setErrorMessage('');
                       }}
                       className="text-[#FF5D7A] hover:underline font-semibold cursor-pointer ml-1"
                     >

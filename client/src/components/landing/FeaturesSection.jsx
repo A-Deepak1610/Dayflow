@@ -5,19 +5,15 @@ import {
   UserCheck,
   DollarSign,
   ShieldCheck,
-  CheckCircle,
+  Check,
   ArrowRight,
   Sparkles,
-  Sliders,
-  Check,
-  Building,
   Lock,
-  Eye,
-  ChevronRight
+  Eye
 } from 'lucide-react';
 
-export const FeaturesSection = ({ onOpenAuth }) => {
-  const [selectedTab, setSelectedTab] = useState('admin'); // 'admin' | 'employee'
+export const FeaturesSection = ({ onOpenAuthModal }) => {
+  const [selectedTab, setSelectedTab] = useState('admin');
 
   const features = [
     {
@@ -31,9 +27,9 @@ export const FeaturesSection = ({ onOpenAuth }) => {
         'Automated late arrival & early exit flags',
         'Custom shift rules & break tracking'
       ],
-      color: 'from-blue-500/20 to-[#1F2A52]',
-      accentColor: 'text-blue-400',
-      borderColor: 'hover:border-blue-500/50'
+      color: 'bg-blue-50/50',
+      accentColor: 'text-blue-600',
+      borderColor: 'hover:border-blue-300'
     },
     {
       id: 'leave',
@@ -46,9 +42,9 @@ export const FeaturesSection = ({ onOpenAuth }) => {
         'Shared team availability calendar',
         'Automatic weekend & holiday exclusions'
       ],
-      color: 'from-[#FF5D7A]/20 to-[#1F2A52]',
+      color: 'bg-rose-50/50',
       accentColor: 'text-[#FF5D7A]',
-      borderColor: 'hover:border-[#FF5D7A]/50'
+      borderColor: 'hover:border-rose-300'
     },
     {
       id: 'profiles',
@@ -61,9 +57,9 @@ export const FeaturesSection = ({ onOpenAuth }) => {
         'Auto-generated employee IDs',
         'Interactive org chart & team directory'
       ],
-      color: 'from-purple-500/20 to-[#1F2A52]',
-      accentColor: 'text-purple-400',
-      borderColor: 'hover:border-purple-500/50'
+      color: 'bg-purple-50/50',
+      accentColor: 'text-purple-600',
+      borderColor: 'hover:border-purple-300'
     },
     {
       id: 'payroll',
@@ -76,33 +72,30 @@ export const FeaturesSection = ({ onOpenAuth }) => {
         'Itemized tax & deduction breakdowns',
         'Direct digital payslip delivery'
       ],
-      color: 'from-emerald-500/20 to-[#1F2A52]',
-      accentColor: 'text-emerald-400',
-      borderColor: 'hover:border-emerald-500/50'
+      color: 'bg-emerald-50/50',
+      accentColor: 'text-emerald-600',
+      borderColor: 'hover:border-emerald-300'
     }
   ];
 
   return (
-    <section id="features" className="py-20 lg:py-32 relative bg-[#0B1120]">
-      {/* Decorative gradient glow */}
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-[#1F2A52] blur-[140px] rounded-full pointer-events-none -z-10" />
-
+    <section id="features" className="py-20 lg:py-28 relative bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F2A52] border border-[#FF5D7A]/30 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Core Modules</span>
           </div>
 
-          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
+          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-[#1F2A52] tracking-tight leading-tight mb-4">
             Everything your HR team needs, <br />
             <span className="text-[#FF5D7A]">without the clutter.</span>
           </h2>
 
-          <p className="text-slate-300 text-base sm:text-lg">
-            Purpose-built tools designed to save HR managers up to 20 hours per week while offering employees a transparent, friction-free portal.
+          <p className="text-slate-600 text-base sm:text-lg">
+            Purpose-built tools designed to save HR managers up to 20 hours per week while offering employees a transparent self-service portal.
           </p>
         </div>
 
@@ -113,32 +106,29 @@ export const FeaturesSection = ({ onOpenAuth }) => {
             return (
               <div
                 key={feature.id}
-                className={`relative group bg-[#121A36]/80 border border-slate-800 rounded-3xl p-8 transition-all duration-300 ${feature.borderColor} hover:shadow-2xl hover:shadow-black/40 flex flex-col justify-between overflow-hidden`}
+                className={`relative group bg-white border border-slate-200 rounded-3xl p-8 transition-all duration-300 ${feature.borderColor} hover:shadow-xl flex flex-col justify-between overflow-hidden`}
               >
-                {/* Background accent gradient overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl`} />
-
-                <div className="relative z-10">
+                <div>
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-[#1F2A52] border border-slate-700/80 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
                       <IconComponent className={`w-6 h-6 ${feature.accentColor}`} />
                     </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800/90 text-slate-300 border border-slate-700">
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                       {feature.badge}
                     </span>
                   </div>
 
-                  <h3 className="font-sora text-2xl font-bold text-white mb-3 group-hover:text-white transition">
+                  <h3 className="font-sora text-2xl font-bold text-[#1F2A52] mb-3">
                     {feature.title}
                   </h3>
 
-                  <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                  <p className="text-slate-600 text-sm leading-relaxed mb-6">
                     {feature.description}
                   </p>
 
-                  <div className="space-y-2.5 pt-4 border-t border-slate-800">
+                  <div className="space-y-2.5 pt-4 border-t border-slate-100">
                     {feature.highlights.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-2.5 text-xs font-medium text-slate-300">
+                      <div key={idx} className="flex items-center gap-2.5 text-xs font-medium text-slate-700">
                         <Check className={`w-4 h-4 ${feature.accentColor} shrink-0`} />
                         <span>{item}</span>
                       </div>
@@ -146,11 +136,11 @@ export const FeaturesSection = ({ onOpenAuth }) => {
                   </div>
                 </div>
 
-                <div className="relative z-10 pt-6 mt-6 border-t border-slate-800/60 flex items-center justify-between">
+                <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-xs text-slate-400 font-mono">Dayflow Module v2.4</span>
                   <button
-                    onClick={() => onOpenAuth && onOpenAuth('signup')}
-                    className="text-xs font-semibold text-[#FF5D7A] hover:text-white flex items-center gap-1 group/btn cursor-pointer"
+                    onClick={() => onOpenAuthModal && onOpenAuthModal('signup')}
+                    className="text-xs font-semibold text-[#FF5D7A] hover:text-[#1F2A52] flex items-center gap-1 group/btn cursor-pointer"
                   >
                     <span>Explore Module</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
@@ -162,11 +152,11 @@ export const FeaturesSection = ({ onOpenAuth }) => {
         </div>
 
         {/* Role-Based Access Highlight Box (Admin/HR vs Employee) */}
-        <div className="relative bg-gradient-to-br from-[#1F2A52] via-[#121A36] to-[#0F172A] border border-[#FF5D7A]/30 rounded-3xl p-6 sm:p-10 shadow-2xl">
+        <div className="relative bg-gradient-to-br from-slate-900 via-[#1F2A52] to-[#121A36] text-white rounded-3xl p-6 sm:p-10 shadow-xl">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             
             <div className="lg:w-1/2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF5D7A]/15 text-[#FF5D7A] text-xs font-semibold mb-4 border border-[#FF5D7A]/30">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF5D7A]/20 text-[#FF5D7A] text-xs font-semibold mb-4 border border-[#FF5D7A]/30">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Feature Spotlight #5</span>
               </div>
@@ -175,16 +165,16 @@ export const FeaturesSection = ({ onOpenAuth }) => {
                 <span className="text-[#FF5D7A]">(Admin/HR vs Employee)</span>
               </h3>
               <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
-                Enforce security & privacy with custom permissions. Administrators & HR Officers gain full executive oversight, policy creation, and approval powers, while Employees enjoy a clean self-service portal.
+                Enforce privacy with custom permissions. Administrators & HR Officers gain full executive oversight, policy creation, and approval powers, while Employees enjoy a clean self-service portal.
               </p>
 
               {/* Interactive Switcher */}
-              <div className="flex items-center gap-3 p-1.5 bg-[#0F172A] rounded-2xl border border-slate-700 w-fit mb-6">
+              <div className="flex items-center gap-3 p-1.5 bg-[#0F172A] rounded-2xl border border-slate-800 w-fit mb-6">
                 <button
                   onClick={() => setSelectedTab('admin')}
                   className={`px-5 py-2.5 rounded-xl font-sora text-xs font-bold transition-all cursor-pointer ${
                     selectedTab === 'admin'
-                      ? 'bg-[#FF5D7A] text-white shadow-lg shadow-[#FF5D7A]/20'
+                      ? 'bg-[#FF5D7A] text-white shadow-md'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -194,7 +184,7 @@ export const FeaturesSection = ({ onOpenAuth }) => {
                   onClick={() => setSelectedTab('employee')}
                   className={`px-5 py-2.5 rounded-xl font-sora text-xs font-bold transition-all cursor-pointer ${
                     selectedTab === 'employee'
-                      ? 'bg-[#1F2A52] text-white border border-[#FF5D7A]/40 shadow-lg'
+                      ? 'bg-[#1F2A52] text-white border border-[#FF5D7A]/50 shadow-md'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -204,7 +194,7 @@ export const FeaturesSection = ({ onOpenAuth }) => {
             </div>
 
             {/* Preview Panel for Active Role */}
-            <div className="lg:w-1/2 w-full bg-[#0F172A]/90 border border-slate-700 rounded-2xl p-6 shadow-xl">
+            <div className="lg:w-1/2 w-full bg-[#0F172A] border border-slate-800 rounded-2xl p-6 shadow-2xl">
               {selectedTab === 'admin' ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-800">

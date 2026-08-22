@@ -13,6 +13,7 @@ export const apiCall = async (endpoint, options = {}) => {
       ...defaultHeaders,
       ...options.headers,
     },
+    credentials: 'include',
   };
 
   try {
@@ -26,3 +27,21 @@ export const apiCall = async (endpoint, options = {}) => {
 };
 
 export const checkServerHealth = () => apiCall('/health');
+
+// Auth API Endpoints connected to backend
+export const registerCompanyApi = (payload) =>
+  apiCall('/auth/register-company', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export const loginApi = (payload) =>
+  apiCall('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export const logoutApi = () =>
+  apiCall('/auth/logout', {
+    method: 'POST',
+  });
