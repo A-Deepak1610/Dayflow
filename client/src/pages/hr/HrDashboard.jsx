@@ -148,7 +148,7 @@ export const HrDashboard = () => {
             Customize
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Top Section with Right Sidebar */}
       <div className="flex flex-col xl:flex-row gap-6 mb-6">

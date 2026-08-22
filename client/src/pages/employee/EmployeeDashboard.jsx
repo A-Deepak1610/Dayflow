@@ -16,14 +16,30 @@ import {
   Building,
   ShieldCheck,
   Send,
-  Plus
+  Plus,
+  ArrowRight,
+  TrendingUp,
+  Briefcase,
+  FileText,
+  Activity,
+  ChevronRight,
+  X,
+  Settings,
+  RefreshCcw,
+  CalendarDays
 } from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  AreaChart, Area, PieChart, Pie, Cell
+} from 'recharts';
 
 export const EmployeeDashboard = () => {
-  const { user, logoutUser } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Clock In / Out State
+  const [activeDateFilter, setActiveDateFilter] = useState('This Month');
+
+  // Clock In / Out Live State
   const [clockedIn, setClockedIn] = useState(true);
   const [clockInTime, setClockInTime] = useState('08:58 AM');
   const [elapsedSeconds, setElapsedSeconds] = useState(7 * 3600 + 14 * 60 + 22);
@@ -38,10 +54,21 @@ export const EmployeeDashboard = () => {
 
   // My Leave Applications State
   const [myLeaves, setMyLeaves] = useState([
-    { id: 1, type: 'Annual Leave', dates: 'Aug 28 - Aug 30', days: 3, status: 'Pending', reason: 'Personal travel' },
-    { id: 2, type: 'Casual Leave', dates: 'Jul 14', days: 1, status: 'Approved', reason: 'Doctor visit' },
+    { id: 1, type: 'Annual Leave', dates: 'Aug 28 - Aug 30, 2026', days: 3, status: 'Pending', reason: 'Family vacation travel' },
+    { id: 2, type: 'Casual Leave', dates: 'Jul 14, 2026', days: 1, status: 'Approved', reason: 'Medical appointment' },
+    { id: 3, type: 'Sick Leave', dates: 'Jun 02, 2026', days: 1, status: 'Approved', reason: 'High fever rest' }
   ]);
 
+  // Attendance Chart Mock Data
+  const weeklyAttendanceChart = [
+    { day: 'Mon 17', hours: 8.9, status: 'Present' },
+    { day: 'Tue 18', hours: 9.1, status: 'Present' },
+    { day: 'Wed 19', hours: 8.8, status: 'Present' },
+    { day: 'Thu 20', hours: 9.0, status: 'Present' },
+    { day: 'Fri 21', hours: 8.9, status: 'Present' },
+  ];
+
+  // Timer Tick
   useEffect(() => {
     let timer;
     if (clockedIn) {
@@ -74,60 +101,301 @@ export const EmployeeDashboard = () => {
       dates: `${startDate} to ${endDate}`,
       days: 2,
       status: 'Pending',
-      reason: leaveReason
+      reason: leaveReason || 'Personal request'
     };
     setMyLeaves([newReq, ...myLeaves]);
     setLeaveSubmitted(true);
     setTimeout(() => {
       setLeaveSubmitted(false);
       setShowLeaveModal(false);
+      setStartDate('');
+      setEndDate('');
       setLeaveReason('');
-    }, 1500);
-  };
-
-  const handleLogout = async () => {
-    await logoutUser();
-    navigate('/');
+    }, 1200);
   };
 
   return (
-    <div className="text-slate-900 font-inter flex flex-col">
-      {/* Main Employee Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        
-        {/* Welcome & Clock In Counter Widget */}
-        <div className="bg-gradient-to-r from-blue-900 via-[#1F2A52] to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold mb-3 border border-blue-400/30">
-              <User className="w-3.5 h-3.5" />
-              <span>Employee Portal</span>
-            </div>
-            <h1 className="font-sora text-2xl sm:text-4xl font-extrabold tracking-tight">
-              Hello, {user?.firstName || 'Team Member'}!
-            </h1>
-            <p className="text-slate-300 text-xs sm:text-sm mt-1">
-              Your Login ID: <span className="font-mono text-[#FF5D7A] font-bold">{user?.loginId || 'DAY-SJ-2026-0042'}</span>
-            </p>
+    <div className="space-y-6">
+      {/* Top Header Controls Bar matching HR Dashboard */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-[24px] font-bold text-[#333333] tracking-tight">Employee Dashboard</h1>
+          <p className="text-[13px] text-[#888888] mt-0.5">
+            Welcome back, <strong className="text-[#333333]">{user?.firstName || 'Jane'} {user?.lastName || 'Smith'}</strong> ({user?.loginId || 'DAY-EMP-2026-0042'})
+          </p>
+        </div>
+
+        {/* Filter Pills & Date Range */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs">
+            {['This Month', 'Last Month', 'Quarter'].map(filter => (
+              <button
+                key={filter}
+                onClick={() => setActiveDateFilter(filter)}
+                className={`px-3.5 py-1.5 text-[12px] font-medium transition cursor-pointer ${
+                  activeDateFilter === filter
+                    ? 'bg-horilla-primary text-white font-bold'
+                    : 'bg-white text-[#666666] hover:bg-slate-50'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
           </div>
 
-          {/* Interactive Clock In/Out Counter */}
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-6">
-            <div>
-              <p className="text-[11px] text-slate-300 uppercase tracking-wider font-semibold">Shift Elapsed Time</p>
-              <div className="text-2xl sm:text-3xl font-mono font-extrabold text-white mt-0.5">
+          <div className="flex items-center gap-2 hidden sm:flex">
+            <input type="date" defaultValue="2026-08-01" className="px-2.5 py-1.5 text-[12px] border border-slate-200 rounded-lg text-[#666666] bg-white shadow-xs outline-none" />
+            <span className="text-[#888888] text-xs">→</span>
+            <input type="date" defaultValue="2026-08-31" className="px-2.5 py-1.5 text-[12px] border border-slate-200 rounded-lg text-[#666666] bg-white shadow-xs outline-none" />
+          </div>
+
+          <button
+            onClick={() => setShowLeaveModal(true)}
+            className="px-4 py-2 bg-horilla-primary hover:bg-horilla-primary-hover text-white text-[13px] font-semibold rounded-lg shadow-xs flex items-center gap-2 cursor-pointer transition"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Apply for Leave</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Top 4 KPI Cards (Matching Horilla HR Cards style) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        {/* KPI 1: Present Days */}
+        <div className="horilla-card p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-lg bg-[#E6F4EA] flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-[#10B981]" />
+            </div>
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              100% On-time
+            </span>
+          </div>
+          <div className="mt-4">
+            <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Days Present</p>
+            <h3 className="text-[26px] font-extrabold text-[#333333] mt-1 leading-none">19 / 22</h3>
+            <p className="text-[12px] text-[#A0A0A0] mt-2">August 2026 attendance</p>
+          </div>
+        </div>
+
+        {/* KPI 2: Paid Leave Balance */}
+        <div className="horilla-card p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-lg bg-[#FEF3C7] flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-[#F59E0B]" />
+            </div>
+            <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+              6 Sick Remaining
+            </span>
+          </div>
+          <div className="mt-4">
+            <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Paid Leave Balance</p>
+            <h3 className="text-[26px] font-extrabold text-[#333333] mt-1 leading-none">12 Days</h3>
+            <p className="text-[12px] text-[#A0A0A0] mt-2">Available for 2026 policy</p>
+          </div>
+        </div>
+
+        {/* KPI 3: Total Shift Hours */}
+        <div className="horilla-card p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-lg bg-[#FCECE9] flex items-center justify-center">
+              <Clock className="w-5 h-5 text-[#E9573F]" />
+            </div>
+            <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+              +4.2 hrs OT
+            </span>
+          </div>
+          <div className="mt-4">
+            <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Total Hours Logged</p>
+            <h3 className="text-[26px] font-extrabold text-[#333333] mt-1 leading-none">154.5 hrs</h3>
+            <p className="text-[12px] text-[#A0A0A0] mt-2">Avg 7h 42m shift duration</p>
+          </div>
+        </div>
+
+        {/* KPI 4: Latest Net Salary */}
+        <div className="horilla-card p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-lg bg-[#F3E8FF] flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-[#9333EA]" />
+            </div>
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              Paid Aug 25
+            </span>
+          </div>
+          <div className="mt-4">
+            <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">August Net Salary</p>
+            <h3 className="text-[26px] font-extrabold text-[#333333] mt-1 leading-none">$4,580.00</h3>
+            <p className="text-[12px] text-[#A0A0A0] mt-2">PDF Payslip ready for download</p>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Main Grid Content Split: Left (2 Cols) & Right Sidebar Widget (1 Col) */}
+      <div className="flex flex-col xl:flex-row gap-6">
+        
+        {/* Left Column (Main Charts & Data Tables) */}
+        <div className="flex-1 space-y-6">
+          
+          {/* 1. Weekly Shift & Attendance Chart Card */}
+          <div className="horilla-card horilla-card-gradient-top-orange-purple p-5 flex flex-col h-80">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div>
+                <h3 className="text-[15px] font-bold text-[#333333]">My Weekly Work Hours</h3>
+                <p className="text-[12px] text-[#888888]">Shift log for current cycle (Mon 17 – Fri 21)</p>
+              </div>
+              <Link to="/employee/attendance" className="text-[12px] font-bold text-horilla-primary hover:underline flex items-center gap-1">
+                <span>View Full Log</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="flex-1 mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyAttendanceChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <YAxis domain={[0, 10]} axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <Tooltip cursor={{ fill: 'rgba(0,0,0,0.03)' }} />
+                  <Bar dataKey="hours" name="Shift Hours" fill="#9333EA" radius={[6, 6, 0, 0]} barSize={32} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* 2. My Recent Leave Applications Card */}
+          <div className="horilla-card horilla-card-gradient-top-red-orange p-5 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-[15px] font-bold text-[#333333]">My Leave Applications</h3>
+                <p className="text-[12px] text-[#888888]">Track HR approval status for your time-off requests</p>
+              </div>
+              <button
+                onClick={() => setShowLeaveModal(true)}
+                className="text-[12px] font-bold text-horilla-primary hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>New Request</span>
+              </button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-[13px] border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-[#888888] font-bold bg-slate-50 uppercase text-[10px]">
+                    <th className="py-2.5 px-3">LEAVE TYPE</th>
+                    <th className="py-2.5 px-3">DATES</th>
+                    <th className="py-2.5 px-3">DURATION</th>
+                    <th className="py-2.5 px-3">REASON</th>
+                    <th className="py-2.5 px-3 text-right">STATUS</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {myLeaves.map(leave => (
+                    <tr key={leave.id} className="hover:bg-slate-50 transition">
+                      <td className="py-3 px-3">
+                        <span className="font-bold text-[#333333] block">{leave.type}</span>
+                      </td>
+                      <td className="py-3 px-3 text-slate-600 font-medium text-[12px]">{leave.dates}</td>
+                      <td className="py-3 px-3 font-mono font-semibold text-slate-700">{leave.days} day(s)</td>
+                      <td className="py-3 px-3 text-slate-500 italic text-[12px]">{leave.reason}</td>
+                      <td className="py-3 px-3 text-right">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold inline-block border ${
+                          leave.status === 'Approved'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : leave.status === 'Pending'
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-rose-50 text-rose-700 border-rose-200'
+                        }`}>
+                          {leave.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 text-right">
+              <Link to="/employee/leaves" className="text-[12px] font-bold text-horilla-primary hover:underline inline-flex items-center gap-1">
+                <span>View Complete Leave Record</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* 3. Salary & Payslip Snapshot Card */}
+          <div className="horilla-card horilla-card-gradient-top-purple-pink p-5 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-[15px] font-bold text-[#333333]">Salary & Compensation Breakdown</h3>
+                <p className="text-[12px] text-[#888888]">Latest payroll record (August 2026)</p>
+              </div>
+              <Link to="/employee/payslips" className="text-[12px] font-bold text-horilla-primary hover:underline">
+                All Payslips →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                <span className="text-[11px] font-bold text-[#888888] uppercase">Gross Salary</span>
+                <p className="text-xl font-mono font-bold text-[#333333]">$5,200.00</p>
+                <span className="text-[10px] text-slate-400 block">Base pay + allowances</span>
+              </div>
+
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                <span className="text-[11px] font-bold text-[#888888] uppercase">Deductions</span>
+                <p className="text-xl font-mono font-bold text-rose-600">-$620.00</p>
+                <span className="text-[10px] text-slate-400 block">Tax & Health Insurance</span>
+              </div>
+
+              <div className="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-1">
+                <span className="text-[11px] font-bold text-emerald-800 uppercase">Net Disbursed</span>
+                <p className="text-xl font-mono font-extrabold text-emerald-700">$4,580.00</p>
+                <span className="text-[10px] text-emerald-600 block">Direct bank deposit</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-[12px] text-slate-500 font-medium">Payslip PDF generated & verified by HR</span>
+              <button
+                onClick={() => alert('Downloading official PDF Payslip for August 2026...')}
+                className="px-4 py-2 bg-horilla-primary hover:bg-horilla-primary-hover text-white text-[12px] font-bold rounded-lg shadow-xs cursor-pointer flex items-center gap-1.5 transition"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download PDF Slip</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Right Sidebar Widgets Column */}
+        <div className="w-full xl:w-[320px] shrink-0 space-y-6">
+          
+          {/* Live Punch Clock Widget Card */}
+          <div className="horilla-card p-5 space-y-4 border-t-4 border-[#1F2A52]">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-[15px] font-bold text-[#333333]">Shift Punch Control</h3>
+              <span className={`w-2.5 h-2.5 rounded-full ${clockedIn ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+            </div>
+
+            <div className="p-4 bg-[#1F2A52] text-white rounded-xl text-center space-y-1 shadow-sm">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-300">Shift Elapsed Time</span>
+              <div className="text-3xl font-mono font-extrabold text-white">
                 {formatElapsedTime(elapsedSeconds)}
               </div>
-              <p className="text-[11px] text-emerald-400 font-medium mt-0.5">
-                {clockedIn ? `Clocked In at ${clockInTime}` : 'Currently Clocked Out'}
+              <p className="text-[11px] text-emerald-400 font-medium pt-1">
+                {clockedIn ? `Checked In at ${clockInTime}` : 'Currently Checked Out'}
               </p>
             </div>
 
             <button
               onClick={handleToggleClock}
-              className={`px-5 py-3 rounded-2xl font-sora font-bold text-xs sm:text-sm transition-all shadow-lg cursor-pointer flex items-center gap-2 ${
+              className={`w-full py-2.5 rounded-xl font-sora font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-xs ${
                 clockedIn
-                  ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-rose-500/30'
-                  : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/30'
+                  ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                  : 'bg-horilla-primary hover:bg-horilla-primary-hover text-white'
               }`}
             >
               {clockedIn ? (
@@ -143,161 +411,128 @@ export const EmployeeDashboard = () => {
               )}
             </button>
           </div>
-        </div>
 
-        {/* Leave Balances & Actions Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center justify-between text-slate-500 mb-2">
-              <span className="text-xs font-medium">Annual Paid Leave</span>
-              <Calendar className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="text-3xl font-sora font-extrabold text-[#1F2A52]">12 Days</div>
-            <p className="text-xs text-slate-500 mt-1">Remaining in 2026 policy</p>
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center justify-between text-slate-500 mb-2">
-              <span className="text-xs font-medium">Casual / Sick Leave</span>
-              <Calendar className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div className="text-3xl font-sora font-extrabold text-[#1F2A52]">6 Days</div>
-            <p className="text-xs text-slate-500 mt-1">Available for instant request</p>
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-            <div className="flex items-center justify-between text-slate-500 mb-2">
-              <span className="text-xs font-medium">Apply for Time-Off</span>
-              <Plus className="w-5 h-5 text-[#FF5D7A]" />
-            </div>
-            <button
-              onClick={() => setShowLeaveModal(true)}
-              className="w-full py-3 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-bold text-xs rounded-2xl shadow-md transition cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Apply for Leave</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content Split: My Leaves & Payslip Download */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* My Leaves Status Table */}
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          {/* Leave Balance Summary */}
+          <div className="horilla-card p-5 space-y-3">
+            <h3 className="text-[15px] font-bold text-[#333333] border-b border-slate-100 pb-2">Leave Balances</h3>
+            
+            <div className="space-y-3 text-[12px]">
               <div>
-                <h3 className="font-sora text-lg font-bold text-[#1F2A52]">My Leave Applications</h3>
-                <p className="text-xs text-slate-500">Track HR review status of your submitted time-off requests</p>
+                <div className="flex justify-between font-bold text-slate-700 mb-1">
+                  <span>Paid Leave</span>
+                  <span className="text-horilla-primary">12 / 18 days</span>
+                </div>
+                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-horilla-primary rounded-full" style={{ width: '66%' }} />
+                </div>
               </div>
-              <button
-                onClick={() => setShowLeaveModal(true)}
-                className="text-xs font-bold text-[#FF5D7A] hover:underline"
-              >
-                + New Request
-              </button>
+
+              <div>
+                <div className="flex justify-between font-bold text-slate-700 mb-1">
+                  <span>Sick Leave</span>
+                  <span className="text-emerald-600">6 / 10 days</span>
+                </div>
+                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: '60%' }} />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                <span className="font-medium text-slate-600">Unpaid Allowance</span>
+                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold rounded text-[10px] border border-emerald-200">
+                  Available
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Upcoming Holidays & Company Events */}
+          <div className="horilla-card p-5 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-[15px] font-bold text-[#333333]">Upcoming Events</h3>
+              <span className="text-[11px] text-[#888888]">Calendar</span>
             </div>
 
-            <div className="space-y-3">
-              {myLeaves.map(leave => (
-                <div key={leave.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-bold text-[#1F2A52]">{leave.type}</span>
-                      <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                        {leave.days} Day(s)
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-600">{leave.dates} • <span className="italic text-slate-400">"{leave.reason}"</span></p>
-                  </div>
+            <div className="space-y-2 text-[12px]">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="font-bold text-[#333333] block">Aug 31, 2026</span>
+                  <span className="text-[11px] text-[#888888]">Independence Day</span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-700">
+                  Holiday
+                </span>
+              </div>
 
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                    leave.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                  }`}>
-                    {leave.status}
-                  </span>
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="font-bold text-[#333333] block">Sep 05, 2026</span>
+                  <span className="text-[11px] text-[#888888]">Company All-Hands</span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">
+                  10:00 AM
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Employee Activity */}
+          <div className="horilla-card p-5 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-[15px] font-bold text-[#333333]">Recent Activity</h3>
+              <Activity className="w-4 h-4 text-[#888888]" />
+            </div>
+
+            <div className="space-y-3 text-[12px]">
+              {[
+                { title: 'Checked in at 08:58 AM', date: 'Today', color: 'bg-emerald-500' },
+                { title: 'Annual Leave request submitted', date: 'Aug 20, 2026', color: 'bg-amber-500' },
+                { title: 'August Payslip generated', date: 'Aug 18, 2026', color: 'bg-blue-500' },
+                { title: 'Casual Leave approved', date: 'Jul 14, 2026', color: 'bg-emerald-500' }
+              ].map((act, i) => (
+                <div key={i} className="flex items-start gap-2.5">
+                  <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${act.color}`} />
+                  <div>
+                    <p className="text-[#333333] font-semibold leading-tight">{act.title}</p>
+                    <span className="text-[10px] text-[#888888] block mt-0.5">{act.date}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Payslip & Profile Card */}
-          <div className="space-y-6">
+        </div>
+
+      </div>
+
+      {/* Apply Leave Modal matching HR EmployeeModal styling */}
+      {showLeaveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full shadow-2xl relative animate-modal-pop">
             
-            {/* Latest Payslip Box */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 className="font-sora text-base font-bold text-[#1F2A52]">August 2026 Payslip</h3>
-                <DollarSign className="w-5 h-5 text-emerald-600" />
-              </div>
-
-              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Gross Salary:</span>
-                  <span className="font-bold text-[#1F2A52]">$5,200.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Deductions (Tax/Ins):</span>
-                  <span className="font-semibold text-rose-600">-$620.00</span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-slate-200 font-bold text-sm text-emerald-600">
-                  <span>Net Salary Credited:</span>
-                  <span>$4,580.00</span>
-                </div>
-              </div>
-
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+              <h3 className="font-sora text-base font-bold text-[#1F2A52]">Apply for Leave</h3>
               <button
-                onClick={() => alert('Downloading official PDF Payslip for August 2026...')}
-                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-[#1F2A52] rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                onClick={() => setShowLeaveModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-md cursor-pointer"
               >
-                <Download className="w-4 h-4 text-[#FF5D7A]" />
-                <span>Download Payslip PDF</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Profile Info Card */}
-            <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-md space-y-3">
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-[#FF5D7A] text-white font-bold flex items-center justify-center">
-                  {user?.firstName?.[0] || 'E'}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white">{user?.firstName} {user?.lastName}</p>
-                  <p className="text-[10px] font-mono text-[#FF5D7A]">{user?.loginId || 'DAY-EMP-2026-0042'}</p>
-                </div>
-              </div>
-
-              <div className="text-xs space-y-1.5 text-slate-300">
-                <p><span className="text-slate-500">Role:</span> Employee Portal</p>
-                <p><span className="text-slate-500">Shift:</span> 09:00 AM - 06:00 PM</p>
-                <p><span className="text-slate-500">First Login Password Changed:</span> <span className="text-emerald-400">Yes</span></p>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-      </main>
-
-      {/* Apply Leave Modal */}
-      {showLeaveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-md w-full shadow-2xl relative animate-modal-pop">
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-              <h3 className="font-sora text-lg font-bold text-[#1F2A52]">Submit Leave Application</h3>
-              <button onClick={() => setShowLeaveModal(false)} className="text-slate-400 p-1">✕</button>
-            </div>
-
             {leaveSubmitted ? (
-              <div className="p-4 bg-emerald-50 text-emerald-800 rounded-2xl text-xs font-bold text-center">
-                ✓ Leave application submitted to HR Manager!
+              <div className="p-4 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-semibold text-center">
+                ✓ Leave request submitted successfully to HR!
               </div>
             ) : (
               <form onSubmit={handleApplyLeaveSubmit} className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Leave Type</label>
-                  <select value={leaveType} onChange={e => setLeaveType(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                  <label className="block font-bold text-[#333333] mb-1">Leave Type</label>
+                  <select
+                    value={leaveType}
+                    onChange={(e) => setLeaveType(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-horilla-primary"
+                  >
                     <option>Annual Leave</option>
                     <option>Casual Leave</option>
                     <option>Sick Leave</option>
@@ -306,29 +541,59 @@ export const EmployeeDashboard = () => {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Start Date</label>
-                    <input type="date" required value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs" />
+                    <label className="block font-bold text-[#333333] mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-horilla-primary"
+                    />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">End Date</label>
-                    <input type="date" required value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs" />
+                    <label className="block font-bold text-[#333333] mb-1">End Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-horilla-primary"
+                    />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Reason for Leave</label>
-                  <textarea required placeholder="Brief explanation..." value={leaveReason} onChange={e => setLeaveReason(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs h-20" />
+                  <label className="block font-bold text-[#333333] mb-1">Reason for Leave</label>
+                  <textarea
+                    required
+                    placeholder="Brief explanation for HR..."
+                    value={leaveReason}
+                    onChange={(e) => setLeaveReason(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 h-20 focus:outline-none focus:border-horilla-primary resize-none"
+                  />
                 </div>
 
-                <button type="submit" className="w-full py-3 bg-[#FF5D7A] text-white font-bold rounded-xl shadow-md">
-                  Submit to HR Manager
-                </button>
+                <div className="pt-2 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowLeaveModal(false)}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-horilla-primary hover:bg-horilla-primary-hover text-white font-bold rounded-xl shadow-xs transition cursor-pointer"
+                  >
+                    Submit Request
+                  </button>
+                </div>
               </form>
             )}
+
           </div>
         </div>
       )}
-
     </div>
   );
 };
