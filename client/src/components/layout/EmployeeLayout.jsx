@@ -16,7 +16,7 @@ export const EmployeeLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F5F7] text-slate-900 font-inter flex">
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-100 font-inter flex">
       {/* Employee Navigation Sidebar */}
       <EmployeeSidebar />
 
@@ -30,7 +30,7 @@ export const EmployeeLayout = ({ children }) => {
         />
 
         {/* Dynamic Page Main Content */}
-        <main className="flex-1 w-full bg-[#F4F5F7] p-6">
+        <main className="flex-1 w-full bg-[#0a0a0a] p-6">
           {children}
         </main>
       </div>

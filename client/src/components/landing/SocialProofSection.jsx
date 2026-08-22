@@ -37,38 +37,42 @@ export const SocialProofSection = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-20 lg:py-28 relative bg-[#111] border-t border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="testimonials" className="w-full py-20 lg:py-28 relative bg-gradient-to-tr from-[#E5DAE2] via-[#F8F2F6] to-[#EFE7EC] border-t border-[#E2D5E0] text-[#281A26] font-inter overflow-hidden">
+      
+      {/* Ambient Radial Shading Blobs */}
+      <div className="absolute bottom-10 left-1/4 w-[500px] h-[500px] bg-[#FF5D7A]/12 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           {stats.map((stat, idx) => (
             <div
               key={idx}
-              className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 text-center hover:border-[#FF5D7A]/40 transition-colors shadow-sm"
+              className="bg-[#FDFBFD]/90 backdrop-blur-md border border-[#E2D5E0] rounded-3xl p-6 text-center hover:border-[#FF5D7A]/40 transition-colors shadow-sm"
             >
               <div className="font-sora text-3xl sm:text-4xl font-extrabold text-[#FF5D7A] mb-1">
                 {stat.value}
               </div>
-              <div className="text-sm font-semibold text-white mb-1">{stat.label}</div>
-              <div className="text-xs text-slate-400 font-mono">{stat.desc}</div>
+              <div className="text-sm font-semibold text-[#281A26] mb-1">{stat.label}</div>
+              <div className="text-xs text-[#6B5667] font-mono">{stat.desc}</div>
             </div>
           ))}
         </div>
 
         {/* Testimonials Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0a0a0a] border border-white/10 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FDFBFD]/80 backdrop-blur-md border border-[#E2D5E0] text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Trusted Worldwide</span>
           </div>
 
-          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
+          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-[#281A26] tracking-tight leading-tight mb-4">
             Loved by HR Leaders & <br />
             <span className="text-[#FF5D7A]">Forward-Thinking Teams.</span>
           </h2>
 
-          <p className="text-slate-400 text-base sm:text-lg">
+          <p className="text-[#6B5667] text-base sm:text-lg">
             See how modern organizations run effortless HR operations with Dayflow.
           </p>
         </div>
@@ -78,7 +82,7 @@ export const SocialProofSection = () => {
           {testimonials.map((t, idx) => (
             <div
               key={idx}
-              className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-sm flex flex-col justify-between hover:border-[#FF5D7A]/40 transition duration-300"
+              className="bg-[#FDFBFD]/90 backdrop-blur-md border border-[#E2D5E0] rounded-3xl p-8 shadow-sm flex flex-col justify-between hover:border-[#FF5D7A]/40 transition duration-300"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -90,20 +94,20 @@ export const SocialProofSection = () => {
                   <Quote className="w-6 h-6 text-slate-300" />
                 </div>
 
-                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed italic mb-6">
+                <p className="text-[#6B5667] text-xs sm:text-sm leading-relaxed italic mb-6">
                   "{t.quote}"
                 </p>
               </div>
 
-              <div className="flex items-center gap-3.5 pt-4 border-t border-white/5">
+              <div className="flex items-center gap-3.5 pt-4 border-t border-[#E2D5E0]">
                 <img
                   src={t.avatar}
                   alt={t.author}
                   className="w-10 h-10 rounded-full object-cover border-2 border-[#FF5D7A]"
                 />
                 <div>
-                  <h4 className="font-sora text-sm font-bold text-white">{t.author}</h4>
-                  <p className="text-[11px] text-slate-400">{t.title} • <span className="text-[#FF5D7A] font-semibold">{t.company}</span></p>
+                  <h4 className="font-sora text-sm font-bold text-[#281A26]">{t.author}</h4>
+                  <p className="text-[11px] text-[#6B5667]">{t.title} • <span className="text-[#FF5D7A] font-semibold">{t.company}</span></p>
                 </div>
               </div>
             </div>

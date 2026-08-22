@@ -8,7 +8,7 @@ export const HrLayout = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-inter flex">
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-100 font-inter flex">
       {/* Dedicated Collapsible HR Navigation Sidebar */}
       <HrSidebar />
 
@@ -18,7 +18,7 @@ export const HrLayout = () => {
         <HrHeader onOpenAddModal={() => setIsAddModalOpen(true)} />
 
         {/* Dynamic Page Content */}
-        <main className="flex-1 w-full bg-[#F4F5F7]">
+        <main className="flex-1 w-full bg-[#0a0a0a]">
           <Outlet context={{ onOpenAddModal: () => setIsAddModalOpen(true) }} />
         </main>
       </div>

@@ -1,10 +1,10 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Moon, Settings, HelpCircle, Bell, LogOut, Plus } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { LogIn, Moon, Settings, HelpCircle, Bell, UserCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const HrHeader = ({ onOpenAddModal }) => {
-  const { user, logoutUser } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -27,70 +27,46 @@ export const HrHeader = ({ onOpenAddModal }) => {
   };
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-3.5 flex items-center justify-between shadow-xs">
+    <header className="bg-[#0a0a0a]/90 backdrop-blur-md border-b border-white/10 sticky top-0 z-20 px-6 py-3.5 flex items-center justify-between font-inter">
       {/* Breadcrumbs */}
-      <div className="flex items-center gap-2 text-[13px] font-medium">
-        <span className="text-[#888888] font-bold">Dayflow</span>
-        <span className="text-[#888888]">&gt;</span>
-        <span className="text-[#888888]">HR Portal</span>
-        <span className="text-[#888888]">&gt;</span>
-        <span className="text-[#E9573F] font-bold">{pageName}</span>
+      <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+        <span className="text-white font-sora font-bold">Dayflow HR</span>
+        <span>&gt;</span>
+        <span className="text-[#FF5D7A] font-semibold">{pageName}</span>
       </div>
 
       {/* Right Controls */}
       <div className="flex items-center gap-4">
-        {/* Onboarding Quick Action */}
+        {/* Onboard Employee Button */}
         {onOpenAddModal && (
           <button
             onClick={onOpenAddModal}
-            className="px-4 py-1.5 bg-[#E9573F] hover:bg-[#d64a32] text-white font-semibold text-[13px] rounded-lg shadow-2xs cursor-pointer flex items-center gap-2 transition"
+            className="px-4 py-1.5 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-semibold text-xs rounded-xl shadow-md shadow-[#FF5D7A]/20 cursor-pointer flex items-center gap-2 transition"
           >
-            <Plus className="w-4 h-4" />
-            <span>Create Employee</span>
+            <UserCheck className="w-3.5 h-3.5" />
+            <span>Onboard Employee</span>
           </button>
         )}
 
-        {/* Header Icon Controls */}
-        <div className="flex items-center gap-2.5">
-          <button
-            title="Toggle Dark Mode"
-            className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center cursor-pointer transition"
-          >
-            <Moon className="w-4 h-4" />
-          </button>
-          <button
-            title="HR Settings"
-            className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center cursor-pointer transition"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-          <button
-            title="Help & Documentation"
-            className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center cursor-pointer transition"
-          >
-            <HelpCircle className="w-4 h-4" />
-          </button>
-          <button
-            title="Notifications"
-            className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center cursor-pointer transition relative"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="w-2 rounded-full bg-emerald-500 h-2 absolute top-0.5 right-0.5 border border-white" />
+        {/* Icon Group */}
+        <div className="flex items-center gap-2">
+          <button className="w-8 h-8 rounded-full bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center cursor-pointer transition">
+            <Bell className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Admin User Profile Summary */}
-        <div className="flex items-center gap-3 ml-2 border-l border-slate-200 pl-4">
-          <div className="w-9 h-9 rounded-full bg-[#1F2A52] text-white flex items-center justify-center font-bold text-xs shadow-sm relative">
+        {/* User Profile */}
+        <div className="flex items-center gap-3 ml-2 border-l border-white/10 pl-4">
+          <div className="w-9 h-9 rounded-full bg-[#FF5D7A] text-white flex items-center justify-center font-bold text-xs shadow-sm relative">
             {user?.firstName?.[0] || 'A'}
-            {user?.lastName?.[0] || 'D'}
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute bottom-0 right-0 border-2 border-white" />
+            {user?.lastName?.[0] || 'A'}
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 absolute bottom-0 right-0 border-2 border-[#0a0a0a]" />
           </div>
-          <div className="hidden sm:block">
-            <p className="text-[13px] font-bold text-[#1F2A52] leading-tight">
-              {user?.firstName || 'Alex'} {user?.lastName || 'Johnson'}
+          <div>
+            <p className="text-xs font-bold text-white leading-tight">
+              {user?.firstName || 'Adam'} {user?.lastName || 'Admin'}
             </p>
-            <p className="text-[11px] text-slate-400 font-mono">{user?.loginId || 'EMP1000'} • {user?.role || 'ADMIN'}</p>
+            <p className="text-[10px] text-slate-500 font-mono">HR Administrator</p>
           </div>
           <button
             onClick={handleLogout}

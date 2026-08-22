@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Users, UserCheck, Calendar, Briefcase, RefreshCcw, Clock, FileCheck2, DollarSign, 
-  ArrowRight, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, BarChart3, PieChart as PieIcon, ShieldCheck
+  Users, UserCheck, Calendar, Briefcase, RefreshCcw, Plus
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
@@ -35,11 +34,44 @@ export const HrDashboard = () => {
 
   // Department distribution
   const headcountData = [
-    { name: 'Engineering', value: 42, color: '#3B82F6' },
-    { name: 'Product Design', value: 18, color: '#EC4899' },
-    { name: 'Human Resources', value: 12, color: '#E9573F' },
-    { name: 'Operations', value: 15, color: '#10B981' },
-    { name: 'Marketing & Sales', value: 25, color: '#F59E0B' },
+    { name: 'Engineering', value: 65, color: '#9333EA' },
+    { name: 'Sales', value: 45, color: '#FF5D7A' },
+    { name: 'Support', value: 30, color: '#10B981' },
+    { name: 'Marketing', value: 25, color: '#F59E0B' },
+    { name: 'Finance', value: 13, color: '#3B82F6' },
+  ];
+
+  const leaveTrendsData = [
+    { name: 'Mon', leaves: 3 },
+    { name: 'Tue', leaves: 3 },
+    { name: 'Wed', leaves: 3 },
+    { name: 'Thu', leaves: 3 },
+    { name: 'Fri', leaves: 3 },
+    { name: 'Sat', leaves: 3 },
+    { name: 'Sun', leaves: 3 },
+  ];
+
+  const empStatusData = [
+    { name: 'Active', value: 178, color: '#10B981' },
+    { name: 'In-Active', value: 2, color: '#FF5D7A' },
+  ];
+
+  const genderData = [
+    { name: 'Male', value: 36, color: '#3B82F6' },
+    { name: 'Female', value: 36, color: '#EC4899' },
+    { name: 'Other', value: 27, color: '#A855F7' },
+  ];
+
+  const recruitmentData = [
+    { stage: 'Initial', value: 2, fill: '#94A3B8' },
+    { stage: 'Applied', value: 7, fill: '#FF5D7A' },
+    { stage: 'Interview', value: 1, fill: '#F59E0B' },
+    { stage: 'Cancelled', value: 2, fill: '#EF4444' },
+    { stage: 'Hired', value: 5, fill: '#10B981' },
+  ];
+
+  const leaveBreakdownData = [
+    { name: 'Casual Leave', value: 14, fill: '#FF5D7A' }
   ];
 
   const attendanceOverviewData = [
@@ -65,24 +97,24 @@ export const HrDashboard = () => {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Top Banner / Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-100 font-inter p-6">
+      {/* Top Filter Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
         <div>
-          <h1 className="text-[22px] font-bold text-[#1F2A52] tracking-tight">Executive HR Overview</h1>
-          <p className="text-[13px] text-slate-500 mt-0.5">Real-time organizational headcount, attendance health, pending approval queues, and payroll metrics.</p>
+          <h1 className="font-sora text-2xl font-extrabold text-white">HR Executive Analytics</h1>
+          <p className="text-xs text-slate-400">Real-time workforce intelligence and system telemetry</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center bg-white rounded-xl border border-slate-200 p-1 shadow-2xs">
+          <div className="flex items-center bg-[#111] rounded-xl border border-white/10 overflow-hidden p-1">
             {['This Month', 'Last Month', 'Quarter'].map(filter => (
               <button
                 key={filter}
                 onClick={() => setActiveDateFilter(filter)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
                   activeDateFilter === filter 
-                    ? 'bg-[#1F2A52] text-white shadow-2xs' 
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#FF5D7A] text-white shadow-md' 
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {filter}
@@ -90,56 +122,194 @@ export const HrDashboard = () => {
             ))}
           </div>
 
-          <button 
-            onClick={loadHrDashboard}
-            className="p-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-2xs transition"
-            title="Refresh Metrics"
-          >
-            <RefreshCcw className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-[#111] px-3 py-1.5 rounded-xl border border-white/10">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            <span>Live Data</span>
+            <RefreshCcw className="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-white transition ml-1" />
+          </div>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1: Total Headcount */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Headcount</span>
-            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Users className="w-5 h-5" />
+      {/* Top Section with Right Sidebar */}
+      <div className="flex flex-col xl:flex-row gap-6 mb-6">
+        
+        {/* Main Content (Left Column) */}
+        <div className="flex-1 space-y-6">
+          
+          {/* Top KPI Cards Row (Image 2 Card Aesthetics) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="horilla-card p-5">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4 text-[#FF5D7A]">
+                <Users className="w-5 h-5" />
+              </div>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">Total Workforce</p>
+              <h3 className="text-3xl font-sora font-extrabold text-white mt-1">179</h3>
+              <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-500">
+                <span>Active employees</span>
+                <span className="text-emerald-400 font-bold">✓ 100% Onboarded</span>
+              </div>
+            </div>
+
+            <div className="horilla-card p-5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
+                <UserCheck className="w-5 h-5" />
+              </div>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">Present Today</p>
+              <h3 className="text-3xl font-sora font-extrabold text-white mt-1">19</h3>
+              <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-500">
+                <span>Check-in rate</span>
+                <span className="text-amber-400 font-bold">10.6% Live</span>
+              </div>
+            </div>
+
+            <div className="horilla-card p-5">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-400">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">On Approved Leave</p>
+              <h3 className="text-3xl font-sora font-extrabold text-white mt-1">3</h3>
+              <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-500">
+                <span>Pending requests</span>
+                <span className="text-[#FF5D7A] font-bold">12 Pending</span>
+              </div>
+            </div>
+
+            <div className="horilla-card p-5">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4 text-purple-400">
+                <Briefcase className="w-5 h-5" />
+              </div>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">Open Positions</p>
+              <h3 className="text-3xl font-sora font-extrabold text-white mt-1">2</h3>
+              <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-500">
+                <span>Active recruitment</span>
+                <span className="text-blue-400 font-bold">5 Hired</span>
+              </div>
             </div>
           </div>
-          <div className="mt-4">
-            <h2 className="text-3xl font-extrabold text-[#1F2A52]">{hrStats?.metrics?.totalEmployees || 36}</h2>
-            <div className="flex items-center gap-2 mt-2 text-xs">
-              <span className="text-emerald-600 font-bold flex items-center gap-0.5">
-                ↑ 3 recruits
-              </span>
-              <span className="text-slate-400">across 5 departments</span>
+
+          {/* Charts Row 1 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Department Headcount */}
+            <div className="horilla-card horilla-card-gradient-top-orange-purple p-5 flex flex-col h-80">
+              <div>
+                <h3 className="text-sm font-sora font-bold text-white">Department Headcount</h3>
+                <p className="text-xs text-slate-400">Distribution across business units</p>
+              </div>
+              <div className="flex-1 relative mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={headcountData} cx="50%" cy="50%" innerRadius={65} outerRadius={95} paddingAngle={3} dataKey="value" stroke="none">
+                      {headcountData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-xs text-slate-400 font-mono">Total</span>
+                  <span className="text-xl font-bold text-white">178</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Leave Trends */}
+            <div className="horilla-card horilla-card-gradient-top-purple-pink p-5 flex flex-col h-80">
+              <div>
+                <h3 className="text-sm font-sora font-bold text-white">Leave Trends</h3>
+                <p className="text-xs text-slate-400">Daily leave applications this week</p>
+              </div>
+              <div className="flex-1 mt-6">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={leaveTrendsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorLeaves" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#FF5D7A" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#FF5D7A" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} domain={[0, 4]} />
+                    <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} />
+                    <Area type="monotone" dataKey="leaves" stroke="#FF5D7A" strokeWidth={3} fillOpacity={1} fill="url(#colorLeaves)" dot={{ r: 4, fill: '#FF5D7A', strokeWidth: 2, stroke: '#111' }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[#E9573F] hover:underline cursor-pointer" onClick={() => navigate('/hr/employees')}>
-            <span>View All Staff</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+
+          {/* Charts Row 2 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Employee Status */}
+            <div className="horilla-card p-5 flex flex-col h-80">
+              <div>
+                <h3 className="text-sm font-sora font-bold text-white">Employee Active Status</h3>
+                <p className="text-xs text-slate-400">Active vs Inactive personnel</p>
+              </div>
+              <div className="flex-1 relative mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={empStatusData} cx="50%" cy="50%" innerRadius={75} outerRadius={100} paddingAngle={2} dataKey="value" stroke="none">
+                      {empStatusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-xs text-slate-400 font-mono">Total</span>
+                  <span className="text-xl font-bold text-white">180</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Gender Distribution */}
+            <div className="horilla-card p-5 flex flex-col h-80">
+              <div>
+                <h3 className="text-sm font-sora font-bold text-white">Gender Diversity</h3>
+                <p className="text-xs text-slate-400">Demographic breakdown</p>
+              </div>
+              <div className="flex-1 mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={genderData} cx="50%" cy="50%" outerRadius={95} dataKey="value" stroke="#111" strokeWidth={2}>
+                      {genderData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Card 2: Attendance Today */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Active Today</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <UserCheck className="w-5 h-5" />
+        {/* Right Sidebar Widgets */}
+        <div className="w-full xl:w-[320px] shrink-0 space-y-6">
+          {/* Announcements */}
+          <div className="horilla-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-sora font-bold text-white">Company Broadcasts</h3>
+              <button className="w-6 h-6 rounded-lg border border-white/10 flex items-center justify-center text-[#FF5D7A] hover:bg-[#FF5D7A]/10 transition">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
             </div>
-          </div>
-          <div className="mt-4">
-            <h2 className="text-3xl font-extrabold text-emerald-600">{hrStats?.metrics?.presentToday || 32}</h2>
-            <div className="flex items-center gap-2 mt-2 text-xs">
-              <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
-                {hrStats?.metrics?.attendanceRate || 94}% On-Time
-              </span>
-              <span className="text-slate-400">4 remote</span>
+            <div className="space-y-4">
+              {[
+                { title: 'Employee Referral Program', date: 'Aug 11, 2026', exp: 'Expires Nov 20' },
+                { title: 'Scheduled IT Maintenance', date: 'Aug 10, 2026', exp: 'Expires Sep 05' },
+                { title: 'Updated Work Policy', date: 'Aug 08, 2026', exp: 'Expires Oct 21' },
+              ].map((item, i) => (
+                <div key={i} className="border-b border-white/10 pb-3 last:border-0 last:pb-0">
+                  <h4 className="text-xs font-bold text-slate-200 leading-snug">{item.title}</h4>
+                  <div className="flex items-center gap-2 mt-1.5 text-[10px] text-slate-500 font-mono">
+                    <span>{item.date}</span>
+                    <span className="text-[#FF5D7A] bg-[#FF5D7A]/10 px-1.5 py-0.5 rounded border border-[#FF5D7A]/20">{item.exp}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600 hover:underline cursor-pointer" onClick={() => navigate('/hr/attendance')}>
@@ -148,213 +318,27 @@ export const HrDashboard = () => {
           </div>
         </div>
 
-        {/* Card 3: Pending Approvals */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Approval Queue</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Calendar className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4">
-            <h2 className="text-3xl font-extrabold text-amber-600">{hrStats?.metrics?.pendingLeavesCount || 5}</h2>
-            <div className="flex items-center gap-2 mt-2 text-xs">
-              <span className="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">
-                Action Required
-              </span>
-              <span className="text-slate-400">leaves & regularizations</span>
-            </div>
-          </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-600 hover:underline cursor-pointer" onClick={() => navigate('/hr/leaves')}>
-            <span>Review Applications</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </div>
-        </div>
-
-        {/* Card 4: Monthly Payroll */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Monthly Payroll</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <DollarSign className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4">
-            <h2 className="text-3xl font-extrabold text-[#1F2A52]">
-              ₹{(hrStats?.metrics?.totalMonthlyPayroll ? (hrStats.metrics.totalMonthlyPayroll / 100000).toFixed(1) + 'L' : '24.8L')}
-            </h2>
-            <div className="flex items-center gap-2 mt-2 text-xs">
-              <span className="text-emerald-600 font-bold">● Processed</span>
-              <span className="text-slate-400">100% compliant</span>
-            </div>
-          </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-purple-600 hover:underline cursor-pointer" onClick={() => navigate('/hr/payroll')}>
-            <span>Payroll Analytics</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </div>
-        </div>
-      </div>
-
-      {/* Main Charts & Analytics Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Department Headcount (2 cols) */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-[16px] font-bold text-[#1F2A52]">Departmental Headcount Distribution</h3>
-              <p className="text-xs text-slate-400">Staff allocation across business divisions</p>
-            </div>
-            <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-              36 Active Roles
-            </span>
-          </div>
-
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={headcountData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} />
-                <YAxis stroke="#94A3B8" fontSize={11} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1F2A52', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                />
-                <Bar dataKey="value" fill="#3B82F6" radius={[6, 6, 0, 0]}>
-                  {headcountData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Right Column: Leave Type Distribution */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col">
-          <h3 className="text-[16px] font-bold text-[#1F2A52]">Leave Types Utilized</h3>
-          <p className="text-xs text-slate-400 mb-4">Current cycle leave requests by category</p>
-
-          <div className="flex-1 h-52">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={leaveBreakdownData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {leaveBreakdownData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 text-xs">
-            {leaveBreakdownData.map(item => (
-              <div key={item.name} className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="text-slate-600 font-medium truncate">{item.name}</span>
+          {/* Pending Approvals */}
+          <div className="horilla-card p-5">
+            <h3 className="text-sm font-sora font-bold text-white mb-4">Approval Matrix</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 text-center hover:border-[#FF5D7A]/40 transition">
+                <h2 className="text-xl font-sora font-extrabold text-white">12</h2>
+                <p className="text-[10px] font-mono text-slate-400 uppercase mt-0.5">LEAVE</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Row: Attendance Health & Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Attendance Rate Trend (2 cols) */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-[16px] font-bold text-[#1F2A52]">Weekly Organizational Punctuality Trend</h3>
-              <p className="text-xs text-slate-400">On-time biometric punch rate across trailing 4 weeks</p>
+              <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 text-center hover:border-emerald-500/40 transition">
+                <h2 className="text-xl font-sora font-extrabold text-white">0</h2>
+                <p className="text-[10px] font-mono text-slate-400 uppercase mt-0.5">ATTENDANCE</p>
+              </div>
+              <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 text-center hover:border-purple-500/40 transition">
+                <h2 className="text-xl font-sora font-extrabold text-white">3</h2>
+                <p className="text-[10px] font-mono text-slate-400 uppercase mt-0.5">ASSETS</p>
+              </div>
+              <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 text-center hover:border-blue-500/40 transition">
+                <h2 className="text-xl font-sora font-extrabold text-white">5</h2>
+                <p className="text-[10px] font-mono text-slate-400 uppercase mt-0.5">PAYROLL</p>
+              </div>
             </div>
-            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-              96.2% Company Avg
-            </span>
-          </div>
-
-          <div className="h-56 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={attendanceTrendData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                <XAxis dataKey="date" stroke="#94A3B8" fontSize={11} />
-                <YAxis stroke="#94A3B8" fontSize={11} domain={[85, 100]} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1F2A52', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                />
-                <Line type="monotone" dataKey="rate" stroke="#10B981" strokeWidth={3} dot={{ r: 5, fill: '#10B981' }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Quick Operational Shortcuts */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
-          <div>
-            <h3 className="text-[16px] font-bold text-[#1F2A52] mb-1">HR Operations Shortcuts</h3>
-            <p className="text-xs text-slate-400 mb-4">Instant navigation to administrative workflows</p>
-            
-            <div className="space-y-2.5">
-              <Link 
-                to="/hr/attendance"
-                className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-100 rounded-xl flex items-center justify-between transition group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <Clock className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#1F2A52]">Review Regularizations</p>
-                    <p className="text-[10px] text-slate-400">Biometric corrections</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#1F2A52] transition" />
-              </Link>
-
-              <Link 
-                to="/hr/leaves"
-                className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-100 rounded-xl flex items-center justify-between transition group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <Calendar className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#1F2A52]">Leave Approvals</p>
-                    <p className="text-[10px] text-slate-400">Pending applications</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#1F2A52] transition" />
-              </Link>
-
-              <Link 
-                to="/hr/payroll"
-                className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-100 rounded-xl flex items-center justify-between transition group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                    <DollarSign className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#1F2A52]">Salary Structures</p>
-                    <p className="text-[10px] text-slate-400">CTC breakdown & revisions</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#1F2A52] transition" />
-              </Link>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              System Status: Optimal
-            </span>
-            <span className="font-mono text-[11px]">v2.4.0</span>
           </div>
         </div>
       </div>

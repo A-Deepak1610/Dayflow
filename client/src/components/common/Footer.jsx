@@ -3,7 +3,7 @@ import { ShieldCheck } from 'lucide-react';
 
 export const Footer = ({ onOpenAuthModal }) => {
   return (
-    <footer id="footer" className="bg-[#0a0a0a] border-t border-white/10 text-slate-400 pt-16 pb-12">
+    <footer id="footer" className="w-full bg-[#EFE7EC] border-t border-[#E2D5E0] text-[#6B5667] pt-16 pb-12 font-inter">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
@@ -11,15 +11,15 @@ export const Footer = ({ onOpenAuthModal }) => {
           {/* Brand Col */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#1F2A52] flex items-center justify-center font-sora font-bold text-[#FF5D7A] text-sm shadow-md">
+              <div className="w-9 h-9 rounded-xl bg-[#281A26] flex items-center justify-center font-sora font-bold text-white text-sm shadow-md">
                 DF
               </div>
-              <span className="font-sora text-xl font-extrabold text-white tracking-tight">
+              <span className="font-sora text-xl font-extrabold text-[#281A26] tracking-tight">
                 Dayflow <span className="text-[#FF5D7A]">HRMS</span>
               </span>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
+            <p className="text-xs text-[#6B5667] leading-relaxed max-w-sm">
               The next-generation Human Resource Management System built for workforce alignment. Streamlining attendance, leaves, employee profiles, and payroll in one unified platform.
             </p>
 
@@ -31,7 +31,7 @@ export const Footer = ({ onOpenAuthModal }) => {
 
           {/* Product Links */}
           <div>
-            <h4 className="font-sora text-xs font-bold text-white uppercase tracking-wider mb-4">
+            <h4 className="font-sora text-xs font-bold text-[#281A26] uppercase tracking-wider mb-4">
               Product Modules
             </h4>
             <ul className="space-y-2.5 text-xs">
@@ -55,7 +55,7 @@ export const Footer = ({ onOpenAuthModal }) => {
 
           {/* Solution Links */}
           <div>
-            <h4 className="font-sora text-xs font-bold text-white uppercase tracking-wider mb-4">
+            <h4 className="font-sora text-xs font-bold text-[#281A26] uppercase tracking-wider mb-4">
               Resources & Pricing
             </h4>
             <ul className="space-y-2.5 text-xs">
@@ -83,7 +83,7 @@ export const Footer = ({ onOpenAuthModal }) => {
 
           {/* Legal & Security */}
           <div>
-            <h4 className="font-sora text-xs font-bold text-white uppercase tracking-wider mb-4">
+            <h4 className="font-sora text-xs font-bold text-[#281A26] uppercase tracking-wider mb-4">
               Security & Legal
             </h4>
             <ul className="space-y-2.5 text-xs">
@@ -109,10 +109,10 @@ export const Footer = ({ onOpenAuthModal }) => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+        <div className="pt-8 border-t border-[#E2D5E0] flex flex-col sm:flex-row items-center justify-between text-xs text-[#6B5667] gap-4">
           <p>© {new Date().getFullYear()} Dayflow HRMS Inc. Every workday, perfectly aligned.</p>
           <p className="flex items-center gap-1">
-            Built with precision using <span className="text-[#FF5D7A] font-semibold">Navy #1F2A52 & Coral #FF5D7A</span> identity
+            Built with precision for <span className="text-[#FF5D7A] font-semibold">Dayflow HRMS</span>
           </p>
         </div>
 

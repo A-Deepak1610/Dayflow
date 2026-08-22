@@ -2,19 +2,19 @@
 
 @layer base {
   :root {
-    /* Horilla Primary Color - Coral/Red */
-    --horilla-primary: #E9573F;
-    --horilla-primary-hover: #D64A32;
-    --horilla-primary-light: #FCECE9;
+    /* Dayflow Dark Cinematic Primary Palette */
+    --horilla-primary: #FF5D7A;
+    --horilla-primary-hover: #FF4263;
+    --horilla-primary-light: rgba(255, 93, 122, 0.15);
     
-    /* UI Colors */
-    --horilla-text-main: #333333;
-    --horilla-text-muted: #888888;
-    --horilla-bg-main: #F4F5F7;
+    /* Dark Theme UI Colors */
+    --horilla-text-main: #f8fafc;
+    --horilla-text-muted: #94a3b8;
+    --horilla-bg-main: #0a0a0a;
     
     /* Chart Colors */
     --chart-purple: #9333EA;
-    --chart-red: #E9573F;
+    --chart-red: #FF5D7A;
     --chart-green: #10B981;
     --chart-orange: #F59E0B;
     --chart-blue: #3B82F6;
@@ -24,9 +24,9 @@
     /* Chart Gradients */
     --gradient-purple-pink: linear-gradient(90deg, #9333EA 0%, #EC4899 100%);
     --gradient-orange-purple: linear-gradient(90deg, #F59E0B 0%, #9333EA 100%);
-    --gradient-red-orange: linear-gradient(90deg, #E9573F 0%, #F59E0B 100%);
+    --gradient-red-orange: linear-gradient(90deg, #FF5D7A 0%, #F59E0B 100%);
 
-    --font-heading: 'Inter', sans-serif;
+    --font-heading: 'Sora', 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
   }
 
@@ -48,6 +48,7 @@
     border: none;
     display: flex;
     flex-direction: column;
+    background-color: #0a0a0a;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -68,41 +69,44 @@
   border-color: var(--horilla-primary);
 }
 
-/* Card Styling */
+/* Card Styling (Matching Image 2 Aesthetic) */
 .horilla-card {
-  background: #FFFFFF;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  background: #111113;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
   position: relative;
   overflow: hidden;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.horilla-card:hover {
+  border-color: rgba(255, 93, 122, 0.3);
 }
 
 .horilla-card-gradient-top-orange-purple {
-  border-top: 4px solid;
-  border-image: var(--gradient-orange-purple) 1;
+  border-top: 3px solid #FF5D7A;
 }
 
 .horilla-card-gradient-top-purple-pink {
-  border-top: 4px solid;
-  border-image: var(--gradient-purple-pink) 1;
+  border-top: 3px solid #9333EA;
 }
 
 .horilla-card-gradient-top-red-orange {
-  border-top: 4px solid;
-  border-image: var(--gradient-red-orange) 1;
+  border-top: 3px solid #F59E0B;
 }
 
-/* Custom Scrollbar */
+/* Custom Dark Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #0a0a0a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #27272a;
   border-radius: 4px;
 }
 
