@@ -4,10 +4,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import MainLayout from './components/layout/MainLayout';
 import Home from './pages/Home';
 
-// HR Pages
+// HR Pages & Layout
+import HrLayout from './pages/hr/HrLayout';
 import HrDashboard from './pages/hr/HrDashboard';
-import EmployeeManagement from './pages/hr/EmployeeManagement';
-import LeaveApprovals from './pages/hr/LeaveApprovals';
+import EmployeeProfilesPage from './pages/hr/EmployeeProfilesPage';
+import AttendanceMonitorPage from './pages/hr/AttendanceMonitorPage';
+import LeaveManagementPage from './pages/hr/LeaveManagementPage';
+import PayrollAnalyticsPage from './pages/hr/PayrollAnalyticsPage';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -37,33 +40,24 @@ function AppRoutes() {
       {/* Landing Page */}
       <Route path="/" element={<Home />} />
 
-      {/* HR / Admin Pages */}
+      {/* HR / Admin Portal Suite with Dedicated Sidebar */}
       <Route
-        path="/hr/dashboard"
+        path="/hr"
         element={
           <HrRoute>
-            <HrDashboard />
+            <HrLayout />
           </HrRoute>
         }
-      />
-      <Route
-        path="/hr/employees"
-        element={
-          <HrRoute>
-            <EmployeeManagement />
-          </HrRoute>
-        }
-      />
-      <Route
-        path="/hr/leaves"
-        element={
-          <HrRoute>
-            <LeaveApprovals />
-          </HrRoute>
-        }
-      />
+      >
+        <Route index element={<Navigate to="/hr/dashboard" replace />} />
+        <Route path="dashboard" element={<HrDashboard />} />
+        <Route path="employees" element={<EmployeeProfilesPage />} />
+        <Route path="attendance" element={<AttendanceMonitorPage />} />
+        <Route path="leaves" element={<LeaveManagementPage />} />
+        <Route path="payroll" element={<PayrollAnalyticsPage />} />
+      </Route>
 
-      {/* Employee Pages */}
+      {/* Employee Self-Service Pages */}
       <Route
         path="/employee/dashboard"
         element={
@@ -107,9 +101,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <MainLayout>
-          <AppRoutes />
-        </MainLayout>
+        <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   );
