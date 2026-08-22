@@ -38,23 +38,36 @@ Dayflow supports two primary user roles across the organization:
 
 ## Tech Stack
 
-### Frontend
+<div align="center">
+
+| Layer | Technologies & Frameworks |
+| :--- | :--- |
+| **Frontend** | ![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) ![Vite](https://img.shields.io/badge/Vite_8-646CFF?style=for-the-badge&logo=vite&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) |
+| **Backend** | ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white) ![Express.js](https://img.shields.io/badge/Express.js_5-000000?style=for-the-badge&logo=express&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript_7-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma_v6-2D3748?style=for-the-badge&logo=prisma&logoColor=white) |
+| **Database** | ![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white) ![TiDB Cloud](https://img.shields.io/badge/TiDB_Cloud-F36523?style=for-the-badge&logo=pingcap&logoColor=white) |
+| **AI Assistant** | ![Gemini 3.6 Flash](https://img.shields.io/badge/Gemini_3.6_Flash-8E44AD?style=for-the-badge&logo=googlegemini&logoColor=white) |
+
+</div>
+
+### Detailed Specifications
+
+#### Frontend
 * **Library**: [React 19](https://react.dev/)
 * **Build Tool**: [Vite 8](https://vite.dev/)
 * **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 * **Language**: JavaScript (ES Modules)
 
-### Backend
+#### Backend
 * **Runtime / Framework**: Node.js with [Express 5](https://expressjs.com/)
 * **Execution**: [tsx](https://github.com/privatenumber/tsx) (TypeScript execute)
 * **Language**: [TypeScript 7](https://www.typescriptlang.org/)
 * **ORM**: [Prisma ORM v6](https://www.prisma.io/)
 
-### Database
+#### Database & Intelligence
 * **Database Engine**: [MySQL](https://www.mysql.com/) (Compatible with [TiDB Cloud](https://pingcap.com/tidb-cloud))
-* **Database Driver**: `mysql2`
+* **AI Model**: [Google Gemini 3.6 Flash](https://ai.google.dev/) (Virtual HR Assistant)
 
-### Code Quality & Tooling
+#### Code Quality & Tooling
 * **Linter**: ESLint 10 (`@eslint/js`, `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`)
 * **Type Checker**: TypeScript Compiler (`tsc`)
 
