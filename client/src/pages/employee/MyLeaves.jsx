@@ -347,3 +347,5 @@ export const MyPayslips = () => {
     </div>
   );
 };
+
+export default MyLeaves;
