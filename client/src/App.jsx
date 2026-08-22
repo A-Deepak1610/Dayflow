@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import MainLayout from './components/layout/MainLayout';
+import EmployeeLayout from './components/layout/EmployeeLayout';
 import Home from './pages/Home';
 
 // HR Pages
@@ -28,14 +29,14 @@ const HrRoute = ({ children }) => {
 const EmployeeRoute = ({ children }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/" replace />;
-  return children;
+  return <EmployeeLayout>{children}</EmployeeLayout>;
 };
 
 function AppRoutes() {
   return (
     <Routes>
       {/* Landing Page */}
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<MainLayout><Home /></MainLayout>} />
 
       {/* HR / Admin Pages */}
       <Route
@@ -107,9 +108,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <MainLayout>
-          <AppRoutes />
-        </MainLayout>
+        <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   );
