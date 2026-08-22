@@ -22,7 +22,7 @@ export const HeroSection = ({ onOpenAuthModal }) => {
       {/* Background Soft Glow Effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-blue-200/40 via-purple-100/50 to-[#FF5D7A]/15 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-6 lg:px-12">
         
         {/* Top Tagline Pill */}
         <div className="flex justify-center mb-6">
@@ -71,7 +71,7 @@ export const HeroSection = ({ onOpenAuthModal }) => {
         </div>
 
         {/* Light Preview Dashboard Visual */}
-        <div className="relative max-w-5xl mx-auto">
+        <div className="relative w-full max-w-7xl mx-auto">
           {/* Subtle Outer Frame Shadow */}
           <div className="relative bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl shadow-slate-300/60 overflow-hidden">
             

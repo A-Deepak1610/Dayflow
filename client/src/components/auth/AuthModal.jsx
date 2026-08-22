@@ -16,9 +16,13 @@ import {
   Loader2,
   X
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { registerCompanyApi, loginApi } from '../../services/api';
 
 export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
+  const navigate = useNavigate();
+  const { loginUser } = useAuth();
   const [mode, setMode] = useState(initialMode); // 'login' | 'signup'
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -104,11 +108,28 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       });
 
       if (res.ok) {
+        const userData = res.data?.user || {
+          loginId: loginIdOrEmail,
+          firstName: 'User',
+          role: loginIdOrEmail.includes('HR') || loginIdOrEmail.includes('ADMIN') ? 'HR' : 'EMPLOYEE'
+        };
+
+        loginUser(userData);
+
         setSubmittedSuccess({
           type: 'login',
           title: 'Login Successful',
-          message: `Welcome back, ${res.data?.user?.firstName || 'User'}! Connected as ${res.data?.user?.role || 'Admin'} (${res.data?.user?.loginId || loginIdOrEmail}).`,
+          message: `Welcome back, ${userData.firstName}! Redirecting to ${userData.role} portal...`,
         });
+
+        setTimeout(() => {
+          onClose();
+          if (userData.role === 'ADMIN' || userData.role === 'HR') {
+            navigate('/hr/dashboard');
+          } else {
+            navigate('/employee/dashboard');
+          }
+        }, 1200);
       } else {
         setErrorMessage(res.data?.message || res.error || 'Authentication failed. Please check credentials.');
       }
@@ -144,7 +165,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         email: signUpEmail,
         phone: signUpPhone,
         password: signUpPassword,
-      });
+      }, logoFile);
 
       if (res.ok) {
         const generatedId = res.data?.loginId || calculateSampleId();
@@ -239,7 +260,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                 : 'text-slate-600 hover:text-[#1F2A52]'
             }`}
           >
-            Sign Up
+            Sign Up (HR Admin Only)
           </button>
         </div>
 
