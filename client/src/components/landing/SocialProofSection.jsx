@@ -37,7 +37,7 @@ export const SocialProofSection = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-20 lg:py-28 relative bg-slate-50 border-t border-slate-200">
+    <section id="testimonials" className="py-20 lg:py-28 relative bg-[#111] border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Stats Grid */}
@@ -45,30 +45,30 @@ export const SocialProofSection = () => {
           {stats.map((stat, idx) => (
             <div
               key={idx}
-              className="bg-white border border-slate-200 rounded-3xl p-6 text-center hover:border-[#FF5D7A]/40 transition-colors shadow-sm"
+              className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 text-center hover:border-[#FF5D7A]/40 transition-colors shadow-sm"
             >
               <div className="font-sora text-3xl sm:text-4xl font-extrabold text-[#FF5D7A] mb-1">
                 {stat.value}
               </div>
-              <div className="text-sm font-semibold text-[#1F2A52] mb-1">{stat.label}</div>
-              <div className="text-xs text-slate-500 font-mono">{stat.desc}</div>
+              <div className="text-sm font-semibold text-white mb-1">{stat.label}</div>
+              <div className="text-xs text-slate-400 font-mono">{stat.desc}</div>
             </div>
           ))}
         </div>
 
         {/* Testimonials Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0a0a0a] border border-white/10 text-[#FF5D7A] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Trusted Worldwide</span>
           </div>
 
-          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-[#1F2A52] tracking-tight leading-tight mb-4">
+          <h2 className="font-sora text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
             Loved by HR Leaders & <br />
             <span className="text-[#FF5D7A]">Forward-Thinking Teams.</span>
           </h2>
 
-          <p className="text-slate-600 text-base sm:text-lg">
+          <p className="text-slate-400 text-base sm:text-lg">
             See how modern organizations run effortless HR operations with Dayflow.
           </p>
         </div>
@@ -78,7 +78,7 @@ export const SocialProofSection = () => {
           {testimonials.map((t, idx) => (
             <div
               key={idx}
-              className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm flex flex-col justify-between hover:border-[#FF5D7A]/40 transition duration-300"
+              className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-sm flex flex-col justify-between hover:border-[#FF5D7A]/40 transition duration-300"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -90,20 +90,20 @@ export const SocialProofSection = () => {
                   <Quote className="w-6 h-6 text-slate-300" />
                 </div>
 
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed italic mb-6">
+                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed italic mb-6">
                   "{t.quote}"
                 </p>
               </div>
 
-              <div className="flex items-center gap-3.5 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-3.5 pt-4 border-t border-white/5">
                 <img
                   src={t.avatar}
                   alt={t.author}
                   className="w-10 h-10 rounded-full object-cover border-2 border-[#FF5D7A]"
                 />
                 <div>
-                  <h4 className="font-sora text-sm font-bold text-[#1F2A52]">{t.author}</h4>
-                  <p className="text-[11px] text-slate-500">{t.title} • <span className="text-[#FF5D7A] font-semibold">{t.company}</span></p>
+                  <h4 className="font-sora text-sm font-bold text-white">{t.author}</h4>
+                  <p className="text-[11px] text-slate-400">{t.title} • <span className="text-[#FF5D7A] font-semibold">{t.company}</span></p>
                 </div>
               </div>
             </div>
