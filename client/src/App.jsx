@@ -1,19 +1,33 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './context/ToastContext';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import LoadingSpinner from './components/common/LoadingSpinner';
 import MainLayout from './components/layout/MainLayout';
 import EmployeeLayout from './components/layout/EmployeeLayout';
+
+// Eagerly loaded landing page
 import Home from './pages/Home';
 
-// HR Pages
-import HrDashboard from './pages/hr/HrDashboard';
-import EmployeeManagement from './pages/hr/EmployeeManagement';
-import LeaveApprovals from './pages/hr/LeaveApprovals';
+// HR Pages (Lazy loaded for optimal initial bundle performance)
+const HrLayout = lazy(() => import('./pages/hr/HrLayout'));
+const HrDashboard = lazy(() => import('./pages/hr/HrDashboard'));
+const EmployeeProfilesPage = lazy(() => import('./pages/hr/EmployeeProfilesPage'));
+const AttendanceMonitorPage = lazy(() => import('./pages/hr/AttendanceMonitorPage'));
+const LeaveManagementPage = lazy(() => import('./pages/hr/LeaveManagementPage'));
+const PayrollAnalyticsPage = lazy(() => import('./pages/hr/PayrollAnalyticsPage'));
+const EmployeeProfileDetail = lazy(() => import('./pages/hr/EmployeeProfileDetail'));
+const PerformanceAnalyticsPage = lazy(() => import('./pages/hr/PerformanceAnalyticsPage'));
+const HelpdeskPage = lazy(() => import('./pages/hr/HelpdeskPage'));
 
-// Employee Pages
-import EmployeeDashboard from './pages/employee/EmployeeDashboard';
-import MyAttendance from './pages/employee/MyAttendance';
-import { MyLeaves, MyPayslips } from './pages/employee/MyLeaves';
+// Employee Pages (Lazy loaded)
+const EmployeeDashboard = lazy(() => import('./pages/employee/EmployeeDashboard'));
+const EmployeeDirectory = lazy(() => import('./pages/employee/EmployeeDirectory'));
+const MyAttendance = lazy(() => import('./pages/employee/MyAttendance'));
+const MyLeaves = lazy(() => import('./pages/employee/MyLeaves'));
+const MyPayslips = lazy(() => import('./pages/employee/MyPayslips'));
 
 // Protected Route Component for HR / Admin
 const HrRoute = ({ children }) => {
@@ -34,83 +48,100 @@ const EmployeeRoute = ({ children }) => {
 
 function AppRoutes() {
   return (
-    <Routes>
-      {/* Landing Page */}
-      <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+    <Suspense fallback={<LoadingSpinner label="Loading Dayflow workspace..." />}>
+      <Routes>
+        {/* Landing Page */}
+        <Route path="/" element={<MainLayout><Home /></MainLayout>} />
 
-      {/* HR / Admin Pages */}
-      <Route
-        path="/hr/dashboard"
-        element={
-          <HrRoute>
-            <HrDashboard />
-          </HrRoute>
-        }
-      />
-      <Route
-        path="/hr/employees"
-        element={
-          <HrRoute>
-            <EmployeeManagement />
-          </HrRoute>
-        }
-      />
-      <Route
-        path="/hr/leaves"
-        element={
-          <HrRoute>
-            <LeaveApprovals />
-          </HrRoute>
-        }
-      />
+        {/* HR / Admin Portal Suite */}
+        <Route
+          path="/hr"
+          element={
+            <HrRoute>
+              <HrLayout />
+            </HrRoute>
+          }
+        >
+          <Route index element={<Navigate to="/hr/dashboard" replace />} />
+          <Route path="dashboard" element={<HrDashboard />} />
+          <Route path="employees" element={<EmployeeProfilesPage />} />
+          <Route path="employees/:id" element={<EmployeeProfileDetail />} />
+          <Route path="attendance" element={<AttendanceMonitorPage />} />
+          <Route path="leaves" element={<LeaveManagementPage />} />
+          <Route path="payroll" element={<PayrollAnalyticsPage />} />
+          <Route path="performance" element={<PerformanceAnalyticsPage />} />
+          <Route path="helpdesk" element={<HelpdeskPage />} />
+        </Route>
 
-      {/* Employee Pages */}
-      <Route
-        path="/employee/dashboard"
-        element={
-          <EmployeeRoute>
-            <EmployeeDashboard />
-          </EmployeeRoute>
-        }
-      />
-      <Route
-        path="/employee/attendance"
-        element={
-          <EmployeeRoute>
-            <MyAttendance />
-          </EmployeeRoute>
-        }
-      />
-      <Route
-        path="/employee/leaves"
-        element={
-          <EmployeeRoute>
-            <MyLeaves />
-          </EmployeeRoute>
-        }
-      />
-      <Route
-        path="/employee/payslips"
-        element={
-          <EmployeeRoute>
-            <MyPayslips />
-          </EmployeeRoute>
-        }
-      />
+        {/* Employee Self-Service Suite */}
+        <Route
+          path="/employee/dashboard"
+          element={
+            <EmployeeRoute>
+              <EmployeeDashboard />
+            </EmployeeRoute>
+          }
+        />
+        <Route
+          path="/employee/profile"
+          element={
+            <EmployeeRoute>
+              <EmployeeDirectory initialTab="my-profile" />
+            </EmployeeRoute>
+          }
+        />
+        <Route
+          path="/employee/directory"
+          element={
+            <EmployeeRoute>
+              <EmployeeDirectory initialTab="directory" />
+            </EmployeeRoute>
+          }
+        />
+        <Route
+          path="/employee/attendance"
+          element={
+            <EmployeeRoute>
+              <MyAttendance />
+            </EmployeeRoute>
+          }
+        />
+        <Route
+          path="/employee/leaves"
+          element={
+            <EmployeeRoute>
+              <MyLeaves />
+            </EmployeeRoute>
+          }
+        />
+        <Route
+          path="/employee/payslips"
+          element={
+            <EmployeeRoute>
+              <MyPayslips />
+            </EmployeeRoute>
+          }
+        />
 
-      {/* Catch-all redirect */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Catch-all redirect */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
-
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </AuthProvider>
+        </ToastProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
