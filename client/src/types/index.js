@@ -1,2 +1,1 @@
-// Frontend type definitions placeholder
-export {};
+export * from './constants';

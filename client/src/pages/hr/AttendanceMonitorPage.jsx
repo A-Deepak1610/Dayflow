@@ -157,12 +157,15 @@ export const AttendanceMonitorPage = () => {
   // Filtered Daily Records
   const filteredRecords = useMemo(() => {
     return attendanceRecords.filter(item => {
+      const s = (searchTerm || '').toLowerCase();
       const matchesSearch =
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.empId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.dept.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesDept = deptFilter === 'ALL' || item.dept === deptFilter;
-      const matchesStatus = statusFilter === 'ALL' || item.status.toUpperCase() === statusFilter.toUpperCase();
+        !s ||
+        (item.name || '').toLowerCase().includes(s) ||
+        (item.empId || '').toLowerCase().includes(s) ||
+        (item.dept || '').toLowerCase().includes(s);
+      
+      const matchesDept = deptFilter === 'ALL' || (item.dept || '').toLowerCase().includes(deptFilter.toLowerCase());
+      const matchesStatus = statusFilter === 'ALL' || (item.status || '').toUpperCase() === statusFilter.toUpperCase();
       return matchesSearch && matchesDept && matchesStatus;
     });
   }, [attendanceRecords, searchTerm, deptFilter, statusFilter]);

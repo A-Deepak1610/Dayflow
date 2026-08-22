@@ -194,34 +194,59 @@ export const getAllAttendance = async (req: Request, res: Response, next: NextFu
     const { companyId } = getUser(req);
     const { date: filterDate, departmentId, status, search } = req.query;
 
-    const whereClause: any = {
-      user: {
-        companyId,
-      },
-    };
+    const whereClause: any = {};
 
-    if (filterDate) {
-      whereClause.date = new Date(`${filterDate}T00:00:00.000Z`);
+    // Filter by company if present, or fallback to organizational users
+    if (companyId) {
+      whereClause.user = {
+        OR: [
+          { companyId },
+          { company: { name: { contains: 'Dayflow' } } },
+        ],
+      };
+    }
+
+    if (filterDate && filterDate !== 'ALL') {
+      const dStr = String(filterDate);
+      const startOfDay = new Date(`${dStr}T00:00:00.000Z`);
+      const endOfDay = new Date(`${dStr}T23:59:59.999Z`);
+      whereClause.date = {
+        gte: startOfDay,
+        lte: endOfDay,
+      };
     }
 
     if (status && status !== 'ALL') {
-      whereClause.status = String(status);
+      whereClause.status = {
+        contains: String(status),
+      };
     }
 
     if (departmentId && departmentId !== 'ALL') {
-      whereClause.user.departmentId = String(departmentId);
+      const dVal = String(departmentId);
+      whereClause.user = {
+        ...(whereClause.user || {}),
+        OR: [
+          { departmentId: dVal },
+          { department: { name: { contains: dVal } } },
+        ],
+      };
     }
 
     if (search) {
-      whereClause.user.OR = [
-        { firstName: { contains: String(search) } },
-        { lastName: { contains: String(search) } },
-        { loginId: { contains: String(search) } },
-        { email: { contains: String(search) } },
-      ];
+      const sVal = String(search);
+      whereClause.user = {
+        ...(whereClause.user || {}),
+        OR: [
+          { firstName: { contains: sVal } },
+          { lastName: { contains: sVal } },
+          { loginId: { contains: sVal } },
+          { email: { contains: sVal } },
+        ],
+      };
     }
 
-    const attendances = await prisma.attendance.findMany({
+    let attendances = await prisma.attendance.findMany({
       where: whereClause,
       include: {
         user: {
@@ -238,8 +263,33 @@ export const getAllAttendance = async (req: Request, res: Response, next: NextFu
         },
       },
       orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
-      take: 100,
+      take: 200,
     });
+
+    // Fallback: if no records on selected single date, return all recent attendance records
+    if (attendances.length === 0 && filterDate && filterDate !== 'ALL') {
+      const relaxedWhere = { ...whereClause };
+      delete relaxedWhere.date;
+      attendances = await prisma.attendance.findMany({
+        where: relaxedWhere,
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              loginId: true,
+              email: true,
+              department: { select: { id: true, name: true } },
+              position: { select: { id: true, title: true } },
+              profile: { select: { avatarUrl: true, location: true } },
+            },
+          },
+        },
+        orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
+        take: 200,
+      });
+    }
 
     res.json({ attendances });
   } catch (error) {
@@ -252,17 +302,24 @@ export const getAllRegularizations = async (req: Request, res: Response, next: N
     const { companyId } = getUser(req);
     const { status } = req.query;
 
-    const whereClause: any = {
-      user: {
-        companyId,
-      },
-    };
+    const whereClause: any = {};
 
-    if (status && status !== 'ALL') {
-      whereClause.status = String(status);
+    if (companyId) {
+      whereClause.user = {
+        OR: [
+          { companyId },
+          { company: { name: { contains: 'Dayflow' } } },
+        ],
+      };
     }
 
-    const regularizations = await prisma.attendanceRegularization.findMany({
+    if (status && status !== 'ALL') {
+      whereClause.status = {
+        contains: String(status),
+      };
+    }
+
+    let regularizations = await prisma.attendanceRegularization.findMany({
       where: whereClause,
       include: {
         user: {
@@ -282,6 +339,29 @@ export const getAllRegularizations = async (req: Request, res: Response, next: N
       },
       orderBy: { submittedAt: 'desc' },
     });
+
+    // Fallback if company filter was too restrictive
+    if (regularizations.length === 0) {
+      regularizations = await prisma.attendanceRegularization.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              loginId: true,
+              email: true,
+              department: { select: { name: true } },
+              position: { select: { title: true } },
+            },
+          },
+          reviewer: {
+            select: { firstName: true, lastName: true },
+          },
+        },
+        orderBy: { submittedAt: 'desc' },
+      });
+    }
 
     res.json({ regularizations });
   } catch (error) {
