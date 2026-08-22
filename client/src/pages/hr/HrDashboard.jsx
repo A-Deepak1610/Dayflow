@@ -4,7 +4,7 @@ import {
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  AreaChart, Area, PieChart, Pie, Cell, Legend
+  AreaChart, Area, PieChart, Pie, Cell, Legend, LineChart, Line
 } from 'recharts';
 
 export const HrDashboard = () => {
@@ -12,11 +12,11 @@ export const HrDashboard = () => {
 
   // Chart Data
   const headcountData = [
-    { name: 'Engineering', value: 65, color: '#9333EA' }, // Purple
-    { name: 'Sales', value: 45, color: '#E9573F' }, // Red
-    { name: 'Support', value: 30, color: '#10B981' }, // Green
-    { name: 'Marketing', value: 25, color: '#F59E0B' }, // Orange
-    { name: 'Finance', value: 13, color: '#3B82F6' }, // Blue
+    { name: 'Engineering', value: 65, color: '#9333EA' },
+    { name: 'Sales', value: 45, color: '#E9573F' },
+    { name: 'Support', value: 30, color: '#10B981' },
+    { name: 'Marketing', value: 25, color: '#F59E0B' },
+    { name: 'Finance', value: 13, color: '#3B82F6' },
   ];
 
   const leaveTrendsData = [
@@ -48,9 +48,52 @@ export const HrDashboard = () => {
     { stage: 'Hired', value: 5, fill: '#10B981' },
   ];
 
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-    return `${(percent * 100).toFixed(0)}%`;
-  };
+  const leaveBreakdownData = [
+    { name: 'Casual Leave', value: 14, fill: '#E9573F' }
+  ];
+
+  const attendanceOverviewData = [
+    { name: 'Eng', onTime: 85, late: 10, early: 5 },
+    { name: 'Sales', onTime: 70, late: 20, early: 10 },
+    { name: 'Support', onTime: 90, late: 5, early: 5 },
+    { name: 'Marketing', onTime: 80, late: 15, early: 5 },
+  ];
+
+  const departmentOvertimeData = [
+    { name: 'Eng', hours: 45 },
+    { name: 'Sales', hours: 10 },
+    { name: 'Support', hours: 25 },
+    { name: 'Market', hours: 5 },
+  ];
+
+  const attendanceTrendData = [
+    { date: 'Week 1', rate: 95 },
+    { date: 'Week 2', rate: 93 },
+    { date: 'Week 3', rate: 96 },
+    { date: 'Week 4', rate: 94 },
+  ];
+
+  const recruitmentPipelineData = [
+    { role: 'Frontend Eng', applied: 45, interview: 12, offer: 3 },
+    { role: 'Sales Rep', applied: 30, interview: 8, offer: 2 },
+    { role: 'Support Agent', applied: 60, interview: 15, offer: 5 },
+  ];
+
+  const hiringTimelineData = [
+    { month: 'Jan', joined: 4 },
+    { month: 'Feb', joined: 2 },
+    { month: 'Mar', joined: 6 },
+    { month: 'Apr', joined: 3 },
+    { month: 'May', joined: 5 },
+    { month: 'Jun', joined: 1 },
+  ];
+
+  const employeeTurnoverData = [
+    { name: 'Engineering', newHires: 4, exits: 1 },
+    { name: 'Sales', newHires: 2, exits: 2 },
+    { name: 'Support', newHires: 5, exits: 0 },
+    { name: 'Marketing', newHires: 1, exits: 1 },
+  ];
 
   return (
     <div className="p-6">
@@ -99,14 +142,14 @@ export const HrDashboard = () => {
         </div>
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-6">
+      {/* Top Section with Right Sidebar */}
+      <div className="flex flex-col xl:flex-row gap-6 mb-6">
         
         {/* Main Content (Left Column) */}
         <div className="flex-1 space-y-6">
           
           {/* Top KPI Cards Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
             <div className="horilla-card p-5">
               <div className="w-10 h-10 rounded-lg bg-[#FCECE9] flex items-center justify-center mb-4">
                 <Users className="w-5 h-5 text-[#E9573F]" />
@@ -114,7 +157,6 @@ export const HrDashboard = () => {
               <p className="text-[11px] font-bold text-[#888888] uppercase tracking-wide">Total Employees</p>
               <h3 className="text-[28px] font-extrabold text-[#333333] mt-1 leading-none">179</h3>
               <p className="text-[12px] text-[#A0A0A0] mt-2">No new joiners</p>
-              {/* Decorative Circle */}
               <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-slate-100 rounded-full opacity-50 pointer-events-none"></div>
             </div>
 
@@ -147,12 +189,10 @@ export const HrDashboard = () => {
               <p className="text-[12px] text-[#A0A0A0] mt-2">Active hiring</p>
               <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-slate-100 rounded-full opacity-50 pointer-events-none"></div>
             </div>
-
           </div>
 
           {/* Charts Row 1 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
             {/* Department Headcount */}
             <div className="horilla-card horilla-card-gradient-top-orange-purple p-5 flex flex-col h-80">
               <div>
@@ -162,16 +202,7 @@ export const HrDashboard = () => {
               <div className="flex-1 relative mt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={headcountData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={70}
-                      outerRadius={100}
-                      paddingAngle={2}
-                      dataKey="value"
-                      stroke="none"
-                    >
+                    <Pie data={headcountData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={2} dataKey="value" stroke="none">
                       {headcountData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
@@ -209,12 +240,10 @@ export const HrDashboard = () => {
                 </ResponsiveContainer>
               </div>
             </div>
-
           </div>
 
           {/* Charts Row 2 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
             {/* Employee Status */}
             <div className="horilla-card horilla-card-gradient-top-orange-purple p-5 flex flex-col h-80">
               <div>
@@ -224,16 +253,7 @@ export const HrDashboard = () => {
               <div className="flex-1 relative mt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={empStatusData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={80}
-                      outerRadius={105}
-                      paddingAngle={0}
-                      dataKey="value"
-                      stroke="none"
-                    >
+                    <Pie data={empStatusData} cx="50%" cy="50%" innerRadius={80} outerRadius={105} paddingAngle={0} dataKey="value" stroke="none">
                       {empStatusData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
@@ -267,17 +287,7 @@ export const HrDashboard = () => {
               <div className="flex-1 mt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={genderData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={100}
-                      dataKey="value"
-                      stroke="#fff"
-                      strokeWidth={2}
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      labelLine={false}
-                    >
+                    <Pie data={genderData} cx="50%" cy="50%" outerRadius={100} dataKey="value" stroke="#fff" strokeWidth={2} label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} labelLine={false}>
                       {genderData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
@@ -301,82 +311,11 @@ export const HrDashboard = () => {
                 </div>
               </div>
             </div>
-
           </div>
-
-          {/* Charts Row 3 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            {/* Payroll Summary Widget */}
-            <div className="horilla-card p-0 flex flex-col h-80 border-t-4 border-[#9333EA]">
-              <div className="p-5 pb-4 border-b border-slate-100">
-                <h3 className="text-[15px] font-bold text-[#333333]">Payroll Summary</h3>
-                <p className="text-[12px] text-[#888888]">August 2026</p>
-              </div>
-              <div className="p-5 flex-1 flex flex-col gap-4">
-                <div className="bg-gradient-to-r from-[#9333EA] to-[#EC4899] rounded-xl p-5 text-white flex items-center justify-between shadow-md">
-                  <div>
-                    <p className="text-[10px] font-bold tracking-wider opacity-80 mb-1">NET PAY</p>
-                    <h2 className="text-3xl font-bold">440,338</h2>
-                  </div>
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
-                    <span className="text-[12px] font-bold text-white">↑ 9%</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 flex-1">
-                  <div className="bg-[#E6F4EA] rounded-xl p-4 flex flex-col items-center justify-center text-center">
-                    <h3 className="text-[18px] font-bold text-[#10B981]">511,774</h3>
-                    <p className="text-[10px] font-bold text-[#666666] uppercase mt-1">Gross</p>
-                  </div>
-                  <div className="bg-[#FCECE9] rounded-xl p-4 flex flex-col items-center justify-center text-center">
-                    <h3 className="text-[18px] font-bold text-[#E9573F]">71,435</h3>
-                    <p className="text-[10px] font-bold text-[#666666] uppercase mt-1">Deductions</p>
-                  </div>
-                  <div className="bg-[#EEF2FF] rounded-xl p-4 flex flex-col items-center justify-center text-center">
-                    <h3 className="text-[18px] font-bold text-[#E9573F]">20</h3>
-                    <p className="text-[10px] font-bold text-[#666666] uppercase mt-1">Payslips</p>
-                  </div>
-                  <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col items-center justify-center text-center">
-                    <h3 className="text-[18px] font-bold text-[#333333]">403,814</h3>
-                    <p className="text-[10px] font-bold text-[#888888] uppercase mt-1">Prev Month</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Recruitment Funnel */}
-            <div className="horilla-card horilla-card-gradient-top-red-orange p-5 flex flex-col h-80">
-              <div>
-                <h3 className="text-[15px] font-bold text-[#333333]">Recruitment Funnel</h3>
-                <p className="text-[12px] text-[#888888]">Candidates by stage — active recruitments</p>
-              </div>
-              <div className="text-right mt-2">
-                <span className="text-[11px] text-[#888888]">2 active recruitments · 17 total · 5 hired</span>
-              </div>
-              <div className="flex-1 mt-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={recruitmentData} layout="vertical" margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
-                    <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
-                    <YAxis dataKey="stage" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#333333', fontWeight: 600 }} />
-                    <Tooltip cursor={{fill: 'transparent'}} />
-                    <Bar dataKey="value" barSize={20} radius={[0, 4, 4, 0]}>
-                      {recruitmentData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-          </div>
-
         </div>
 
         {/* Right Sidebar Widgets */}
         <div className="w-full xl:w-[320px] shrink-0 space-y-6">
-          
           {/* Announcements */}
           <div className="horilla-card p-5">
             <div className="flex items-center justify-between mb-4">
@@ -387,10 +326,10 @@ export const HrDashboard = () => {
             </div>
             <div className="space-y-4">
               {[
-                { title: 'Employee Referral Program — Earn Referral Bonuses', date: 'Aug 11, 2026', exp: 'Expires Nov 20' },
-                { title: 'Scheduled IT Infrastructure Maintenance', date: 'Aug 10, 2026', exp: 'Expires Sep 05' },
-                { title: 'Company Family Day — September 15, 2026', date: 'Aug 09, 2026', exp: 'Expires Sep 15' },
-                { title: 'Updated Work-From-Home Policy — Effective September 1, 2026', date: 'Aug 08, 2026', exp: 'Expires Oct 21' },
+                { title: 'Employee Referral Program', date: 'Aug 11, 2026', exp: 'Expires Nov 20' },
+                { title: 'Scheduled IT Maintenance', date: 'Aug 10, 2026', exp: 'Expires Sep 05' },
+                { title: 'Company Family Day', date: 'Aug 09, 2026', exp: 'Expires Sep 15' },
+                { title: 'Updated Work-From-Home Policy', date: 'Aug 08, 2026', exp: 'Expires Oct 21' },
               ].map((item, i) => (
                 <div key={i} className="border-b border-slate-100 pb-3 last:border-0 last:pb-0">
                   <h4 className="text-[13px] font-bold text-[#333333] leading-snug">{item.title}</h4>
@@ -471,14 +410,233 @@ export const HrDashboard = () => {
               </div>
               <div className="bg-[#FCEDF5] border border-[#FAD3E9] rounded-lg p-3 text-center cursor-pointer hover:shadow-sm transition">
                 <h2 className="text-[20px] font-extrabold text-[#333333]">5</h2>
-                <p className="text-[10px] font-bold text-[#888888] uppercase mt-0.5">REIMBURSEMENTS</p>
+                <p className="text-[10px] font-bold text-[#888888] uppercase mt-0.5">REIMB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section (Full Width Charts) */}
+      <div className="space-y-6">
+        
+        {/* Charts Row 3: Payroll & Recruitment Funnel */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Payroll Summary Widget */}
+          <div className="horilla-card p-0 flex flex-col h-80 border-t-4 border-[#9333EA]">
+            <div className="p-5 pb-4 border-b border-slate-100">
+              <h3 className="text-[15px] font-bold text-[#333333]">Payroll Summary</h3>
+              <p className="text-[12px] text-[#888888]">August 2026</p>
+            </div>
+            <div className="p-5 flex-1 flex flex-col gap-4">
+              <div className="bg-gradient-to-r from-[#9333EA] to-[#EC4899] rounded-xl p-5 text-white flex items-center justify-between shadow-md">
+                <div>
+                  <p className="text-[10px] font-bold tracking-wider opacity-80 mb-1">NET PAY</p>
+                  <h2 className="text-3xl font-bold">440,338</h2>
+                </div>
+                <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
+                  <span className="text-[12px] font-bold text-white">↑ 9%</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 flex-1">
+                <div className="bg-[#E6F4EA] rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                  <h3 className="text-[18px] font-bold text-[#10B981]">511,774</h3>
+                  <p className="text-[10px] font-bold text-[#666666] uppercase mt-1">Gross</p>
+                </div>
+                <div className="bg-[#FCECE9] rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                  <h3 className="text-[18px] font-bold text-[#E9573F]">71,435</h3>
+                  <p className="text-[10px] font-bold text-[#666666] uppercase mt-1">Deductions</p>
+                </div>
+                <div className="bg-[#EEF2FF] rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                  <h3 className="text-[18px] font-bold text-[#E9573F]">20</h3>
+                  <p className="text-[10px] font-bold text-[#666666] uppercase mt-1">Payslips</p>
+                </div>
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                  <h3 className="text-[18px] font-bold text-[#333333]">403,814</h3>
+                  <p className="text-[10px] font-bold text-[#888888] uppercase mt-1">Prev Month</p>
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Recruitment Funnel */}
+          <div className="horilla-card horilla-card-gradient-top-red-orange p-5 flex flex-col h-80">
+            <div>
+              <h3 className="text-[15px] font-bold text-[#333333]">Recruitment Funnel</h3>
+              <p className="text-[12px] text-[#888888]">Candidates by stage — active recruitments</p>
+            </div>
+            <div className="text-right mt-2">
+              <span className="text-[11px] text-[#888888]">2 active recruitments · 17 total · 5 hired</span>
+            </div>
+            <div className="flex-1 mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={recruitmentData} layout="vertical" margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
+                  <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <YAxis dataKey="stage" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#333333', fontWeight: 600 }} />
+                  <Tooltip cursor={{fill: 'transparent'}} />
+                  <Bar dataKey="value" barSize={20} radius={[0, 4, 4, 0]}>
+                    {recruitmentData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Charts Row 4: Leave & Attendance Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Leave Breakdown */}
+          <div className="horilla-card horilla-card-gradient-top-purple-pink p-5 flex flex-col h-80">
+            <div>
+              <h3 className="text-[15px] font-bold text-[#333333]">Leave Breakdown</h3>
+              <p className="text-[12px] text-[#888888]">August 2026</p>
+            </div>
+            <div className="flex-1 mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={leaveBreakdownData} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
+                  <XAxis type="number" axisLine={false} tickLine={false} tick={false} />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#333333', fontWeight: 600 }} />
+                  <Tooltip cursor={{fill: 'transparent'}} />
+                  <Bar dataKey="value" barSize={30} radius={[0, 8, 8, 0]}>
+                    {leaveBreakdownData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Attendance Overview */}
+          <div className="horilla-card horilla-card-gradient-top-orange-purple p-5 flex flex-col h-80">
+            <div>
+              <h3 className="text-[15px] font-bold text-[#333333]">Attendance Overview</h3>
+              <p className="text-[12px] text-[#888888]">On-time, late arrivals & early departures by department</p>
+            </div>
+            <div className="flex-1 mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={attendanceOverviewData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <Tooltip />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', color: '#666666' }} />
+                  <Bar dataKey="onTime" name="On-Time" stackId="a" fill="#10B981" radius={[0, 0, 4, 4]} />
+                  <Bar dataKey="late" name="Late" stackId="a" fill="#F59E0B" />
+                  <Bar dataKey="early" name="Early Departure" stackId="a" fill="#E9573F" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Charts Row 5 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Department Overtime */}
+          <div className="horilla-card horilla-card-gradient-top-orange-purple p-5 flex flex-col h-80">
+            <div>
+              <h3 className="text-[15px] font-bold text-[#333333]">Department Overtime</h3>
+              <p className="text-[12px] text-[#888888]">Overtime hours distribution</p>
+            </div>
+            <div className="flex-1 mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={departmentOvertimeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <Tooltip />
+                  <Bar dataKey="hours" name="Overtime Hours" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={25} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Attendance Trend */}
+          <div className="horilla-card horilla-card-gradient-top-orange-purple p-5 flex flex-col h-80">
+            <div>
+              <h3 className="text-[15px] font-bold text-[#333333]">Attendance Trend</h3>
+              <p className="text-[12px] text-[#888888]">Weekly rate — 2026-08-01 → 2026-08-31</p>
+            </div>
+            <div className="flex-1 mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={attendanceTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <YAxis domain={[90, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="rate" name="Attendance %" stroke="#9333EA" strokeWidth={3} dot={{ r: 4, fill: '#9333EA', strokeWidth: 2, stroke: '#fff' }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Charts Row 6 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recruitment Pipeline */}
+          <div className="horilla-card horilla-card-gradient-top-red-orange p-5 flex flex-col h-80">
+            <div>
+              <h3 className="text-[15px] font-bold text-[#333333]">Recruitment Pipeline</h3>
+              <p className="text-[12px] text-[#888888]">Candidates by stage per recruitment</p>
+            </div>
+            <div className="flex-1 mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={recruitmentPipelineData} layout="vertical" margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                  <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <YAxis dataKey="role" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#333333' }} />
+                  <Tooltip />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
+                  <Bar dataKey="applied" name="Applied" stackId="a" fill="#E9573F" />
+                  <Bar dataKey="interview" name="Interview" stackId="a" fill="#F59E0B" />
+                  <Bar dataKey="offer" name="Offer" stackId="a" fill="#10B981" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Hiring Timeline */}
+          <div className="horilla-card horilla-card-gradient-top-orange-purple p-5 flex flex-col h-80">
+            <div>
+              <h3 className="text-[15px] font-bold text-[#333333]">Hiring Timeline</h3>
+              <p className="text-[12px] text-[#888888]">Employees joined by month</p>
+            </div>
+            <div className="flex-1 mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={hiringTimelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <Tooltip />
+                  <Bar dataKey="joined" name="Joined Employees" fill="#10B981" radius={[4, 4, 0, 0]} barSize={25} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Charts Row 7 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Employee Turnover */}
+          <div className="horilla-card horilla-card-gradient-top-purple-pink p-5 flex flex-col h-80">
+            <div>
+              <h3 className="text-[15px] font-bold text-[#333333]">Employee Turnover</h3>
+              <p className="text-[12px] text-[#888888]">6-month turnover rate: 2.1%</p>
+            </div>
+            <div className="flex-1 mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={employeeTurnoverData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888888' }} />
+                  <Tooltip />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
+                  <Bar dataKey="newHires" name="New Hires" fill="#10B981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="exits" name="Exits" fill="#E9573F" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
 
       </div>
+
     </div>
   );
 };

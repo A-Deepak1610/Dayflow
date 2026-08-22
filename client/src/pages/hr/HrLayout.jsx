@@ -18,7 +18,7 @@ export const HrLayout = () => {
         <HrHeader onOpenAddModal={() => setIsAddModalOpen(true)} />
 
         {/* Dynamic Page Content */}
-        <main className="flex-1 p-6 lg:p-8 space-y-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 w-full bg-[#F4F5F7]">
           <Outlet context={{ onOpenAddModal: () => setIsAddModalOpen(true) }} />
         </main>
       </div>
