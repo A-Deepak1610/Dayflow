@@ -1,63 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { Search, UserPlus, Bell, Activity, CheckCircle2 } from 'lucide-react';
-import { checkServerHealth } from '../../services/api';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { LogIn, Moon, Settings, HelpCircle, Bell, Building } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
-export const HrHeader = ({ title = 'HR Management Center', onOpenAddModal }) => {
-  const [health, setHealth] = useState(null);
+export const HrHeader = () => {
+  const { user } = useAuth();
+  const location = useLocation();
 
-  useEffect(() => {
-    const fetchHealth = async () => {
-      const res = await checkServerHealth();
-      if (res.ok) setHealth(res.data);
-    };
-    fetchHealth();
-  }, []);
+  const currentPath = location.pathname.split('/').pop();
+  const pageName = currentPath ? currentPath.charAt(0).toUpperCase() + currentPath.slice(1) : 'Dashboard';
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-3.5 flex items-center justify-between shadow-2xs">
-      {/* Title & Page Header */}
-      <div>
-        <h2 className="font-sora text-xl font-extrabold text-[#1F2A52] tracking-tight">
-          {title}
-        </h2>
-        <p className="text-xs text-slate-500">Dayflow HR Operations & Compliance</p>
-      </div>
-
-      {/* Center Global Search */}
-      <div className="hidden md:flex items-center relative w-72">
-        <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-        <input
-          type="text"
-          placeholder="Search employee, ID, department..."
-          className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition"
-        />
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+      {/* Breadcrumbs */}
+      <div className="flex items-center gap-2 text-[14px] font-medium">
+        <span className="text-[#888888]">Horilla</span>
+        <span className="text-[#888888]">&gt;</span>
+        <span className="text-horilla-primary">{pageName}</span>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3">
-        {/* Database Telemetry Badge */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-mono text-slate-600">
-          <Activity className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
-          <span>DB:</span>
-          <span className="font-semibold text-emerald-600">
-            {health?.database?.status === 'connected' ? 'TiDB Connected' : 'Online'}
-          </span>
+      <div className="flex items-center gap-4">
+        {/* Check In Button */}
+        <button className="px-5 py-2 bg-[#E6F4EA] text-[#28A745] font-semibold text-[13px] rounded-lg shadow-sm cursor-pointer flex items-center gap-2 transition hover:bg-[#D4EDDA]">
+          <LogIn className="w-4 h-4" />
+          <span>Check In</span>
+        </button>
+
+        {/* Icon Group */}
+        <div className="flex items-center gap-3">
+          <button className="w-9 h-9 rounded-full bg-horilla-primary-light text-horilla-primary flex items-center justify-center cursor-pointer transition hover:bg-horilla-primary hover:text-white">
+            <Moon className="w-4 h-4" />
+          </button>
+          <button className="w-9 h-9 rounded-full bg-horilla-primary-light text-horilla-primary flex items-center justify-center cursor-pointer transition hover:bg-horilla-primary hover:text-white">
+            <Settings className="w-4 h-4" />
+          </button>
+          <button className="w-9 h-9 rounded-full bg-horilla-primary-light text-horilla-primary flex items-center justify-center cursor-pointer transition hover:bg-horilla-primary hover:text-white">
+            <HelpCircle className="w-4 h-4" />
+          </button>
+          <button className="w-9 h-9 rounded-full bg-horilla-primary-light text-horilla-primary flex items-center justify-center cursor-pointer transition hover:bg-horilla-primary hover:text-white relative">
+            <Bell className="w-4 h-4" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#28A745] absolute top-0 right-0 border-2 border-white" />
+          </button>
+          <button className="w-9 h-9 rounded-full bg-horilla-primary-light text-horilla-primary flex items-center justify-center cursor-pointer transition hover:bg-horilla-primary hover:text-white">
+            <Building className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* Quick Onboard Employee Action Button */}
-        <button
-          onClick={onOpenAddModal}
-          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-sora font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition cursor-pointer flex items-center gap-1.5"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span className="hidden sm:inline">Onboard Employee</span>
-        </button>
-
-        {/* Notification Bell */}
-        <button className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 relative cursor-pointer transition">
-          <Bell className="w-4 h-4" />
-          <span className="w-2 h-2 rounded-full bg-emerald-500 absolute top-1.5 right-1.5 ring-2 ring-white" />
-        </button>
+        {/* User Profile */}
+        <div className="flex items-center gap-3 ml-2 border-l border-slate-200 pl-6">
+          <div className="w-10 h-10 rounded-full bg-horilla-primary text-white flex items-center justify-center font-bold text-sm shadow-sm relative">
+            {user?.firstName?.[0] || 'A'}
+            {user?.lastName?.[0] || 'A'}
+            <span className="w-3 h-3 rounded-full bg-red-500 absolute bottom-0 right-0 border-2 border-white" />
+          </div>
+          <div>
+            <p className="text-[14px] font-bold text-[#333333] leading-tight">
+              {user?.firstName || 'Adam'} {user?.lastName || 'Admin'}
+            </p>
+            <p className="text-[12px] text-[#888888]">Offline</p>
+          </div>
+        </div>
       </div>
     </header>
   );
