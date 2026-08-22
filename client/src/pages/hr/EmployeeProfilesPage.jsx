@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { Search, UserPlus, Mail, Phone, Briefcase, Building, Loader2 } from 'lucide-react';
-import { fetchAllEmployeesApi } from '../../services/api';
+import { Search, UserPlus, Mail, Phone, Briefcase, Building, Sparkles } from 'lucide-react';
 
 export const EmployeeProfilesPage = () => {
   const { onOpenAddModal } = useOutletContext();
@@ -49,17 +48,17 @@ export const EmployeeProfilesPage = () => {
   });
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-[#0a0a0a] min-h-screen text-slate-100 font-inter">
       {/* Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-[24px] font-bold text-[#333333]">Employee Directory</h1>
-          <p className="text-[13px] text-[#888888] mt-1">Manage employee profiles and records (Live Database)</p>
+          <h1 className="text-2xl font-extrabold text-white font-sora">Employee Directory</h1>
+          <p className="text-xs text-slate-400 mt-1">Manage personnel records, roles, and profiles</p>
         </div>
 
         <button
           onClick={onOpenAddModal}
-          className="px-5 py-2.5 bg-horilla-primary hover:bg-horilla-primary-hover text-white font-semibold text-[13px] rounded-lg shadow-sm cursor-pointer flex items-center gap-2 transition"
+          className="px-4 py-2 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-semibold text-xs rounded-xl shadow-md shadow-[#FF5D7A]/20 cursor-pointer flex items-center gap-2 transition"
         >
           <UserPlus className="w-4 h-4" />
           <span>Create Employee</span>
@@ -67,15 +66,15 @@ export const EmployeeProfilesPage = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row items-center gap-4 mb-6">
+      <div className="bg-[#111113] border border-white/10 rounded-2xl p-4 shadow-md flex flex-col sm:flex-row items-center gap-4 mb-6">
         <div className="relative w-full sm:w-96">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search employees by name, email, or ID..."
+            placeholder="Search by name, email, or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] text-[#333333] focus:bg-white focus:border-horilla-primary outline-none transition"
+            className="w-full pl-9 pr-4 py-2 bg-[#18181b] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:border-[#FF5D7A] outline-none transition"
           />
         </div>
 
@@ -84,7 +83,7 @@ export const EmployeeProfilesPage = () => {
           <select
             value={deptFilter}
             onChange={(e) => setDeptFilter(e.target.value)}
-            className="w-full sm:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] font-medium text-[#333333] outline-none focus:border-horilla-primary"
+            className="w-full sm:w-auto px-4 py-2 bg-[#18181b] border border-white/10 rounded-xl text-xs font-semibold text-white outline-none focus:border-[#FF5D7A]"
           >
             <option value="ALL">All Departments</option>
             <option value="Engineering">Engineering</option>
@@ -107,21 +106,21 @@ export const EmployeeProfilesPage = () => {
       )}
 
       {/* Employee Cards Grid */}
-      {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map((emp) => (
-            <div 
-              key={emp.id} 
-              onClick={() => navigate(`/hr/employees/${emp.id}`)}
-              className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col"
-            >
-              {/* Card Header (Avatar & Status) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filtered.map((emp) => (
+          <div 
+            key={emp.id} 
+            onClick={() => navigate(`/hr/employees/${emp.id}`)}
+            className="horilla-card p-5 cursor-pointer flex flex-col justify-between"
+          >
+            <div>
+              {/* Card Header */}
               <div className="flex items-start justify-between mb-4">
-                <div className="w-14 h-14 rounded-full bg-horilla-primary text-white flex items-center justify-center text-[18px] font-bold shadow-sm">
-                  {emp.name.split(' ').map(n=>n[0]).join('').slice(0, 2)}
+                <div className="w-12 h-12 rounded-xl bg-[#FF5D7A] text-white flex items-center justify-center font-sora font-extrabold text-sm shadow-md shadow-[#FF5D7A]/20">
+                  {emp.name.split(' ').map(n=>n[0]).join('')}
                 </div>
-                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
-                  emp.status === 'Active' ? 'bg-[#E6F4EA] text-[#10B981]' : 'bg-[#FEF3C7] text-[#F59E0B]'
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase tracking-wider ${
+                  emp.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                 }`}>
                   {emp.status}
                 </span>
@@ -129,49 +128,44 @@ export const EmployeeProfilesPage = () => {
 
               {/* Name & Role */}
               <div>
-                <h3 className="text-[16px] font-bold text-[#333333] hover:text-horilla-primary transition">
-                  {emp.name}
-                </h3>
-                <p className="text-[12px] font-semibold text-horilla-primary mt-0.5">{emp.position}</p>
-                <p className="text-[11px] text-[#888888]">{emp.loginId}</p>
+                <h3 className="text-base font-sora font-bold text-white">{emp.name}</h3>
+                <p className="text-xs font-semibold text-[#FF5D7A] mt-0.5">{emp.role}</p>
               </div>
+
+              <div className="my-4 border-t border-white/10"></div>
 
               {/* Details List */}
-              <div className="mt-4 pt-4 border-t border-slate-100 space-y-2 flex-1">
-                <div className="flex items-center gap-2 text-[12px] text-[#666666]">
-                  <Mail className="w-3.5 h-3.5 text-[#888888]" />
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <Briefcase className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span className="truncate">{emp.dept}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <span className="truncate">{emp.email}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[12px] text-[#666666]">
-                  <Phone className="w-3.5 h-3.5 text-[#888888]" />
-                  <span>{emp.phone}</span>
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span className="truncate">{emp.phone}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[12px] text-[#666666]">
-                  <Building className="w-3.5 h-3.5 text-[#888888]" />
-                  <span>{emp.dept}</span>
-                </div>
-              </div>
-
-              {/* Card Footer (Salary & Action) */}
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-[#888888] block">Annual CTC</span>
-                  <span className="text-[13px] font-bold text-[#333333]">{emp.salary}</span>
-                </div>
-                <span className="text-[11px] font-semibold text-horilla-primary hover:underline">
-                  View Profile →
-                </span>
               </div>
             </div>
           ))}
 
-          {filtered.length === 0 && (
-            <div className="col-span-full py-12 text-center text-slate-400">
-              No employees found matching the search criteria.
+            <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span className="text-[10px] text-slate-500 font-mono">{emp.id}</span>
+              <span className="text-xs font-bold text-[#FF5D7A]">Profile &rarr;</span>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        ))}
+
+        {filtered.length === 0 && (
+          <div className="col-span-full py-12 text-center horilla-card p-6">
+            <p className="text-slate-400 text-xs font-mono">No personnel match the specified search parameters.</p>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 };
