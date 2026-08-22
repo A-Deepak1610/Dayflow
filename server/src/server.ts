@@ -30,13 +30,13 @@ app.get('/', (_req, res) => {
 });
 
 // Global Error Handler
-app.use(errorHandler);
+app.use(errorHandler); 
 
 // Start Server
 app.listen(config.port, async () => {
   console.log(`🚀 Server running on http://localhost:${config.port}`);
   try {
-    await prisma.$connect();
+    await prisma.$connect();         
     await prisma.$queryRaw`SELECT 1`;
     console.log(`✅ [Database] Successfully connected to TiDB MySQL Database via Prisma`);
   } catch (error: any) {
