@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Users, UserCheck, Calendar, Briefcase, Settings, RefreshCcw, Plus
 } from 'lucide-react';
@@ -148,7 +149,7 @@ export const HrDashboard = () => {
             Customize
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Top Section with Right Sidebar */}
       <div className="flex flex-col xl:flex-row gap-6 mb-6">
