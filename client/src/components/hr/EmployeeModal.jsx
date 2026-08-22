@@ -113,7 +113,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
         {/* Header */}
         <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#1F2A52] text-[#FF5D7A] flex items-center justify-center font-bold text-sm shadow-md">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
               {isEditMode ? 'EP' : 'OE'}
             </div>
             <div>
@@ -139,7 +139,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
               <button
                 onClick={() => setProfileTab('personal')}
                 className={`flex-1 py-2 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
-                  profileTab === 'personal' ? 'bg-[#1F2A52] text-white shadow-sm' : 'text-slate-600 hover:text-[#1F2A52]'
+                  profileTab === 'personal' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-[#1F2A52]'
                 }`}
               >
                 Personal & Job Details
@@ -147,7 +147,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
               <button
                 onClick={() => setProfileTab('salary')}
                 className={`flex-1 py-2 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
-                  profileTab === 'salary' ? 'bg-[#1F2A52] text-white shadow-sm' : 'text-slate-600 hover:text-[#1F2A52]'
+                  profileTab === 'salary' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-[#1F2A52]'
                 }`}
               >
                 Salary Structure
@@ -155,7 +155,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
               <button
                 onClick={() => setProfileTab('documents')}
                 className={`flex-1 py-2 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
-                  profileTab === 'documents' ? 'bg-[#1F2A52] text-white shadow-sm' : 'text-slate-600 hover:text-[#1F2A52]'
+                  profileTab === 'documents' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-[#1F2A52]'
                 }`}
               >
                 Documents Vault
@@ -172,7 +172,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                   </div>
                   <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
                     <p className="text-slate-500">System Login ID</p>
-                    <p className="font-mono font-bold text-[#FF5D7A] text-sm">{selectedEmployee.id}</p>
+                    <p className="font-mono font-bold text-emerald-700 text-sm">{selectedEmployee.id}</p>
                   </div>
                 </div>
 
@@ -194,7 +194,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                   </div>
                   <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
                     <p className="text-slate-500">Role Privilege</p>
-                    <span className="font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">{roleName}</span>
+                    <span className="font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">{roleName}</span>
                   </div>
                 </div>
               </div>
@@ -203,12 +203,12 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
             {/* TAB 2: Salary Structure */}
             {profileTab === 'salary' && (
               <div className="space-y-4 text-xs">
-                <div className="p-4 bg-[#1F2A52] text-white rounded-2xl flex items-center justify-between">
+                <div className="p-4 bg-emerald-950 text-white rounded-2xl flex items-center justify-between border border-emerald-900">
                   <div>
-                    <p className="text-xs text-slate-300">Annual Net Package</p>
+                    <p className="text-xs text-emerald-300">Annual Net Package</p>
                     <p className="font-sora text-2xl font-bold text-emerald-400">${(calculatedSalary.netPay * 12).toLocaleString()}</p>
                   </div>
-                  <DollarSign className="w-8 h-8 text-[#FF5D7A]" />
+                  <DollarSign className="w-8 h-8 text-emerald-400" />
                 </div>
 
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
@@ -250,7 +250,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                 ].map((doc, i) => (
                   <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <FileText className="w-4 h-4 text-[#FF5D7A]" />
+                      <FileText className="w-4 h-4 text-emerald-600" />
                       <div>
                         <p className="font-semibold text-[#1F2A52]">{doc.name}</p>
                         <p className="text-[10px] text-slate-400">{doc.size} • Uploaded {doc.date}</p>
@@ -274,14 +274,14 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                 <p className="text-slate-600">The system has generated their official credentials and dispatched a welcome email.</p>
 
                 <div className="p-4 bg-white border border-emerald-300 rounded-xl font-mono space-y-1.5 text-slate-700">
-                  <p><span className="text-slate-400">Assigned Login ID:</span> <strong className="text-[#FF5D7A] text-sm">{successData.loginId}</strong></p>
+                  <p><span className="text-slate-400">Assigned Login ID:</span> <strong className="text-emerald-700 text-sm">{successData.loginId}</strong></p>
                   <p><span className="text-slate-400">Temporary Password:</span> <strong>{successData.password}</strong></p>
                   <p><span className="text-slate-400">Sent to Email:</span> {successData.email}</p>
                 </div>
 
                 <button
                   onClick={() => setSuccessData(null)}
-                  className="w-full py-2.5 bg-[#1F2A52] text-white font-bold rounded-xl text-xs cursor-pointer shadow-md"
+                  className="w-full py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md"
                 >
                   Onboard Another Team Member
                 </button>
@@ -304,7 +304,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                       placeholder="e.g. Sarah"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-[#FF5D7A] outline-none"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-emerald-500 outline-none"
                     />
                   </div>
                   <div>
@@ -315,7 +315,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                       placeholder="e.g. Jenkins"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-[#FF5D7A] outline-none"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-emerald-500 outline-none"
                     />
                   </div>
                 </div>
@@ -328,7 +328,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                     placeholder="sarah.j@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-[#FF5D7A] outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-emerald-500 outline-none"
                   />
                 </div>
 
@@ -340,7 +340,7 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                       placeholder="+1 555-0192"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-[#FF5D7A] outline-none"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-emerald-500 outline-none"
                     />
                   </div>
 
@@ -374,13 +374,13 @@ export const EmployeeModal = ({ isOpen, onClose, selectedEmployee = null }) => {
                 </div>
 
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-500">
-                  📌 System auto-generates Login ID format: <code className="text-[#FF5D7A] font-bold">COMP-EMP-2026-0001</code>
+                  📌 System auto-generates Login ID format: <code className="text-emerald-700 font-bold">COMP-EMP-2026-0001</code>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-[#FF5D7A] hover:bg-[#FF4263] text-white rounded-xl font-sora font-bold text-xs shadow-md cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-sora font-bold text-xs shadow-md cursor-pointer flex items-center justify-center gap-2"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Issue Credentials & Onboard</span>}
                 </button>

@@ -40,12 +40,12 @@ export const PayrollAnalyticsPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-sora text-2xl font-bold text-[#1F2A52]">Payroll Control & Reports</h1>
-          <p className="text-xs text-slate-500">SRS 3.6: Manage salary structures, payroll accuracy, salary slips & analytics reports</p>
+          <p className="text-xs text-slate-500">Manage salary structures, payroll accuracy, salary slips & analytics reports</p>
         </div>
 
         <button
           onClick={() => alert('Generating August 2026 Payroll Summary PDF Report...')}
-          className="px-4 py-2 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-bold text-xs rounded-xl shadow-md cursor-pointer flex items-center gap-1.5 shrink-0"
+          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-sora font-bold text-xs rounded-xl shadow-md cursor-pointer flex items-center gap-1.5 shrink-0"
         >
           <Download className="w-4 h-4" />
           <span>Export Payroll Report</span>
@@ -54,13 +54,13 @@ export const PayrollAnalyticsPage = () => {
 
       {/* Summary KPI Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-[#1F2A52] text-white rounded-3xl p-6 shadow-md flex items-center justify-between">
+        <div className="bg-emerald-950 text-white rounded-3xl p-6 shadow-md flex items-center justify-between border border-emerald-900">
           <div>
-            <p className="text-xs text-slate-300">Total August Payroll</p>
+            <p className="text-xs text-emerald-300">Total August Payroll</p>
             <p className="font-sora text-3xl font-extrabold text-emerald-400 mt-1">${totalPayroll.toLocaleString()}</p>
-            <p className="text-[11px] text-slate-400 mt-1">Direct deposit scheduled</p>
+            <p className="text-[11px] text-emerald-400/80 mt-1 font-mono">Direct deposit scheduled</p>
           </div>
-          <DollarSign className="w-8 h-8 text-[#FF5D7A]" />
+          <DollarSign className="w-8 h-8 text-emerald-400" />
         </div>
 
         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex items-center justify-between">
@@ -78,7 +78,7 @@ export const PayrollAnalyticsPage = () => {
             <p className="font-sora text-3xl font-extrabold text-[#1F2A52] mt-1">${Math.round(totalPayroll / employees.length).toLocaleString()}</p>
             <p className="text-xs text-slate-500 font-medium mt-1">Per employee / month</p>
           </div>
-          <BarChart3 className="w-8 h-8 text-purple-600" />
+          <BarChart3 className="w-8 h-8 text-emerald-600" />
         </div>
       </div>
 
@@ -126,8 +126,8 @@ export const PayrollAnalyticsPage = () => {
                   </td>
                   <td className="py-3.5 px-3 font-mono text-emerald-700">+${emp.hra.toLocaleString()}</td>
                   <td className="py-3.5 px-3 font-mono text-emerald-700">+${emp.allowances.toLocaleString()}</td>
-                  <td className="py-3.5 px-3 font-mono text-rose-600">-${emp.pf.toLocaleString()}</td>
-                  <td className="py-3.5 px-3 font-mono text-rose-600">-${emp.tax.toLocaleString()}</td>
+                  <td className="py-3.5 px-3 font-mono text-slate-600">-${emp.pf.toLocaleString()}</td>
+                  <td className="py-3.5 px-3 font-mono text-slate-600">-${emp.tax.toLocaleString()}</td>
                   <td className="py-3.5 px-3 font-mono font-bold text-[#1F2A52]">${emp.netPay.toLocaleString()}</td>
                   <td className="py-3.5 px-3 text-right">
                     {editingId === emp.id ? (
@@ -140,7 +140,7 @@ export const PayrollAnalyticsPage = () => {
                     ) : (
                       <button
                         onClick={() => { setEditingId(emp.id); setEditBase(emp.basePay); }}
-                        className="px-2.5 py-1 bg-slate-100 hover:bg-[#1F2A52] text-[#1F2A52] hover:text-white rounded font-semibold text-[11px] border border-slate-200 transition"
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-emerald-600 text-[#1F2A52] hover:text-white rounded font-semibold text-[11px] border border-slate-200 transition"
                       >
                         Edit Base
                       </button>

@@ -34,7 +34,7 @@ export const EmployeeProfilesPage = () => {
 
         <button
           onClick={onOpenAddModal}
-          className="px-4 py-2.5 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-bold text-xs rounded-xl shadow-md cursor-pointer flex items-center gap-1.5 shrink-0"
+          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-sora font-bold text-xs rounded-xl shadow-md cursor-pointer flex items-center gap-1.5 shrink-0"
         >
           <UserPlus className="w-4 h-4" />
           <span>Onboard New Employee</span>
@@ -50,7 +50,7 @@ export const EmployeeProfilesPage = () => {
             placeholder="Search by name, email or Login ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-[#FF5D7A] outline-none"
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] focus:bg-white focus:border-emerald-500 outline-none"
           />
         </div>
 
@@ -89,10 +89,10 @@ export const EmployeeProfilesPage = () => {
             <tbody className="divide-y divide-slate-100">
               {filtered.map((emp) => (
                 <tr key={emp.id} className="hover:bg-slate-50 transition">
-                  <td className="py-3.5 px-4 font-mono font-bold text-[#FF5D7A]">{emp.id}</td>
+                  <td className="py-3.5 px-4 font-mono font-bold text-emerald-700">{emp.id}</td>
                   <td className="py-3.5 px-4 font-semibold text-[#1F2A52]">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-[#1F2A52] text-white flex items-center justify-center text-[10px] font-bold">
+                      <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
                         {emp.name.split(' ').map(n=>n[0]).join('')}
                       </div>
                       <span>{emp.name}</span>
@@ -102,7 +102,7 @@ export const EmployeeProfilesPage = () => {
                   <td className="py-3.5 px-4 text-slate-700 font-medium">{emp.dept}</td>
                   <td className="py-3.5 px-4">
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      emp.role === 'ADMIN' ? 'bg-rose-100 text-rose-700' : emp.role === 'HR' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                      emp.role === 'ADMIN' ? 'bg-emerald-800 text-white' : emp.role === 'HR' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
                     }`}>
                       {emp.role}
                     </span>
@@ -111,7 +111,7 @@ export const EmployeeProfilesPage = () => {
                   <td className="py-3.5 px-4 text-right">
                     <button
                       onClick={() => setSelectedEmpForView(emp)}
-                      className="px-3 py-1 bg-slate-100 hover:bg-[#1F2A52] text-[#1F2A52] hover:text-white border border-slate-200 rounded-lg font-semibold transition cursor-pointer flex items-center gap-1 ml-auto"
+                      className="px-3 py-1 bg-slate-100 hover:bg-emerald-600 text-[#1F2A52] hover:text-white border border-slate-200 rounded-lg font-semibold transition cursor-pointer flex items-center gap-1 ml-auto"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>View Profile</span>

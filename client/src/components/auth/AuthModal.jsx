@@ -241,7 +241,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             }}
             className={`flex-1 py-2 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
               mode === 'login'
-                ? 'bg-[#FF5D7A] text-white shadow-sm'
+                ? 'bg-emerald-600 text-white shadow-sm'
                 : 'text-slate-600 hover:text-[#1F2A52]'
             }`}
           >
@@ -256,7 +256,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             }}
             className={`flex-1 py-2 text-xs font-sora font-semibold rounded-lg transition cursor-pointer ${
               mode === 'signup'
-                ? 'bg-[#FF5D7A] text-white shadow-sm'
+                ? 'bg-emerald-600 text-white shadow-sm'
                 : 'text-slate-600 hover:text-[#1F2A52]'
             }`}
           >

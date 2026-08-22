@@ -2,12 +2,11 @@
 
 @layer base {
   :root {
+    --dayflow-emerald: #10B981;
+    --dayflow-emerald-hover: #059669;
+    --dayflow-emerald-dark: #047857;
+    --dayflow-emerald-glow: rgba(16, 185, 129, 0.15);
     --dayflow-navy: #1F2A52;
-    --dayflow-navy-dark: #121A36;
-    --dayflow-navy-light: #2A386C;
-    --dayflow-coral: #FF5D7A;
-    --dayflow-coral-hover: #FF4263;
-    --dayflow-coral-glow: rgba(255, 93, 122, 0.15);
     --font-heading: 'Sora', sans-serif;
     --font-body: 'Inter', sans-serif;
   }
@@ -37,7 +36,7 @@
   }
 }
 
-/* Custom Design System Utility Classes for Light Theme */
+/* Custom Design System Utility Classes for White & Green Light Theme */
 .font-sora {
   font-family: 'Sora', sans-serif;
 }
@@ -46,39 +45,31 @@
   font-family: 'Inter', sans-serif;
 }
 
-.bg-dayflow-navy {
-  background-color: #1F2A52;
+.bg-dayflow-emerald {
+  background-color: #10B981;
 }
 
-.text-dayflow-navy {
-  color: #1F2A52;
+.text-dayflow-emerald {
+  color: #10B981;
 }
 
-.bg-dayflow-coral {
-  background-color: #FF5D7A;
+.border-dayflow-emerald {
+  border-color: #10B981;
 }
 
-.text-dayflow-coral {
-  color: #FF5D7A;
-}
-
-.border-dayflow-coral {
-  border-color: #FF5D7A;
-}
-
-.coral-shadow {
-  box-shadow: 0 10px 25px -5px rgba(255, 93, 122, 0.3);
+.emerald-shadow {
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3);
 }
 
 .light-glass-panel {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .gradient-text-light {
-  background: linear-gradient(135deg, #1F2A52 0%, #3B82F6 50%, #FF5D7A 100%);
+  background: linear-gradient(135deg, #1F2A52 0%, #059669 50%, #10B981 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -98,7 +89,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #FF5D7A;
+  background: #10B981;
 }
 
 /* Keyframes for modal fade-in & pop */

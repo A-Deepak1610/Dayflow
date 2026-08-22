@@ -29,7 +29,7 @@ export const HrHeader = ({ title = 'HR Management Center', onOpenAddModal }) => 
         <input
           type="text"
           placeholder="Search employee, ID, department..."
-          className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-[#FF5D7A] focus:bg-white transition"
+          className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#1F2A52] placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition"
         />
       </div>
 
@@ -47,16 +47,16 @@ export const HrHeader = ({ title = 'HR Management Center', onOpenAddModal }) => 
         {/* Quick Onboard Employee Action Button */}
         <button
           onClick={onOpenAddModal}
-          className="px-4 py-2 bg-[#FF5D7A] hover:bg-[#FF4263] text-white font-sora font-bold text-xs rounded-xl shadow-md shadow-[#FF5D7A]/20 transition cursor-pointer flex items-center gap-1.5"
+          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-sora font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition cursor-pointer flex items-center gap-1.5"
         >
           <UserPlus className="w-4 h-4" />
           <span className="hidden sm:inline">Onboard Employee</span>
         </button>
 
         {/* Notification Bell */}
-        <button className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 relative cursor-pointer">
+        <button className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 relative cursor-pointer transition">
           <Bell className="w-4 h-4" />
-          <span className="w-2 h-2 rounded-full bg-[#FF5D7A] absolute top-1.5 right-1.5 ring-2 ring-white" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 absolute top-1.5 right-1.5 ring-2 ring-white" />
         </button>
       </div>
     </header>
