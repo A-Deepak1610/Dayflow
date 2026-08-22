@@ -1,4 +1,5 @@
 import express from 'express';
+// Server entry point
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
