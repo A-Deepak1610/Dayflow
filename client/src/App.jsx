@@ -18,8 +18,10 @@ import HelpdeskPage from './pages/hr/HelpdeskPage';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
+import EmployeeDirectory from './pages/employee/EmployeeDirectory';
 import MyAttendance from './pages/employee/MyAttendance';
-import { MyLeaves, MyPayslips } from './pages/employee/MyLeaves';
+import MyLeaves from './pages/employee/MyLeaves';
+import MyPayslips from './pages/employee/MyPayslips';
 
 // Protected Route Component for HR / Admin
 const HrRoute = ({ children }) => {
@@ -70,6 +72,22 @@ function AppRoutes() {
         element={
           <EmployeeRoute>
             <EmployeeDashboard />
+          </EmployeeRoute>
+        }
+      />
+      <Route
+        path="/employee/profile"
+        element={
+          <EmployeeRoute>
+            <EmployeeDirectory initialTab="my-profile" />
+          </EmployeeRoute>
+        }
+      />
+      <Route
+        path="/employee/directory"
+        element={
+          <EmployeeRoute>
+            <EmployeeDirectory initialTab="directory" />
           </EmployeeRoute>
         }
       />
