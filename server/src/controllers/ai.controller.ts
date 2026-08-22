@@ -103,7 +103,7 @@ export const handleAiChat = async (req: Request, res: Response): Promise<void> =
     }
 
     // Call Google Gemini API
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const formattedContents = [
       {
@@ -155,7 +155,7 @@ export const handleAiChat = async (req: Request, res: Response): Promise<void> =
     res.json({
       ok: true,
       reply: replyText,
-      source: 'gemini-1.5-flash'
+      source: 'gemini-3.6-flash'
     });
 
   } catch (error: any) {
