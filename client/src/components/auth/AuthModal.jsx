@@ -16,7 +16,7 @@ import {
   Loader2,
   X
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 import { useAuth } from '../../context/AuthContext';
 import { registerCompanyApi, loginApi } from '../../services/api';
 
