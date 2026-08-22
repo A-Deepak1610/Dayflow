@@ -96,14 +96,22 @@ export const HrDashboard = () => {
   ];
 
   return (
-    <div className="p-6">
-      
-      {/* Header Row */}
-      <div className="flex flex-col xl:flex-row xl:items-start justify-between mb-6 gap-4">
-        <div>
-          <h1 className="text-[24px] font-bold text-[#333333]">Dashboard</h1>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-[13px] text-[#888888]">Saturday, August 22, 2026</span>
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-inter flex flex-col">
+      {/* Top HR Admin Navigation */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="w-9 h-9 rounded-xl bg-[#1F2A52] text-[#FF5D7A] flex items-center justify-center font-sora font-bold text-sm">
+                DF
+              </div>
+              <span className="font-sora text-lg font-extrabold text-[#1F2A52]">
+                Dayflow <span className="text-[#FF5D7A]">HR Admin</span>
+              </span>
+            </Link>
+            <span className="hidden sm:inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-100 text-[#FF5D7A] border border-rose-200">
+              Admin Portal
+            </span>
           </div>
           <div className="flex items-center gap-1.5 mt-1">
             <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div>

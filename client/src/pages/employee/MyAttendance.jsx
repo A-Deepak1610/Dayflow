@@ -10,7 +10,7 @@ export const MyAttendance = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-inter p-6">
+    <div className="text-slate-900 font-inter p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         <Link to="/employee/dashboard" className="text-xs font-semibold text-slate-600 hover:text-[#1F2A52] flex items-center gap-1">
           <ArrowLeft className="w-4 h-4" />
