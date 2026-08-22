@@ -11,6 +11,8 @@ import EmployeeProfilesPage from './pages/hr/EmployeeProfilesPage';
 import AttendanceMonitorPage from './pages/hr/AttendanceMonitorPage';
 import LeaveManagementPage from './pages/hr/LeaveManagementPage';
 import PayrollAnalyticsPage from './pages/hr/PayrollAnalyticsPage';
+import EmployeeProfileDetail from './pages/hr/EmployeeProfileDetail';
+import PerformanceAnalyticsPage from './pages/hr/PerformanceAnalyticsPage';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -52,9 +54,11 @@ function AppRoutes() {
         <Route index element={<Navigate to="/hr/dashboard" replace />} />
         <Route path="dashboard" element={<HrDashboard />} />
         <Route path="employees" element={<EmployeeProfilesPage />} />
+        <Route path="employees/:id" element={<EmployeeProfileDetail />} />
         <Route path="attendance" element={<AttendanceMonitorPage />} />
         <Route path="leaves" element={<LeaveManagementPage />} />
         <Route path="payroll" element={<PayrollAnalyticsPage />} />
+        <Route path="performance" element={<PerformanceAnalyticsPage />} />
       </Route>
 
       {/* Employee Self-Service Pages */}
