@@ -13,6 +13,7 @@ import LeaveManagementPage from './pages/hr/LeaveManagementPage';
 import PayrollAnalyticsPage from './pages/hr/PayrollAnalyticsPage';
 import EmployeeProfileDetail from './pages/hr/EmployeeProfileDetail';
 import PerformanceAnalyticsPage from './pages/hr/PerformanceAnalyticsPage';
+import HelpdeskPage from './pages/hr/HelpdeskPage';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -59,6 +60,7 @@ function AppRoutes() {
         <Route path="leaves" element={<LeaveManagementPage />} />
         <Route path="payroll" element={<PayrollAnalyticsPage />} />
         <Route path="performance" element={<PerformanceAnalyticsPage />} />
+        <Route path="helpdesk" element={<HelpdeskPage />} />
       </Route>
 
       {/* Employee Self-Service Pages */}

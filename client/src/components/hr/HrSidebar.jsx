@@ -32,12 +32,12 @@ export const HrSidebar = () => {
     { label: 'Attendance', path: '/hr/attendance', icon: CheckCircle2 },
     { label: 'Leave', path: '/hr/leaves', icon: XCircle },
     { label: 'Payroll', path: '/hr/payroll', icon: DollarSign },
-    { label: 'Recruitment', path: '/hr/recruitment', icon: Briefcase },
-    { label: 'Onboarding', path: '/hr/onboarding', icon: UserPlus },
-    { label: 'Offboarding', path: '/hr/offboarding', icon: UserMinus },
+    // { label: 'Recruitment', path: '/hr/recruitment', icon: Briefcase },
+    // { label: 'Onboarding', path: '/hr/onboarding', icon: UserPlus },
+    // { label: 'Offboarding', path: '/hr/offboarding', icon: UserMinus },
     { label: 'Performance', path: '/hr/performance', icon: TrendingUp },
-    { label: 'Project', path: '/hr/project', icon: FolderKanban },
-    { label: 'Assets', path: '/hr/assets', icon: MonitorSmartphone },
+    // { label: 'Project', path: '/hr/project', icon: FolderKanban },
+    // { label: 'Assets', path: '/hr/assets', icon: MonitorSmartphone },
     { label: 'Helpdesk', path: '/hr/helpdesk', icon: HeadphonesIcon },
   ];
 
